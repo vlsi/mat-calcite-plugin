@@ -1,0 +1,15 @@
+# Build results
+target/
+coverage-report/
+dependency-reduced-pom.xml
+/source/revision.txt
+
+#IDE projects
+.idea/
+*.iml
+
+# MacOS cache file
+.DS_Store
+
+# Windows image cache files
+Thumbs.db
