@@ -17,11 +17,11 @@ Sample
 Query that lists duplicate URLs:
 
 ```sql
-select "path", count(*), sum("@RETAINED"), sum("@SHALLOW")
-  from "java.net.URL"
- group by "path"
+select file, count(*) cnt, sum(`@RETAINED`) sum_retained, sum(`@SHALLOW`) sum_shallow
+  from `java.net.URL`
+ group by file
 having count(*)>1
- order by sum("@RETAINED") desc
+ order by sum(`@RETAINED`) desc
 ```
 
 To gen an explain plan, use `explain plan for select ...`:
@@ -29,8 +29,8 @@ To gen an explain plan, use `explain plan for select ...`:
 ```
 EnumerableSortRel(sort0=[$2], dir0=[Descending])
   EnumerableCalcRel(expr#0..3=[{inputs}], expr#4=[1], expr#5=[>($t1, $t4)], proj#0..3=[{exprs}], $condition=[$t5])
-    EnumerableAggregateRel(group=[{0}], EXPR$1=[COUNT()], EXPR$2=[SUM($1)], EXPR$3=[SUM($2)])
-      EnumerableCalcRel(expr#0..14=[{inputs}], path=[$t8], @RETAINED=[$t2], @SHALLOW=[$t1])
+    EnumerableAggregateRel(group=[{0}], cnt=[COUNT()], sum_retained=[SUM($1)], sum_shallow=[SUM($2)])
+      EnumerableCalcRel(expr#0..14=[{inputs}], file=[$t11], @RETAINED=[$t2], @SHALLOW=[$t1])
         EnumerableTableAccessRel(table=[[HEAP, java.net.URL]])
 ```
 
@@ -38,8 +38,8 @@ Heap schema
 -----------
 
 ### Each java class maps to a table. The table lists instances without subclasses
- For instance: "java.lang.Object", "java.lang.String"
- Note: you need to use double-quote identifiers
+ For instance: `java.lang.Object`, `java.lang.String`
+ Note: you need to use back-ticks to quote identifiers
  Note: it is assumed that classes sharing the same name have the same fields
 
  The fields become columns.
@@ -96,6 +96,9 @@ This library is distributed under terms of Apache 2 License
 
 Change log
 ----------
+v1.0.1
+  Updated optiq to 0.4.18: enable case-sensitive identifiers by default, back-tick quotes
+
 v1.0.0
   Proof of concept.
 

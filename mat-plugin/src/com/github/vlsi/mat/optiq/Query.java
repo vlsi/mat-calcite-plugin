@@ -75,7 +75,7 @@ public class Query implements IQuery {
 	@Override
 	public IResult execute(IProgressListener listener) throws Exception {
 		Class.forName("net.hydromatic.optiq.jdbc.Driver");
-		Connection connection = DriverManager.getConnection("jdbc:optiq:");
+		Connection connection = DriverManager.getConnection("jdbc:optiq:lex=JAVA");
 		OptiqConnection con = connection.unwrap(OptiqConnection.class);
 
 		SchemaPlus root = con.getRootSchema();
