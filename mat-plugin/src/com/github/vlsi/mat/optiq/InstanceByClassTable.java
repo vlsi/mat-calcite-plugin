@@ -106,7 +106,7 @@ public class InstanceByClassTable extends AbstractQueryableTable {
 						return classSpecific;
 					return ((IObject) res).getDisplayName();
 				}
-				return object;
+				return res;
 			} catch (SnapshotException e) {
 				e.printStackTrace();
 				return 0;
