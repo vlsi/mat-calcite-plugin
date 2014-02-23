@@ -20,12 +20,14 @@ import org.eclipse.mat.query.IResultTable;
 import org.eclipse.mat.query.ResultMetaData;
 import org.eclipse.mat.query.annotations.Argument;
 import org.eclipse.mat.query.annotations.Category;
+import org.eclipse.mat.query.annotations.CommandName;
 import org.eclipse.mat.query.annotations.Name;
 import org.eclipse.mat.snapshot.ISnapshot;
 import org.eclipse.mat.util.IProgressListener;
 
 @Name("SQL via optiq")
 @Category("SQL")
+@CommandName("optiq")
 public class Query implements IQuery {
 
 	@Argument
@@ -34,48 +36,11 @@ public class Query implements IQuery {
 	@Argument(flag = Argument.UNFLAGGED)
 	public String sql;
 
-	static class Result implements IResultTable {
-		@Override
-		public Object getColumnValue(Object row, int columnIndex) {
-			return null;
-		}
-
-		@Override
-		public Column[] getColumns() {
-			// TODO Auto-generated method stub
-			return null;
-		}
-
-		@Override
-		public IContextObject getContext(Object row) {
-			// TODO Auto-generated method stub
-			return null;
-		}
-
-		@Override
-		public ResultMetaData getResultMetaData() {
-			// TODO Auto-generated method stub
-			return null;
-		}
-
-		@Override
-		public Object getRow(int rowId) {
-			// TODO Auto-generated method stub
-			return null;
-		}
-
-		@Override
-		public int getRowCount() {
-			// TODO Auto-generated method stub
-			return 0;
-		}
-
-	}
-
 	@Override
 	public IResult execute(IProgressListener listener) throws Exception {
 		Class.forName("net.hydromatic.optiq.jdbc.Driver");
-		Connection connection = DriverManager.getConnection("jdbc:optiq:lex=JAVA");
+		Connection connection = DriverManager
+				.getConnection("jdbc:optiq:lex=JAVA");
 		OptiqConnection con = connection.unwrap(OptiqConnection.class);
 
 		SchemaPlus root = con.getRootSchema();

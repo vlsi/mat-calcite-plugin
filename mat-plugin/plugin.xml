@@ -7,5 +7,20 @@
             impl="com.github.vlsi.mat.optiq.Query">
       </query>
    </extension>
+   <extension
+         point="org.eclipse.mat.ui.editorContributions">
+      <contribution
+            class="com.github.vlsi.mat.optiq.editor.HeapEditorContributions"
+            editorClass="org.eclipse.mat.ui.snapshot.editor.HeapEditor"
+            sequenceNr="2">
+      </contribution>
+   </extension>
+   <extension
+         point="org.eclipse.mat.ui.editorPanes">
+      <pane
+            class="com.github.vlsi.mat.optiq.editor.OptiqPane"
+            id="OPTIQ">
+      </pane>
+   </extension>
 
 </plugin>
