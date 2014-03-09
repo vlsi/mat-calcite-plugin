@@ -3,12 +3,15 @@ package com.github.vlsi.mat.optiq.editor;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 
+import org.eclipse.core.commands.operations.IUndoContext;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.text.Document;
 import org.eclipse.jface.text.IDocument;
+import org.eclipse.jface.text.IUndoManagerExtension;
 import org.eclipse.jface.text.source.SourceViewer;
+import org.eclipse.jface.text.source.SourceViewerConfiguration;
 import org.eclipse.mat.query.IResult;
 import org.eclipse.mat.query.registry.QueryResult;
 import org.eclipse.mat.ui.editor.AbstractEditorPane;
@@ -23,9 +26,14 @@ import org.eclipse.swt.custom.StyledText;
 import org.eclipse.swt.events.KeyAdapter;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.ui.IActionBars;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorSite;
+import org.eclipse.ui.IWorkbenchCommandConstants;
 import org.eclipse.ui.PartInitException;
+import org.eclipse.ui.actions.ActionFactory;
+import org.eclipse.ui.operations.RedoActionHandler;
+import org.eclipse.ui.operations.UndoActionHandler;
 
 import com.github.vlsi.mat.optiq.action.ExecuteQueryAction;
 
@@ -42,6 +50,7 @@ public class OptiqPane extends CompositeHeapEditorPane {
 	public void createPartControl(Composite parent) {
 		SashForm sash = new SashForm(parent, SWT.VERTICAL | SWT.SMOOTH);
 		queryViewer = new SourceViewer(sash, null, SWT.MULTI | SWT.WRAP);
+		queryViewer.configure(new SourceViewerConfiguration());
 		queryString = queryViewer.getTextWidget();
 		queryString.setFont(JFaceResources.getFont(JFaceResources.TEXT_FONT));
 		queryString.addKeyListener(new KeyAdapter() {
@@ -65,6 +74,24 @@ public class OptiqPane extends CompositeHeapEditorPane {
 		queryViewer.setDocument(doc);
 		createContainer(sash);
 		makeActions();
+
+		installUndoRedoSupport();
+	}
+
+	private void installUndoRedoSupport() {
+		IUndoContext undoContext = ((IUndoManagerExtension) queryViewer.getUndoManager()).getUndoContext();
+
+		UndoActionHandler undoAction = new UndoActionHandler(getSite(), undoContext);
+		RedoActionHandler redoAction = new RedoActionHandler(getSite(), undoContext);
+
+		undoAction.setActionDefinitionId(IWorkbenchCommandConstants.EDIT_UNDO);
+		redoAction.setActionDefinitionId(IWorkbenchCommandConstants.EDIT_REDO);
+
+		IActionBars actionBars = getEditor().getEditorSite().getActionBars();
+		actionBars.setGlobalActionHandler(ActionFactory.UNDO.getId(), undoAction);
+		actionBars.setGlobalActionHandler(ActionFactory.REDO.getId(), redoAction);
+
+		actionBars.updateActionBars();
 	}
 
 	private IDocument createDocument() {
