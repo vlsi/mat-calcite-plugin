@@ -96,7 +96,7 @@ public class OptiqPane extends CompositeHeapEditorPane {
 
 	private IDocument createDocument() {
 		IDocument doc = new Document();
-		doc.set("select * from `java.net.URL`");
+		doc.set("select * from \"java.net.URL\"");
 		return doc;
 	}
 

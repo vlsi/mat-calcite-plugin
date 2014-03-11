@@ -19,8 +19,13 @@ public class HeapSchema extends AbstractSchema {
 	private Map<String, Table> tableMap;
 
 	public HeapSchema(SchemaPlus parentSchema, String name,
-			final ISnapshot snapshot) {
+			final ISnapshot snapshot, HeapSchema prototype) {
 		super(parentSchema, name);
+
+		if (prototype != null) {
+			this.tableMap = prototype.tableMap;
+			return;
+		}
 
 		Collection<IClass> classes;
 		try {
