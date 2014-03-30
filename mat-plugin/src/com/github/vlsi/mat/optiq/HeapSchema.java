@@ -12,8 +12,8 @@ import org.eclipse.mat.SnapshotException;
 import org.eclipse.mat.snapshot.ISnapshot;
 import org.eclipse.mat.snapshot.model.IClass;
 
-import com.google.common.base.Function;
-import com.google.common.collect.FluentIterable;
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableMap.Builder;
 
 public class HeapSchema extends AbstractSchema {
 	private Map<String, Table> tableMap;
@@ -34,18 +34,15 @@ public class HeapSchema extends AbstractSchema {
 			e.printStackTrace();
 			classes = Collections.emptyList();
 		}
-		tableMap = FluentIterable.from(classes)
-				.transform(new Function<IClass, String>() {
-					@Override
-					public String apply(IClass input) {
-						return input.getName();
-					}
-				}).toMap(new Function<String, Table>() {
-					@Override
-					public Table apply(String input) {
-						return new InstanceByClassTable(snapshot, input, false);
-					}
-				});
+		Builder<String, Table> builder = ImmutableMap.builder();
+		for (IClass klass : classes) {
+			String className = klass.getName();
+			builder.put(className, new InstanceByClassTable(snapshot,
+					className, false));
+			builder.put("instanceof " + className, new InstanceByClassTable(
+					snapshot, className, true));
+		}
+		tableMap = builder.build();
 	}
 
 	@Override
