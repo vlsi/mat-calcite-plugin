@@ -1,7 +1,6 @@
 package com.github.vlsi.mat.optiq.editor;
 
 import org.eclipse.jface.action.Action;
-import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.mat.ui.editor.MultiPaneEditor;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IWorkbenchPage;

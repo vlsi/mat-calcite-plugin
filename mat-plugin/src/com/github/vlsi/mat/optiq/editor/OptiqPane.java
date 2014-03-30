@@ -9,7 +9,9 @@ import org.eclipse.jface.action.Action;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.text.Document;
 import org.eclipse.jface.text.IDocument;
+import org.eclipse.jface.text.IDocumentPartitioner;
 import org.eclipse.jface.text.IUndoManagerExtension;
+import org.eclipse.jface.text.rules.FastPartitioner;
 import org.eclipse.jface.text.source.SourceViewer;
 import org.eclipse.jface.text.source.SourceViewerConfiguration;
 import org.eclipse.mat.query.IResult;
@@ -50,7 +52,7 @@ public class OptiqPane extends CompositeHeapEditorPane {
 	public void createPartControl(Composite parent) {
 		SashForm sash = new SashForm(parent, SWT.VERTICAL | SWT.SMOOTH);
 		queryViewer = new SourceViewer(sash, null, SWT.MULTI | SWT.WRAP);
-		queryViewer.configure(new SourceViewerConfiguration());
+		queryViewer.configure(new OptiqSourceViewerConfiguration());
 		queryString = queryViewer.getTextWidget();
 		queryString.setFont(JFaceResources.getFont(JFaceResources.TEXT_FONT));
 		queryString.addKeyListener(new KeyAdapter() {
@@ -71,7 +73,15 @@ public class OptiqPane extends CompositeHeapEditorPane {
 		});
 
 		IDocument doc = createDocument();
+		SourceViewerConfiguration svc = new OptiqSourceViewerConfiguration();
+		IDocumentPartitioner partitioner = new FastPartitioner(
+				new OptiqPartitionScanner(),
+				svc.getConfiguredContentTypes(queryViewer));
+		partitioner.connect(doc);
+		doc.setDocumentPartitioner(partitioner);
 		queryViewer.setDocument(doc);
+		queryViewer.configure(svc);
+
 		createContainer(sash);
 		makeActions();
 

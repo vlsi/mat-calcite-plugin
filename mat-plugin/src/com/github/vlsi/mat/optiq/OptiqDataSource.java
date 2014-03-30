@@ -49,13 +49,15 @@ public class OptiqDataSource {
 		OptiqConnection con = connection
 				.unwrap(OptiqConnection.class);
 
+		if (snapshot == null)
+			return connection;
+
 		SchemaPlus root = con.getRootSchema();
 		HeapSchema prototype = SCHEMA_CACHE.get(snapshot);
-		HeapSchema heapSchema = new HeapSchema(root, "HEAP",
-				snapshot, prototype);
+		HeapSchema heapSchema = new HeapSchema(root, "HEAP", snapshot,
+				prototype);
 		if (prototype == null)
 			SCHEMA_CACHE.put(snapshot, heapSchema);
-
 		root.add(heapSchema);
 		con.setSchema(heapSchema.getName());
 

@@ -4,8 +4,6 @@ import org.eclipse.jface.action.Action;
 import org.eclipse.mat.ui.util.PaneState;
 import org.eclipse.swt.custom.StyledText;
 import org.eclipse.swt.graphics.Point;
-import org.eclipse.ui.PartInitException;
-
 import com.github.vlsi.mat.optiq.editor.OptiqPane;
 
 public class ExecuteQueryAction extends Action {
