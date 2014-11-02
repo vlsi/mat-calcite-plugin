@@ -1,15 +1,14 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: Optiq-mat-plugin
-Bundle-SymbolicName: optiq-mat-plugin;singleton:=true
-Bundle-Version: 1.0.0.qualifier
+Bundle-Name: MatCalcitePlugin
+Bundle-SymbolicName: MatCalcitePlugin;singleton:=true
+Bundle-Version: 1.1.1.qualifier
 Bundle-Vendor: Vladimir Sitnikov
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7
-Require-Bundle: org.eclipse.mat.api;bundle-version="1.3.0",
- org.eclipse.mat.ui;bundle-version="1.3.0",
+Require-Bundle: org.eclipse.mat.api;bundle-version="1.4.0",
+ org.eclipse.mat.ui;bundle-version="1.4.0",
  org.eclipse.ui;bundle-version="3.7.0",
  org.eclipse.core.runtime;bundle-version="3.7.0",
  org.eclipse.jface.text;bundle-version="3.7.2",
  org.eclipse.core.resources;bundle-version="3.7.101"
-Bundle-ClassPath: lib/optiq-uberjar-1.0.0.0.jar,
- .
+Bundle-ClassPath: .,target/dependency/dependencies.jar

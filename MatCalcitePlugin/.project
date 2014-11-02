@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <projectDescription>
-	<name>mat-plugin</name>
+	<name>mat-calcite-plugin</name>
 	<comment></comment>
 	<projects>
 	</projects>
@@ -25,11 +25,4 @@
 		<nature>org.eclipse.pde.PluginNature</nature>
 		<nature>org.eclipse.jdt.core.javanature</nature>
 	</natures>
-	<linkedResources>
-		<link>
-			<name>lib/optiq-uberjar-1.0.0.0-sources.jar</name>
-			<type>1</type>
-			<location>/Users/vladimirsitnikov/Documents/workspace/optiq-mat-plugin/optiq-uberjar/target/optiq-uberjar-1.0.0.0-sources.jar</location>
-		</link>
-	</linkedResources>
 </projectDescription>

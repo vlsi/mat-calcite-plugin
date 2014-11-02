@@ -1,35 +1,25 @@
 package com.github.vlsi.mat.optiq;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.util.Map;
-import java.util.Properties;
-
-import net.hydromatic.optiq.Schema;
-import net.hydromatic.optiq.SchemaPlus;
-import net.hydromatic.optiq.jdbc.OptiqConnection;
-
-import org.eclipse.mat.snapshot.ISnapshot;
-
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
-import com.google.common.collect.MapMaker;
+import net.hydromatic.optiq.Schema;
+import net.hydromatic.optiq.SchemaPlus;
+import net.hydromatic.optiq.jdbc.OptiqConnection;
+import org.eclipse.mat.snapshot.ISnapshot;
+
+import java.sql.*;
+import java.util.Properties;
+import java.util.concurrent.ExecutionException;
 
 public class OptiqDataSource {
 
-	private static Map<ISnapshot, HeapSchema> SCHEMA_CACHE = new MapMaker()
-	.weakKeys().makeMap();
-
-	private static LoadingCache<ISnapshot, Schema> SCH2EMA_CACHE = CacheBuilder
+	private static LoadingCache<ISnapshot, Schema> SCHEMA_CACHE = CacheBuilder
 			.newBuilder()
 			.weakKeys().build(new CacheLoader<ISnapshot, Schema>() {
 				@Override
 				public Schema load(ISnapshot key) throws Exception {
-					return null;
+					return new HeapSchema(key);
 				}
 			});
 
@@ -45,21 +35,25 @@ public class OptiqDataSource {
 		info.put("lex", "JAVA");
 		info.put("quoting", "DOUBLE_QUOTE");
 		Connection connection = DriverManager.getConnection(
-				"jdbc:optiq:", info);
+				"jdbc:calcite:", info);
 		OptiqConnection con = connection
 				.unwrap(OptiqConnection.class);
 
 		if (snapshot == null)
 			return connection;
 
+		if ("HEAP".equals(con.getSchema()))
+			return connection;
+
 		SchemaPlus root = con.getRootSchema();
-		HeapSchema prototype = SCHEMA_CACHE.get(snapshot);
-		HeapSchema heapSchema = new HeapSchema(root, "HEAP", snapshot,
-				prototype);
-		if (prototype == null)
-			SCHEMA_CACHE.put(snapshot, heapSchema);
-		root.add(heapSchema);
-		con.setSchema(heapSchema.getName());
+		Schema heapSchema;
+		try {
+			heapSchema = SCHEMA_CACHE.get(snapshot);
+		} catch (ExecutionException e) {
+			throw new SQLException("Unable to create heap schema", e);
+		}
+		root.add("HEAP", heapSchema);
+		con.setSchema("HEAP");
 
 		return connection;
 	}

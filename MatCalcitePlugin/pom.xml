@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <artifactId>MatCalcitePlugin</artifactId>
+    <version>1.1.1-SNAPSHOT</version>
+    <packaging>eclipse-plugin</packaging>
+    <name>Calcite SQL plugin</name>
+
+    <parent>
+        <groupId>com.github.vlsi.mat.calcite</groupId>
+        <artifactId>parent</artifactId>
+        <version>1.1.1-SNAPSHOT</version>
+    </parent>
+
+    <dependencies>
+        <dependency>
+            <groupId>com.github.vlsi.mat.calcite</groupId>
+            <artifactId>dependencies</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <sourceDirectory>src</sourceDirectory>
+
+        <plugins>
+            <plugin>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>copy-dependencies</id>
+                        <goals>
+                            <goal>copy-dependencies</goal>
+                        </goals>
+                        <phase>initialize</phase>
+                        <configuration>
+                            <includeGroupIds>com.github.vlsi.mat.calcite</includeGroupIds>
+                            <stripVersion>true</stripVersion>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>classpath</id>
+                        <goals>
+                            <goal>build-classpath</goal>
+                        </goals>
+                        <configuration>
+                            <fileSeparator>/</fileSeparator>
+                            <prefix>target/dependency</prefix>
+                            <outputFile>${project.build.directory}/classPath.txt
+                            </outputFile>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.eclipse.tycho.extras</groupId>
+                <artifactId>tycho-eclipserun-plugin</artifactId>
+                <version>${tycho-version}</version>
+                <configuration>
+                    <appArgLine>-product org.eclipse.mat.ui.rcp.MemoryAnalyzer</appArgLine>
+                    <repositories>
+                        <repository>
+                            <id>luna</id>
+                            <layout>p2</layout>
+                            <url>http://download.eclipse.org/releases/luna</url>
+                        </repository>
+                    </repositories>
+                    <dependencies>
+                        <!--<dependency>-->
+                        <!--<groupId></groupId>-->
+                        <!--<artifactId>com.github.vlsi.mat.calcite.MatCalcitePlugin</artifactId>-->
+                        <!--<version>${project.version}</version>-->
+                        <!--<type>eclipse-plugin</type>-->
+                        <!--</dependency>-->
+                    </dependencies>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
+</project>
