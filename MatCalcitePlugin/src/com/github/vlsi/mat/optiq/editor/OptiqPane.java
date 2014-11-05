@@ -122,7 +122,7 @@ public class OptiqPane extends CompositeHeapEditorPane {
 
 	@Override
 	public String getTitle() {
-		return "Optiq SQL";
+		return "Calcite SQL";
 	}
 
 	private void makeActions() {
