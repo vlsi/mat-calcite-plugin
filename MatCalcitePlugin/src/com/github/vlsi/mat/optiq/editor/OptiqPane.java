@@ -27,6 +27,8 @@ import org.eclipse.swt.custom.SashForm;
 import org.eclipse.swt.custom.StyledText;
 import org.eclipse.swt.events.KeyAdapter;
 import org.eclipse.swt.events.KeyEvent;
+import org.eclipse.swt.events.TraverseEvent;
+import org.eclipse.swt.events.TraverseListener;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.IActionBars;
 import org.eclipse.ui.IEditorInput;
@@ -55,13 +57,19 @@ public class OptiqPane extends CompositeHeapEditorPane {
 		queryViewer.configure(new OptiqSourceViewerConfiguration());
 		queryString = queryViewer.getTextWidget();
 		queryString.setFont(JFaceResources.getFont(JFaceResources.TEXT_FONT));
+		queryString.addTraverseListener(new TraverseListener() {
+			@Override
+			public void keyTraversed(TraverseEvent e) {
+				if (e.detail == SWT.TRAVERSE_RETURN && (e.stateMask & SWT.MOD1) != 0) {
+					executeAction.run();
+					e.detail = SWT.TRAVERSE_NONE;
+				}
+			}
+		});
 		queryString.addKeyListener(new KeyAdapter() {
 			@Override
 			public void keyPressed(KeyEvent e) {
-				if (e.keyCode == '\r' && (e.stateMask & SWT.MOD1) != 0) {
-					e.doit = false;
-					executeAction.run();
-				} else if (e.keyCode == ' ' && (e.stateMask & SWT.CTRL) != 0) {
+				if (e.keyCode == ' ' && (e.stateMask & SWT.CTRL) != 0) {
 					// ctrl space combination for content assist
 					// contentAssistAction.run();
 				} else if (e.keyCode == SWT.F5) {
