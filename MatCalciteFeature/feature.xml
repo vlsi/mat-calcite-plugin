@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<feature
+        id="MatCalciteFeature"
+        label="Calcite plugin for MAT"
+        version="1.1.1.qualifier"
+        provider-name="Vladimir Sitnikov">
+
+    <description>This plugin for Eclipse Memory Analyzer allows to query heap dump via SQL</description>
+
+    <copyright>Author: Vladimir Sitnikov</copyright>
+
+    <license>You should use this functionality only for the great justice.</license>
+
+    <plugin id="MatCalcitePlugin" version="0.0.0" unpack="false"/>
+</feature>

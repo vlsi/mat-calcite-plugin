@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<site>
+    <feature url="features/MatCalciteFeature_1.1.1.qualifier.jar" id="MatCalciteFeature" version="1.1.1.qualifier">
+        <category name="queries_category"/>
+    </feature>
+    <category-def name="queries_category" label="Queries">
+        <description>
+            Extended queries for MAT
+        </description>
+    </category-def>
+</site>

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?pde version="3.5"?>
 
-<product name="%product.appName" uid="mat-calcite" version="1.1.1.qualifier" useFeatures="false" includeLaunchers="false">
+<product name="MAT with SQL" uid="mat-calcite" version="1.1.1.qualifier" useFeatures="true" includeLaunchers="true">
 
    <aboutInfo>
       <image path="icons/eclipse_lg.gif"/>
@@ -14,15 +14,16 @@
    </configIni>
 
    <launcherArgs>
-      <vmArgsMac>-XstartOnFirstThread -Dorg.eclipse.swt.internal.carbon.smallFonts
-      </vmArgsMac>
+      <vmArgsMac>-XstartOnFirstThread -Dorg.eclipse.swt.internal.carbon.smallFonts</vmArgsMac>
    </launcherArgs>
 
    <windowImages/>
 
    <plugins>
-      <plugin id="MatCalcitePlugin"/>
    </plugins>
 
+   <features>
+     <feature id="MatCalciteFeature" version="0.0.0"/>
+   </features>
 
 </product>

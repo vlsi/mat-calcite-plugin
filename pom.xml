@@ -15,9 +15,10 @@
     </properties>
 
     <modules>
-        <module>eclipse-repository</module>
-        <module>MatCalcitePlugin</module>
         <module>luna</module>
+        <module>MatCalcitePlugin</module>
+        <module>MatCalciteFeature</module>
+        <module>MatCalciteRepository</module>
     </modules>
 
     <repositories>
