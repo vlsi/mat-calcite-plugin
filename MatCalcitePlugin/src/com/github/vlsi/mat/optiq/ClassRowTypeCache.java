@@ -63,46 +63,52 @@ public class ClassRowTypeCache {
 			types.add(typeFactory.createJavaType(long.class));
 			resolvers.add(new RetainedSizeComputer(snapshot));
 
-			List<FieldDescriptor> fields = clazz.getFieldDescriptors();
-			for (FieldDescriptor fieldDescriptor : fields) {
-				names.add(fieldDescriptor.getName());
-				int type = fieldDescriptor.getType();
-				RelDataType dataType;
-				switch (type) {
-				case IObject.Type.BOOLEAN:
-					dataType = typeFactory.createJavaType(boolean.class);
-					break;
-				case IObject.Type.BYTE:
-					dataType = typeFactory.createJavaType(byte.class);
-					break;
-				case IObject.Type.CHAR:
-					dataType = typeFactory.createJavaType(char.class);
-					break;
-				case IObject.Type.DOUBLE:
-					dataType = typeFactory.createJavaType(double.class);
-					break;
-				case IObject.Type.FLOAT:
-					dataType = typeFactory.createJavaType(float.class);
-					break;
-				case IObject.Type.SHORT:
-					dataType = typeFactory.createJavaType(short.class);
-					break;
-				case IObject.Type.INT:
-					dataType = typeFactory.createJavaType(int.class);
-					break;
-				case IObject.Type.LONG:
-					dataType = typeFactory.createJavaType(long.class);
-					break;
-				case IObject.Type.OBJECT:
-					dataType = typeFactory.createJavaType(String.class);
-					break;
-				default:
-					dataType = typeFactory.createJavaType(String.class);
-					break;
+			while (clazz != null)
+			{
+				List<FieldDescriptor> fields = clazz.getFieldDescriptors();
+				for (FieldDescriptor fieldDescriptor : fields)
+				{
+					names.add(fieldDescriptor.getName());
+					int type = fieldDescriptor.getType();
+					RelDataType dataType;
+					switch (type)
+					{
+						case IObject.Type.BOOLEAN:
+							dataType = typeFactory.createJavaType(boolean.class);
+							break;
+						case IObject.Type.BYTE:
+							dataType = typeFactory.createJavaType(byte.class);
+							break;
+						case IObject.Type.CHAR:
+							dataType = typeFactory.createJavaType(char.class);
+							break;
+						case IObject.Type.DOUBLE:
+							dataType = typeFactory.createJavaType(double.class);
+							break;
+						case IObject.Type.FLOAT:
+							dataType = typeFactory.createJavaType(float.class);
+							break;
+						case IObject.Type.SHORT:
+							dataType = typeFactory.createJavaType(short.class);
+							break;
+						case IObject.Type.INT:
+							dataType = typeFactory.createJavaType(int.class);
+							break;
+						case IObject.Type.LONG:
+							dataType = typeFactory.createJavaType(long.class);
+							break;
+						case IObject.Type.OBJECT:
+							dataType = typeFactory.createJavaType(String.class);
+							break;
+						default:
+							dataType = typeFactory.createJavaType(String.class);
+							break;
+					}
+					types.add(dataType);
+					resolvers.add(new PropertyComputer(snapshot, fieldDescriptor
+							.getName()));
 				}
-				types.add(dataType);
-				resolvers.add(new PropertyComputer(snapshot, fieldDescriptor
-						.getName()));
+				clazz = clazz.getSuperClass();
 			}
 			return Pair.of(
 					typeFactory.createStructType(Pair.zip(names, types)),
