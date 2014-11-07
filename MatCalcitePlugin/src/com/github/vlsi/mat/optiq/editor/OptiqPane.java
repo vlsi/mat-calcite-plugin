@@ -25,16 +25,9 @@ import org.eclipse.mat.ui.util.PaneState.PaneType;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.SashForm;
 import org.eclipse.swt.custom.StyledText;
-import org.eclipse.swt.events.KeyAdapter;
-import org.eclipse.swt.events.KeyEvent;
-import org.eclipse.swt.events.TraverseEvent;
-import org.eclipse.swt.events.TraverseListener;
+import org.eclipse.swt.events.*;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.ui.IActionBars;
-import org.eclipse.ui.IEditorInput;
-import org.eclipse.ui.IEditorSite;
-import org.eclipse.ui.IWorkbenchCommandConstants;
-import org.eclipse.ui.PartInitException;
+import org.eclipse.ui.*;
 import org.eclipse.ui.actions.ActionFactory;
 import org.eclipse.ui.operations.RedoActionHandler;
 import org.eclipse.ui.operations.UndoActionHandler;
@@ -46,6 +39,7 @@ public class OptiqPane extends CompositeHeapEditorPane {
 	private StyledText queryString;
 
 	private Action executeAction;
+	private Action copyQueryStringAction;
 
 	public OptiqPane() {
 	}
@@ -78,6 +72,16 @@ public class OptiqPane extends CompositeHeapEditorPane {
 				}
 			}
 
+		});
+		this.queryString.addFocusListener(new FocusListener() {
+			public void focusGained(FocusEvent e) {
+				IActionBars actionBars = OptiqPane.this.getEditor().getEditorSite().getActionBars();
+				actionBars.setGlobalActionHandler(ActionFactory.COPY.getId(), OptiqPane.this.copyQueryStringAction);
+				actionBars.updateActionBars();
+			}
+
+			public void focusLost(FocusEvent e) {
+			}
 		});
 
 		IDocument doc = createDocument();
@@ -135,6 +139,14 @@ public class OptiqPane extends CompositeHeapEditorPane {
 
 	private void makeActions() {
 		executeAction = new ExecuteQueryAction(this, null);
+		IWorkbenchWindow window = this.getEditorSite().getWorkbenchWindow();
+		ActionFactory.IWorkbenchAction globalAction = ActionFactory.COPY.create(window);
+		this.copyQueryStringAction = new Action() {
+			public void run() {
+				OptiqPane.this.queryString.copy();
+			}
+		};
+		this.copyQueryStringAction.setAccelerator(globalAction.getAccelerator());
 	}
 
 	public StyledText getQueryString() {
