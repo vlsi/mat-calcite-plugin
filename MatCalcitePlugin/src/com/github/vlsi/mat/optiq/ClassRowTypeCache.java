@@ -51,10 +51,6 @@ public class ClassRowTypeCache {
 			types.add(typeFactory.createJavaType(int.class));
 			resolvers.add(null);
 
-			names.add("@PK");
-			types.add(typeFactory.createJavaType(String.class));
-			resolvers.add(new PKComputer(snapshot));
-
 			names.add("@SHALLOW");
 			types.add(typeFactory.createJavaType(long.class));
 			resolvers.add(new ShallowSizeComputer(snapshot));
@@ -121,33 +117,6 @@ public class ClassRowTypeCache {
 
 		public BaseComputer(ISnapshot snapshot) {
 			this.snapshot = snapshot;
-		}
-	}
-
-	static class PKComputer extends BaseComputer {
-		public PKComputer(ISnapshot snapshot) {
-			super(snapshot);
-		}
-
-		@Override
-		public Object apply(Integer input) {
-			int objectId = input.intValue();
-
-			try {
-				StringBuilder sb = new StringBuilder();
-				IObject object = snapshot.getObject(objectId);
-				String classSpecific = (object).getClassSpecificName();
-				if (classSpecific != null)
-					sb.append(classSpecific);
-				else
-					sb.append(object.getDisplayName());
-				sb.append("::");
-				sb.append(objectId);
-				return sb.toString();
-			} catch (SnapshotException e) {
-				e.printStackTrace();
-				return "undefined";
-			}
 		}
 	}
 
