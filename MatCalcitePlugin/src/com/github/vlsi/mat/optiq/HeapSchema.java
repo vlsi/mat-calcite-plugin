@@ -2,8 +2,12 @@ package com.github.vlsi.mat.optiq;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableMap.Builder;
+import com.google.common.collect.ImmutableMultimap;
+import com.google.common.collect.Multimap;
+import net.hydromatic.optiq.Function;
 import net.hydromatic.optiq.Table;
 import net.hydromatic.optiq.impl.AbstractSchema;
+import net.hydromatic.optiq.impl.ScalarFunctionImpl;
 import org.eclipse.mat.SnapshotException;
 import org.eclipse.mat.snapshot.ISnapshot;
 import org.eclipse.mat.snapshot.model.IClass;
@@ -15,6 +19,7 @@ import java.util.Map;
 
 public class HeapSchema extends AbstractSchema {
     private Map<String, Table> tableMap;
+    private Multimap<String, Function> functionMultimap;
 
     public HeapSchema(final ISnapshot snapshot) {
         Collection<IClass> classes;
@@ -36,6 +41,15 @@ public class HeapSchema extends AbstractSchema {
                     snapshot, className, true));
         }
         tableMap = builder.build();
+
+        ImmutableMultimap.Builder<String, Function> b = ImmutableMultimap.builder();
+        b.putAll(ScalarFunctionImpl.createAll(HeapFunctions.class));
+        functionMultimap = b.build();
+    }
+
+    @Override
+    protected Multimap<String, Function> getFunctionMultimap() {
+        return functionMultimap;
     }
 
     @Override

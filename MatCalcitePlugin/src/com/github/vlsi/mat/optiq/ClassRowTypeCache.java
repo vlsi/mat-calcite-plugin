@@ -98,7 +98,7 @@ public class ClassRowTypeCache {
 							dataType = typeFactory.createJavaType(long.class);
 							break;
 						case IObject.Type.OBJECT:
-							dataType = typeFactory.createJavaType(String.class);
+							dataType = typeFactory.createJavaType(HeapReference.class);
 							break;
 						default:
 							dataType = typeFactory.createJavaType(String.class);
@@ -200,11 +200,7 @@ public class ClassRowTypeCache {
 				IObject object = snapshot.getObject(objectId);
 				Object res = object.resolveValue(field);
 				if (res instanceof IObject) {
-					String classSpecific = ((IObject) res)
-							.getClassSpecificName();
-					if (classSpecific != null)
-						return classSpecific + "::" + objectId;
-					return ((IObject) res).getDisplayName() + "::" + ((IObject) res).getObjectId();
+					return new HeapReference(snapshot, (IObject) res);
 				}
 				return res;
 			} catch (SnapshotException e) {
