@@ -15,7 +15,7 @@ public class HeapFunctions {
         return r.toString();
     }
 
-    public static Object get_by_key(Object r, String value) {
+    public static Object get_by_key(Object r, String key) {
         HeapReference ref = ensureHeapReference(r);
         if (ref == null) {
             return null;
@@ -42,17 +42,10 @@ public class HeapFunctions {
                     while (entry != null)
                     {
                         IObject keyObject = (IObject) entry.resolveValue("key");
-                        if (value.equals(toString(keyObject)))
+                        if (key.equals(toString(keyObject)))
                         {
                             IObject valueObject = (IObject) entry.resolveValue(("value"));
-                            if (valueObject != null)
-                            {
-                                return new HeapReference(snapshot, valueObject);
-                            }
-                            else
-                            {
-                                return null;
-                            }
+                            return HeapReference.valueOf(valueObject);
                         }
 
                         entry = (IObject)entry.resolveValue("next");
@@ -61,7 +54,7 @@ public class HeapFunctions {
             }
         } catch (SnapshotException e)
         {
-            throw new RuntimeException(e);
+            throw new RuntimeException("Unable to lookup key " + key + " in " + r, e);
         }
 
         return null;

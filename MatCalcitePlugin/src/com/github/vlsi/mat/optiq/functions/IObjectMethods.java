@@ -16,8 +16,7 @@ public class IObjectMethods {
     public static HeapReference resolveReferenceValue(IObject object, String name) {
         try {
             Object o = object.resolveValue(name);
-            if (o == null) return null;
-            return new HeapReference((IObject) o);
+            return HeapReference.valueOf((IObject) o);
         } catch (SnapshotException e) {
             throw new IllegalArgumentException("Unable to resolve value " + name + " for object " + object, e);
         }

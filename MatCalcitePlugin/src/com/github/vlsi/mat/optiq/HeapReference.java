@@ -9,6 +9,10 @@ public class HeapReference implements Comparable<HeapReference> {
         this.o = o;
     }
 
+    public static HeapReference valueOf(IObject o) {
+        return o == null ? null : new HeapReference(o);
+    }
+
     public IObject getIObject() {
         return o;
     }
