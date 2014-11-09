@@ -35,10 +35,16 @@ public class HeapSchema extends AbstractSchema {
             String className = klass.getName();
             if (!knownClasses.add(className))
                 continue;
-            builder.put(className, new InstanceByClassTable(snapshot,
-                    className, false));
-            builder.put("instanceof " + className, new InstanceByClassTable(
-                    snapshot, className, true));
+            IClassesList classOnly = new IClassesList(snapshot, className, false);
+            IClassesList withSubClasses = new IClassesList(snapshot, className, true);
+
+            builder.put(className, new InstanceByClassTable(classOnly));
+            builder.put("instanceof " + className, new InstanceByClassTable(withSubClasses));
+
+            // These are "index" tables that produce just object ids.
+            // The tables are not supposed to be used by end-user
+            builder.put("$ids$:" + className, new InstanceIdsByClassTable(classOnly));
+            builder.put("$ids$:instanceof " + className, new InstanceIdsByClassTable(withSubClasses));
         }
         tableMap = builder.build();
 

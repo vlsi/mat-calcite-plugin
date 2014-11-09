@@ -12,3 +12,4 @@ Require-Bundle: org.eclipse.mat.api;bundle-version="1.4.0",
  org.eclipse.jface.text;bundle-version="3.7.2",
  org.eclipse.core.resources;bundle-version="3.7.101"
 Bundle-ClassPath: .,target/dependency/dependencies.jar
+Export-Package: com.github.vlsi.mat.optiq

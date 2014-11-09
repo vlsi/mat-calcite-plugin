@@ -20,6 +20,11 @@
             <artifactId>MatCalciteFeature</artifactId>
             <version>${project.version}</version>
         </dependency>
+        <dependency>
+            <groupId>com.github.vlsi.mat.calcite</groupId>
+            <artifactId>MatCalciteTest</artifactId>
+            <version>${project.version}</version>
+        </dependency>
     </dependencies>
 
     <build>

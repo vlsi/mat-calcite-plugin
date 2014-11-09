@@ -1,14 +1,11 @@
 package com.github.vlsi.mat.optiq;
 
-import org.eclipse.mat.snapshot.ISnapshot;
 import org.eclipse.mat.snapshot.model.IObject;
 
 public class HeapReference implements Comparable<HeapReference> {
-    private final ISnapshot snapshot;
     private final IObject o;
 
-    public HeapReference(ISnapshot snapshot, IObject o) {
-        this.snapshot = snapshot;
+    public HeapReference(IObject o) {
         this.o = o;
     }
 
@@ -24,16 +21,13 @@ public class HeapReference implements Comparable<HeapReference> {
         HeapReference that = (HeapReference) o1;
 
         if (!o.equals(that.o)) return false;
-        if (!snapshot.equals(that.snapshot)) return false;
 
         return true;
     }
 
     @Override
     public int hashCode() {
-        int result = snapshot.hashCode();
-        result = 31 * result + o.hashCode();
-        return result;
+        return o.hashCode();
     }
 
     @Override

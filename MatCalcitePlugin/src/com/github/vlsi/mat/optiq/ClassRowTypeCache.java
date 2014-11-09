@@ -1,30 +1,42 @@
 package com.github.vlsi.mat.optiq;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import org.eclipse.mat.SnapshotException;
-import org.eclipse.mat.snapshot.ISnapshot;
-import org.eclipse.mat.snapshot.model.FieldDescriptor;
-import org.eclipse.mat.snapshot.model.IClass;
-import org.eclipse.mat.snapshot.model.IObject;
-import org.eigenbase.reltype.RelDataType;
-import org.eigenbase.reltype.RelDataTypeFactory;
-import org.eigenbase.util.Pair;
-
+import com.github.vlsi.mat.optiq.functions.IObjectMethods;
+import com.github.vlsi.mat.optiq.functions.ISnapshotMethods;
+import com.github.vlsi.mat.optiq.rex.RexBuilderContext;
 import com.google.common.base.Function;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
+import com.google.common.collect.ImmutableList;
+import net.hydromatic.optiq.impl.ScalarFunctionImpl;
+import org.eclipse.mat.snapshot.ISnapshot;
+import org.eclipse.mat.snapshot.model.FieldDescriptor;
+import org.eclipse.mat.snapshot.model.IClass;
+import org.eclipse.mat.snapshot.model.IObject;
+import org.eigenbase.relopt.RelOptCluster;
+import org.eigenbase.reltype.RelDataType;
+import org.eigenbase.reltype.RelDataTypeFactory;
+import org.eigenbase.rex.RexBuilder;
+import org.eigenbase.rex.RexNode;
+import org.eigenbase.sql.SqlFunction;
+import org.eigenbase.sql.SqlIdentifier;
+import org.eigenbase.sql.parser.SqlParserPos;
+import org.eigenbase.sql.type.OperandTypes;
+import org.eigenbase.sql.type.ReturnTypes;
+import org.eigenbase.sql.validate.SqlUserDefinedFunction;
+import org.eigenbase.util.Pair;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class ClassRowTypeCache {
 
-	public static LoadingCache<RelDataTypeFactory, LoadingCache<IClass, Pair<RelDataType, List<Function<Integer, Object>>>>> CACHE = CacheBuilder
+	public static LoadingCache<RelDataTypeFactory, LoadingCache<IClass, Pair<RelDataType, List<Function<RexBuilderContext, RexNode>>>>> CACHE = CacheBuilder
 			.newBuilder()
 			.weakKeys()
-			.build(new CacheLoader<RelDataTypeFactory, LoadingCache<IClass, Pair<RelDataType, List<Function<Integer, Object>>>>>() {
+			.build(new CacheLoader<RelDataTypeFactory, LoadingCache<IClass, Pair<RelDataType, List<Function<RexBuilderContext, RexNode>>>>>() {
 				@Override
-				public LoadingCache<IClass, Pair<RelDataType, List<Function<Integer, Object>>>> load(
+				public LoadingCache<IClass, Pair<RelDataType, List<Function<RexBuilderContext, RexNode>>>> load(
 						final RelDataTypeFactory typeFactory) throws Exception {
 					return CacheBuilder.newBuilder().weakKeys()
 							.build(new ClassRowTypeResolver(typeFactory));
@@ -33,7 +45,7 @@ public class ClassRowTypeCache {
 
 	private static final class ClassRowTypeResolver
 	extends
-	CacheLoader<IClass, Pair<RelDataType, List<Function<Integer, Object>>>> {
+			CacheLoader<IClass, Pair<RelDataType, List<Function<RexBuilderContext, RexNode>>>> {
 		private final RelDataTypeFactory typeFactory;
 
 		private ClassRowTypeResolver(RelDataTypeFactory typeFactory) {
@@ -41,23 +53,23 @@ public class ClassRowTypeCache {
 		}
 
 		@Override
-		public Pair<RelDataType, List<Function<Integer, Object>>> load(
+		public Pair<RelDataType, List<Function<RexBuilderContext, RexNode>>> load(
 				IClass clazz) throws Exception {
 			ISnapshot snapshot = clazz.getSnapshot();
-			List<Function<Integer, Object>> resolvers = new ArrayList<Function<Integer, Object>>();
+			List<Function<RexBuilderContext, RexNode>> resolvers = new ArrayList<Function<RexBuilderContext, RexNode>>();
 			List<String> names = new ArrayList<String>();
 			List<RelDataType> types = new ArrayList<RelDataType>();
 			names.add("@ID");
 			types.add(typeFactory.createJavaType(int.class));
-			resolvers.add(null);
+			resolvers.add(ObjectIdComputer.INSTANCE);
 
 			names.add("@SHALLOW");
 			types.add(typeFactory.createJavaType(long.class));
-			resolvers.add(new ShallowSizeComputer(snapshot));
+			resolvers.add(ShallowSizeComputer.INSTANCE);
 
 			names.add("@RETAINED");
 			types.add(typeFactory.createJavaType(long.class));
-			resolvers.add(new RetainedSizeComputer(snapshot));
+			resolvers.add(RetainedSizeComputer.INSTANCE);
 
 			while (clazz != null)
 			{
@@ -101,8 +113,10 @@ public class ClassRowTypeCache {
 							break;
 					}
 					types.add(dataType);
-					resolvers.add(new PropertyComputer(snapshot, fieldDescriptor
-							.getName()));
+					if (type == IObject.Type.OBJECT)
+						resolvers.add(new ReferencePropertyComputer(fieldDescriptor.getName()));
+					else
+						resolvers.add(new SimplePropertyComputer(fieldDescriptor.getName(), type, dataType));
 				}
 				clazz = clazz.getSuperClass();
 			}
@@ -112,75 +126,118 @@ public class ClassRowTypeCache {
 		}
 	}
 
-	static abstract class BaseComputer implements Function<Integer, Object> {
-		ISnapshot snapshot;
+	static class ObjectIdComputer implements Function<RexBuilderContext, RexNode> {
+		public static final ObjectIdComputer INSTANCE = new ObjectIdComputer();
 
-		public BaseComputer(ISnapshot snapshot) {
-			this.snapshot = snapshot;
+		@Override
+		public RexNode apply(RexBuilderContext context) {
+			return context.getIObjectId();
 		}
 	}
 
-	static class ShallowSizeComputer extends BaseComputer {
-		public ShallowSizeComputer(ISnapshot snapshot) {
-			super(snapshot);
-		}
+	static class ShallowSizeComputer implements Function<RexBuilderContext, RexNode> {
+		public static final ShallowSizeComputer INSTANCE = new ShallowSizeComputer();
 
 		@Override
-		public Object apply(Integer input) {
-			int objectId = input.intValue();
-			try {
-				return snapshot.getHeapSize(objectId);
-			} catch (SnapshotException e) {
-				e.printStackTrace();
-				return 0;
-			}
+		public RexNode apply(RexBuilderContext context) {
+			RelOptCluster cluster = context.getCluster();
+			RelDataTypeFactory typeFactory = cluster.getTypeFactory();
+			final SqlFunction UDF =
+					new SqlUserDefinedFunction(
+							new SqlIdentifier("GET_SHALLOW_SIZE", SqlParserPos.ZERO),
+							ReturnTypes.explicit(typeFactory.createJavaType(long.class)),
+							null,
+							OperandTypes.ANY_ANY,
+							ImmutableList.of(typeFactory.createTypeWithNullability(typeFactory.createJavaType(ISnapshot.class), false),
+									typeFactory.createJavaType(int.class)),
+							ScalarFunctionImpl.create(ISnapshotMethods.class, "getShallowSize"));
+			return context.getBuilder().makeCall(UDF, context.getSnapshot(), context.getIObjectId());
 		}
 	}
 
-	static class RetainedSizeComputer extends BaseComputer {
-		public RetainedSizeComputer(ISnapshot snapshot) {
-			super(snapshot);
-		}
+	static class RetainedSizeComputer implements Function<RexBuilderContext, RexNode> {
+		public static final RetainedSizeComputer INSTANCE = new RetainedSizeComputer();
 
 		@Override
-		public Object apply(Integer input) {
-			int objectId = input.intValue();
-			try {
-				return snapshot.getRetainedHeapSize(objectId);
-			} catch (SnapshotException e) {
-				e.printStackTrace();
-				return 0;
-			}
+		public RexNode apply(RexBuilderContext context) {
+			RelOptCluster cluster = context.getCluster();
+			RelDataTypeFactory typeFactory = cluster.getTypeFactory();
+			final SqlFunction UDF =
+					new SqlUserDefinedFunction(
+							new SqlIdentifier("GET_RETAINED_SIZE", SqlParserPos.ZERO),
+							ReturnTypes.explicit(typeFactory.createJavaType(long.class)),
+							null,
+							OperandTypes.ANY_ANY,
+							ImmutableList.of(typeFactory.createTypeWithNullability(typeFactory.createJavaType(ISnapshot.class), false),
+									typeFactory.createJavaType(int.class)),
+							ScalarFunctionImpl.create(ISnapshotMethods.class, "getRetainedSize"));
+			return context.getBuilder().makeCall(UDF, context.getSnapshot(), context.getIObjectId());
 		}
 	}
 
-	static class PropertyComputer extends BaseComputer {
-		private String field;
 
-		public PropertyComputer(ISnapshot snapshot, String field) {
-			super(snapshot);
-			this.field = field;
+	static class SimplePropertyComputer implements Function<RexBuilderContext, RexNode> {
+		private final String name;
+		private final int type;
+		private final RelDataType dataType;
+
+		public SimplePropertyComputer(String name, int type, RelDataType dataType) {
+			this.name = name;
+			this.type = type;
+			this.dataType = dataType;
 		}
 
 		@Override
-		public Object apply(Integer input) {
-			int objectId = input.intValue();
-			try {
-				IObject object = snapshot.getObject(objectId);
-				Object res = object.resolveValue(field);
-				if (res instanceof IObject) {
-					return new HeapReference(snapshot, (IObject) res);
-				}
-				return res;
-			} catch (SnapshotException e) {
-				e.printStackTrace();
-				return 0;
-			}
+		public RexNode apply(RexBuilderContext context) {
+			RelOptCluster cluster = context.getCluster();
+			RelDataTypeFactory typeFactory = cluster.getTypeFactory();
+			final SqlFunction UDF =
+					new SqlUserDefinedFunction(
+							new SqlIdentifier("RESOLVE_SIMPLE", SqlParserPos.ZERO),
+							ReturnTypes.explicit(typeFactory.createJavaType(Object.class)),
+							null,
+							OperandTypes.ANY_ANY,
+							ImmutableList.of(typeFactory.createTypeWithNullability(typeFactory.createJavaType(IObject.class), false),
+									typeFactory.createJavaType(int.class)),
+							ScalarFunctionImpl.create(IObjectMethods.class, "resolveSimpleValue"));
+			RexBuilder b = context.getBuilder();
+			RexNode rexNode = b.makeCall(UDF, context.getIObject(), b.makeLiteral(name));
+			return b.makeCast(dataType, rexNode);
 		}
 
 		@Override
 		public String toString() {
-			return "Property{field=" + field + "}";
+			return "Property{field=" + name + "}";
+		}
+	}
+
+	static class ReferencePropertyComputer implements Function<RexBuilderContext, RexNode> {
+		private final String name;
+
+		public ReferencePropertyComputer(String name) {
+			this.name = name;
+		}
+
+		@Override
+		public RexNode apply(RexBuilderContext context) {
+			RelOptCluster cluster = context.getCluster();
+			RelDataTypeFactory typeFactory = cluster.getTypeFactory();
+			final SqlFunction UDF =
+					new SqlUserDefinedFunction(
+							new SqlIdentifier("RESOLVE_REFERENCE", SqlParserPos.ZERO),
+							ReturnTypes.explicit(typeFactory.createJavaType(HeapReference.class)),
+							null,
+							OperandTypes.ANY_ANY,
+							ImmutableList.of(typeFactory.createTypeWithNullability(typeFactory.createJavaType(IObject.class), false),
+									typeFactory.createJavaType(String.class)),
+							ScalarFunctionImpl.create(IObjectMethods.class, "resolveReferenceValue"));
+			RexBuilder b = context.getBuilder();
+			return b.makeCall(UDF, context.getIObject(), b.makeLiteral(name));
+		}
+
+		@Override
+		public String toString() {
+			return "Property{field=" + name + "}";
 		}
 	}
 }

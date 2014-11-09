@@ -1,0 +1,13 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: MatCalciteTest
+Bundle-SymbolicName: MatCalciteTest
+Bundle-Version: 1.1.1.qualifier
+Require-Bundle: org.junit,
+ org.eclipse.core.runtime,
+ org.eclipse.mat.api;bundle-version="1.4.0",
+ org.eclipse.mat.parser;bundle-version="1.4.0",
+ org.eclipse.mat.ui;bundle-version="1.4.0",
+ org.eclipse.mat.hprof;bundle-version="1.4.0"
+Import-Package: com.github.vlsi.mat.optiq,
+ com.google.common.base
