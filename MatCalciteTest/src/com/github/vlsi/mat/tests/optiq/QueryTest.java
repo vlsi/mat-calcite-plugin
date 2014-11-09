@@ -66,6 +66,21 @@ public class QueryTest {
         execute("select \"@SHALLOW\" from \"java.util.HashMap\"", 2);
     }
 
+    @Test
+    public void testReadme() throws SQLException {
+        execute("explain plan for select toString(file) file, count(*) cnt, sum(\"@RETAINED\") sum_retained, sum(\"@SHALLOW\") sum_shallow\n"
+                + "  from \"java.net.URL\"\n"
+                + " group by toString(file)\n"
+                + "having count(*)>1\n"
+                + " order by sum(\"@RETAINED\") desc", 5);
+
+        execute("select toString(file) file, count(*) cnt, sum(\"@RETAINED\") sum_retained, sum(\"@SHALLOW\") sum_shallow\n"
+                + "  from \"java.net.URL\"\n"
+                + " group by toString(file)\n"
+                + "having count(*)>1\n"
+                + " order by sum(\"@RETAINED\") desc", 5);
+    }
+
     private void returnsInOrder(String sql, Object[] expected) throws SQLException {
         Object[] actuals = executeToCSV(sql).toArray();
         System.out.println("Arrays.toString(expected) = " + Arrays.toString(expected));

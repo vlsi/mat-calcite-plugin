@@ -17,9 +17,9 @@ Sample
 Query that lists duplicate URLs:
 
 ```sql
-select file, count(*) cnt, sum("@RETAINED") sum_retained, sum("@SHALLOW") sum_shallow
+select toString(file) file, count(*) cnt, sum("@RETAINED") sum_retained, sum("@SHALLOW") sum_shallow
   from "java.net.URL"
- group by file
+ group by toString(file)
 having count(*)>1
  order by sum("@RETAINED") desc
 ```
@@ -27,12 +27,36 @@ having count(*)>1
 To get an explain plan, use "explain plan for select ...":
 
 ```
-EnumerableSortRel(sort0=[$2], dir0=[Descending])
+EnumerableSortRel(sort0=[$2], dir0=[DESC])
   EnumerableCalcRel(expr#0..3=[{inputs}], expr#4=[1], expr#5=[>($t1, $t4)], proj#0..3=[{exprs}], $condition=[$t5])
     EnumerableAggregateRel(group=[{0}], cnt=[COUNT()], sum_retained=[SUM($1)], sum_shallow=[SUM($2)])
-      EnumerableCalcRel(expr#0..14=[{inputs}], file=[$t11], @RETAINED=[$t2], @SHALLOW=[$t1])
-        EnumerableTableAccessRel(table=[[HEAP, java.net.URL]])
+      EnumerableCalcRel(expr#0=[{inputs}], expr#1=[0], expr#2=[GET_SNAPSHOT($t1)], expr#3=[GET_IOBJECT($t2, $t0)], expr#4=['file'], expr#5=[RESOLVE_REFERENCE($t3, $t4)], expr#6=[toString($t5)], expr#7=[GET_RETAINED_SIZE($t2, $t0)], expr#8=[GET_SHALLOW_SIZE($t2, $t0)], file=[$t6], @RETAINED=[$t7], @SHALLOW=[$t8])
+        EnumerableTableAccessRel(table=[[HEAP, $ids$:java.net.URL]])
 ```
+
+Join sample
+-----------
+
+```sql
+explain plan for
+ select u."@ID", s."@RETAINED"
+   from "java.lang.String" s
+   join "java.net.URL" u
+     on (s."@ID" = get_id(u.path))
+```
+
+Here's execution plan:
+
+```
+EnumerableCalcRel(expr#0..3=[{inputs}], @ID=[$t0], @RETAINED=[$t3])
+  EnumerableJoinRel(condition=[=($1, $2)], joinType=[inner])
+    EnumerableCalcRel(expr#0=[{inputs}], expr#1=[0], expr#2=[GET_SNAPSHOT($t1)], expr#3=[GET_IOBJECT($t2, $t0)], expr#4=['path'], expr#5=[RESOLVE_REFERENCE($t3, $t4)], expr#6=[get_id($t5)], @ID=[$t0], $f15=[$t6])
+      EnumerableTableAccessRel(table=[[HEAP, $ids$:java.net.URL]])
+    EnumerableCalcRel(expr#0=[{inputs}], expr#1=[0], expr#2=[GET_SNAPSHOT($t1)], expr#3=[GET_RETAINED_SIZE($t2, $t0)], @ID=[$t0], @RETAINED=[$t3])
+      EnumerableTableAccessRel(table=[[HEAP, $ids$:java.lang.String]])
+```
+
+Here we do not yet optimize `s."@ID" = get_id(u.path)` join to `snapshot.getObject(get_id(u.path))`, however non-required columns are eliminated.
 
 Heap schema
 -----------
