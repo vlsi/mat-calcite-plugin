@@ -21,7 +21,7 @@
         <dependency>
             <groupId>com.github.vlsi.mat.calcite</groupId>
             <artifactId>MatCalcitePlugin</artifactId>
-            <version>1.1.1-SNAPSHOT</version>
+            <version>${project.version}</version>
         </dependency>
     </dependencies>
 

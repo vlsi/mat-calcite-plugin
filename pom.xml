@@ -56,7 +56,7 @@
                 <artifactId>target-platform-configuration</artifactId>
                 <version>${tycho-version}</version>
                 <configuration>
-                    <pomDependencies>consider</pomDependencies>
+                    <!--<pomDependencies>consider</pomDependencies>-->
                     <target>
                         <artifact>
                             <groupId>com.github.vlsi.mat.calcite</groupId>
