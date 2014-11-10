@@ -20,6 +20,23 @@ import java.util.List;
 public class QueryTest {
     static ISnapshot snapshot;
 
+    /**
+     * Transforms both \r\n and \r to \n
+     */
+    private static String nnl(String text) {
+        return text.replace("\r\n", "\n").replace("\r", "\n");
+    }
+
+    private static Object[] nnl(Object[] array) {
+        for (int i = 0; i<array.length; i++) {
+            if (array[i] instanceof String) {
+                array[i] = nnl((String)array[i]);
+            }
+        }
+        return array;
+    }
+
+
     @BeforeClass
     public static void openSnapshot() throws SnapshotException {
         File file = new File("dumps", "mvn1m_jdk18.hprof");
@@ -85,7 +102,7 @@ public class QueryTest {
         Object[] actuals = executeToCSV(sql).toArray();
         System.out.println("Arrays.toString(expected) = " + Arrays.toString(expected));
         System.out.println("Arrays.toString(actuals) = " + Arrays.toString(actuals));
-        Assert.assertArrayEquals(sql, expected, actuals);
+        Assert.assertArrayEquals(sql, nnl(expected), nnl(actuals));
     }
 
     private List<String> executeToCSV(String sql) throws SQLException {
