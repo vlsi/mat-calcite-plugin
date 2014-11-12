@@ -71,7 +71,7 @@ public class ClassRowTypeCache {
 			types.add(typeFactory.createJavaType(long.class));
 			resolvers.add(RetainedSizeComputer.INSTANCE);
 
-			while (clazz != null)
+			for(; clazz != null; clazz = clazz.getSuperClass())
 			{
 				List<FieldDescriptor> fields = clazz.getFieldDescriptors();
 				for (FieldDescriptor fieldDescriptor : fields)
@@ -118,7 +118,6 @@ public class ClassRowTypeCache {
 					else
 						resolvers.add(new SimplePropertyComputer(fieldDescriptor.getName(), type, dataType));
 				}
-				clazz = clazz.getSuperClass();
 			}
 			return Pair.of(
 					typeFactory.createStructType(Pair.zip(names, types)),
