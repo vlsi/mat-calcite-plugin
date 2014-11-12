@@ -3,6 +3,7 @@ package com.github.vlsi.mat.optiq.editor;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 
+import com.github.vlsi.mat.optiq.action.CommentLineAction;
 import org.eclipse.core.commands.operations.IUndoContext;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.action.Action;
@@ -40,6 +41,7 @@ public class OptiqPane extends CompositeHeapEditorPane {
 
 	private Action executeAction;
 	private Action copyQueryStringAction;
+	private Action commentLineAction;
 
 	public OptiqPane() {
 	}
@@ -66,7 +68,11 @@ public class OptiqPane extends CompositeHeapEditorPane {
 				if (e.keyCode == ' ' && (e.stateMask & SWT.CTRL) != 0) {
 					// ctrl space combination for content assist
 					// contentAssistAction.run();
-				} else if (e.keyCode == SWT.F5) {
+				} else if (e.character == '/' && (e.stateMask & SWT.MOD1) != 0) {
+					commentLineAction.run();
+					e.doit = false;
+				}
+				else if (e.keyCode == SWT.F5) {
 					executeAction.run();
 					e.doit = false;
 				}
@@ -139,6 +145,7 @@ public class OptiqPane extends CompositeHeapEditorPane {
 
 	private void makeActions() {
 		executeAction = new ExecuteQueryAction(this, null);
+		commentLineAction = new CommentLineAction(queryString);
 		IWorkbenchWindow window = this.getEditorSite().getWorkbenchWindow();
 		ActionFactory.IWorkbenchAction globalAction = ActionFactory.COPY.create(window);
 		this.copyQueryStringAction = new Action() {
