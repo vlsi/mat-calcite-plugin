@@ -14,6 +14,7 @@ public class RowSetTable implements IResultTable {
 
 	private CachedRowSet rowSet;
 	Column[] columns;
+	int idColumnPosition = -1;
 
 	public RowSetTable(CachedRowSet rowSet) throws SQLException {
 		this.rowSet = rowSet;
@@ -29,6 +30,8 @@ public class RowSetTable implements IResultTable {
 				clazz = String.class;
 			}
 			columns[i] = new Column(md.getColumnName(i + 1), clazz);
+			if (idColumnPosition == -1 && "@ID".equals(columns[i].getLabel()))
+				idColumnPosition = i;
 		}
 		this.columns = columns;
 	}
@@ -53,16 +56,16 @@ public class RowSetTable implements IResultTable {
 
 	@Override
 	public IContextObject getContext(final Object row) {
-		if (row == null && !(row instanceof Object[]))
+		if (row == null || !(row instanceof Object[]) || idColumnPosition == -1)
 			return null;
 		final Object[] data = (Object[]) row;
-		if (data.length < 1 || !(data[0] instanceof Integer))
+		if (idColumnPosition >= data.length)
 			return null;
 		return new IContextObject() {
 
 			@Override
 			public int getObjectId() {
-				return (Integer) data[0];
+				return (Integer) data[idColumnPosition];
 			}
 		};
 	}
