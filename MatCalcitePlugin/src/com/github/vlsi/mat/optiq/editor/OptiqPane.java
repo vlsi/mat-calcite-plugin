@@ -1,11 +1,8 @@
 package com.github.vlsi.mat.optiq.editor;
 
-import java.io.PrintWriter;
-import java.io.StringWriter;
-
 import com.github.vlsi.mat.optiq.action.CommentLineAction;
+import com.github.vlsi.mat.optiq.action.ExecuteQueryAction;
 import org.eclipse.core.commands.operations.IUndoContext;
-import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.text.Document;
@@ -20,7 +17,6 @@ import org.eclipse.mat.query.registry.QueryResult;
 import org.eclipse.mat.ui.editor.AbstractEditorPane;
 import org.eclipse.mat.ui.editor.CompositeHeapEditorPane;
 import org.eclipse.mat.ui.editor.EditorPaneRegistry;
-import org.eclipse.mat.ui.util.ErrorHelper;
 import org.eclipse.mat.ui.util.PaneState;
 import org.eclipse.mat.ui.util.PaneState.PaneType;
 import org.eclipse.swt.SWT;
@@ -32,8 +28,6 @@ import org.eclipse.ui.*;
 import org.eclipse.ui.actions.ActionFactory;
 import org.eclipse.ui.operations.RedoActionHandler;
 import org.eclipse.ui.operations.UndoActionHandler;
-
-import com.github.vlsi.mat.optiq.action.ExecuteQueryAction;
 
 public class OptiqPane extends CompositeHeapEditorPane {
 	private SourceViewer queryViewer;
@@ -161,24 +155,6 @@ public class OptiqPane extends CompositeHeapEditorPane {
 
 	public StyledText getQueryString() {
 		return queryString;
-	}
-
-	public void createExceptionPane(String message, Throwable e)
-			throws PartInitException {
-		StringWriter sw = new StringWriter();
-		if (message != null)
-			sw.append(message);
-		e.printStackTrace(new PrintWriter(sw));
-
-		AbstractEditorPane pane;
-		try {
-			pane = EditorPaneRegistry.instance().createNewPane("TextViewPane");//$NON-NLS-1$
-			if (pane == null)
-				throw new PartInitException("TextViewPane not found");
-		} catch (CoreException e1) {
-			throw new PartInitException(ErrorHelper.createErrorStatus(e1));
-		}
-		createResultPane(pane, sw.toString());
 	}
 
 	public void initQueryResult(QueryResult queryResult, PaneState state) {
