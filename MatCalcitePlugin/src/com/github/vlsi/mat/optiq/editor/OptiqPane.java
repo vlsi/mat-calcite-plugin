@@ -33,7 +33,7 @@ public class OptiqPane extends CompositeHeapEditorPane {
 	private SourceViewer queryViewer;
 	private StyledText queryString;
 
-	private Action executeAction;
+	private ExecuteQueryAction executeAction;
 	private Action copyQueryStringAction;
 	private Action commentLineAction;
 
@@ -68,9 +68,11 @@ public class OptiqPane extends CompositeHeapEditorPane {
 				} else if (e.character == '/' && (e.stateMask & SWT.MOD1) != 0) {
 					commentLineAction.run();
 					e.doit = false;
-				}
-				else if (e.keyCode == SWT.F5) {
+				} else if (e.keyCode == SWT.F5) {
 					executeAction.run();
+					e.doit = false;
+				} else if (e.keyCode == SWT.F10) {
+					executeAction.runExplain();
 					e.doit = false;
 				}
 			}
@@ -123,7 +125,14 @@ public class OptiqPane extends CompositeHeapEditorPane {
 
 	private IDocument createDocument() {
 		IDocument doc = new Document();
-		doc.set("-- explain plan for\n"
+		doc.set("-- explain plan for -- or F10\n"
+				+ "-- Tables:\n"
+				+ "--   \"java.lang.BigInteger\" list of all BigIntegers\n"
+				+ "--   \"instanceof java.lang.BigInteger\" BigIntegers and all subclasses\n"
+				+ "-- Functions:\n"
+				+ "--   get_id(HeapReference) retrieves object identifier (e.g. for joins)\n"
+				+ "--   get_by_key(HeapReference, key) retrieves value from a HashMap\n"
+				+ "--   toString(any) returns string representation\n"
 				+ "select u.\"@ID\", s.\"@RETAINED\"\n"
 				+ "  from \"java.lang.String\" s\n"
 				+ "     , \"java.net.URL\" u\n"
