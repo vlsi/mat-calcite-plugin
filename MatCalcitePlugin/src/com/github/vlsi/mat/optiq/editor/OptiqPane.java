@@ -43,7 +43,7 @@ public class OptiqPane extends CompositeHeapEditorPane {
 	@Override
 	public void createPartControl(Composite parent) {
 		SashForm sash = new SashForm(parent, SWT.VERTICAL | SWT.SMOOTH);
-		queryViewer = new SourceViewer(sash, null, SWT.MULTI | SWT.WRAP);
+		queryViewer = new SourceViewer(sash, null, SWT.H_SCROLL | SWT.V_SCROLL | SWT.MULTI);
 		queryViewer.configure(new OptiqSourceViewerConfiguration());
 		queryString = queryViewer.getTextWidget();
 		// The following setBackground(getBackround) results in proper white background in MACOS.
