@@ -52,6 +52,9 @@ public class OptiqPane extends CompositeHeapEditorPane {
 		queryViewer = new SourceViewer(sash, null, SWT.MULTI | SWT.WRAP);
 		queryViewer.configure(new OptiqSourceViewerConfiguration());
 		queryString = queryViewer.getTextWidget();
+		// The following setBackground(getBackround) results in proper white background in MACOS.
+		// No sure why the background is gray otherwise.
+		queryString.setBackground(queryString.getBackground());
 		queryString.setFont(JFaceResources.getFont(JFaceResources.TEXT_FONT));
 		queryString.addTraverseListener(new TraverseListener() {
 			@Override
