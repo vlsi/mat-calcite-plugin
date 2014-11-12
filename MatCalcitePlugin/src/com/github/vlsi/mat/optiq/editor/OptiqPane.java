@@ -97,6 +97,8 @@ public class OptiqPane extends CompositeHeapEditorPane {
 		queryViewer.setDocument(doc);
 		queryViewer.configure(svc);
 
+		queryString.selectAll();
+
 		createContainer(sash);
 		makeActions();
 
