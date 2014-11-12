@@ -1,6 +1,7 @@
 package com.github.vlsi.mat.optiq;
 
 import com.github.vlsi.mat.optiq.rules.InstanceAccessByClassIdRule;
+import com.github.vlsi.mat.optiq.rules.PushProjectPastJoinRule;
 import org.eigenbase.rel.RelNode;
 import org.eigenbase.rel.TableAccessRelBase;
 import org.eigenbase.relopt.RelOptCluster;
@@ -21,6 +22,8 @@ public class InstanceByClassTableScan extends TableAccessRelBase {
     @Override
     public void register(RelOptPlanner planner) {
         planner.addRule(InstanceAccessByClassIdRule.INSTANCE);
+        // Workaround until this rule is fixed in Calcite
+        planner.addRule(PushProjectPastJoinRule.INSTANCE);
         // Does not yet work.
         // These rules should convert join (a."@ID" = :var) to "snapshot.getObject(:var)"
 //        planner.addRule(NestedLoopsJoinRule.INSTANCE);

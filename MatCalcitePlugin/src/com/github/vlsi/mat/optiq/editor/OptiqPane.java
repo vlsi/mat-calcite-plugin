@@ -123,7 +123,11 @@ public class OptiqPane extends CompositeHeapEditorPane {
 
 	private IDocument createDocument() {
 		IDocument doc = new Document();
-		doc.set("select * from \"java.net.URL\"");
+		doc.set("-- explain plan for\n"
+				+ "select u.\"@ID\", s.\"@RETAINED\"\n"
+				+ "  from \"java.lang.String\" s\n"
+				+ "     , \"java.net.URL\" u\n"
+				+ " where s.\"@ID\" = get_id(u.path)\n");
 		return doc;
 	}
 
