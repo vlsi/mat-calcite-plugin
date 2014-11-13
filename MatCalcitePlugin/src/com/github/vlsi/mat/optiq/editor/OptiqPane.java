@@ -4,6 +4,7 @@ import com.github.vlsi.mat.optiq.action.CommentLineAction;
 import com.github.vlsi.mat.optiq.action.ExecuteQueryAction;
 import org.eclipse.core.commands.operations.IUndoContext;
 import org.eclipse.jface.action.Action;
+import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.text.Document;
 import org.eclipse.jface.text.IDocument;
@@ -33,7 +34,8 @@ public class OptiqPane extends CompositeHeapEditorPane {
 	private SourceViewer queryViewer;
 	private StyledText queryString;
 
-	private ExecuteQueryAction executeAction;
+	private ExecuteQueryAction executeQueryAction;
+	private ExecuteQueryAction explainQueryAction;
 	private Action copyQueryStringAction;
 	private Action commentLineAction;
 
@@ -54,7 +56,7 @@ public class OptiqPane extends CompositeHeapEditorPane {
 			@Override
 			public void keyTraversed(TraverseEvent e) {
 				if (e.detail == SWT.TRAVERSE_RETURN && (e.stateMask & SWT.MOD1) != 0) {
-					executeAction.run();
+					executeQueryAction.run();
 					e.detail = SWT.TRAVERSE_NONE;
 				}
 			}
@@ -69,10 +71,10 @@ public class OptiqPane extends CompositeHeapEditorPane {
 					commentLineAction.run();
 					e.doit = false;
 				} else if (e.keyCode == SWT.F5) {
-					executeAction.run();
+					executeQueryAction.run();
 					e.doit = false;
 				} else if (e.keyCode == SWT.F10) {
-					executeAction.runExplain();
+					explainQueryAction.run();
 					e.doit = false;
 				}
 			}
@@ -156,7 +158,8 @@ public class OptiqPane extends CompositeHeapEditorPane {
 	}
 
 	private void makeActions() {
-		executeAction = new ExecuteQueryAction(this, null);
+		executeQueryAction = new ExecuteQueryAction(this, null, false);
+		explainQueryAction = new ExecuteQueryAction(this, null, true);
 		commentLineAction = new CommentLineAction(queryString);
 		IWorkbenchWindow window = this.getEditorSite().getWorkbenchWindow();
 		ActionFactory.IWorkbenchAction globalAction = ActionFactory.COPY.create(window);
@@ -197,5 +200,14 @@ public class OptiqPane extends CompositeHeapEditorPane {
 		pane.setPaneState(state);
 
 		createResultPane(pane, queryResult);
+	}
+
+	@Override
+	public void contributeToToolBar(IToolBarManager manager)
+	{
+		//TODO: need to prepare icons for actions
+//		manager.add(executeQueryAction);
+//		manager.add(explainQueryAction);
+		super.contributeToToolBar(manager);
 	}
 }

@@ -10,13 +10,15 @@ import java.util.regex.Pattern;
 public class ExecuteQueryAction extends Action {
 	public static final Pattern STARTS_WITH_EXPLAIN_PLAN = Pattern.compile("^\\s*explain\\s+plan\\s+for", Pattern.CASE_INSENSITIVE);
 
+	private boolean doExplain;
 	private OptiqPane pane;
 	private PaneState state;
 
-	public ExecuteQueryAction(OptiqPane pane, PaneState state) {
+	public ExecuteQueryAction(OptiqPane pane, PaneState state, boolean doExplain) {
 		super(null);
 		this.pane = pane;
 		this.state = state;
+		this.doExplain = doExplain;
 	}
 
 	private String getSelectedQuery() {
@@ -32,16 +34,9 @@ public class ExecuteQueryAction extends Action {
 
 	@Override
 	public void run() {
-		run(false);
-	}
-
-	public void runExplain() {
-		run(true);
-	}
-
-	private void run(boolean explain) {
 		String query = getSelectedQuery();
-		if (explain && !STARTS_WITH_EXPLAIN_PLAN.matcher(query).find()) {
+		//TODO: actually check with this regexp doesn't work if there are comments in the beginning of the query
+		if (doExplain && !STARTS_WITH_EXPLAIN_PLAN.matcher(query).find()) {
 			query = "explain plan for " + query;
 		}
 		new OptiqJob(query, pane, state).schedule();
