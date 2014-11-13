@@ -1,6 +1,7 @@
 package com.github.vlsi.mat.optiq.action;
 
 import org.eclipse.jface.action.Action;
+import org.eclipse.swt.custom.ST;
 import org.eclipse.swt.custom.StyledText;
 
 public class CommentLineAction extends Action
@@ -20,6 +21,12 @@ public class CommentLineAction extends Action
         int lineStart = getLineStart(lineIndex);
         String lineText = text.getLine(lineIndex);
 
+        // Move caret to next line
+        if (lineIndex+1 < text.getLineCount())
+        {
+            text.invokeAction(ST.LINE_DOWN);
+        }
+
         if (lineText.startsWith("--"))
         {
             // Uncomment
@@ -29,20 +36,6 @@ public class CommentLineAction extends Action
         {
             // Comment
             text.replaceTextRange(lineStart, 0, "--");
-        }
-
-        // Move to the next line
-        if (lineIndex+1 < text.getLineCount())
-        {
-            int lineOffset = caretOffset - lineStart;
-            int nextLineLength = text.getLine(lineIndex+1).length();
-
-            if (lineOffset > nextLineLength)
-            {
-                lineOffset = nextLineLength;
-            }
-
-            text.setCaretOffset(getLineStart(lineIndex+1) + lineOffset);
         }
     }
 
