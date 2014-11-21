@@ -1,5 +1,6 @@
 package com.github.vlsi.mat.optiq;
 
+import com.github.vlsi.mat.optiq.functions.HeapFunctions;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableMap.Builder;
 import com.google.common.collect.ImmutableMultimap;

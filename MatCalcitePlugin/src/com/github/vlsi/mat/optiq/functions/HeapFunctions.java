@@ -1,5 +1,6 @@
-package com.github.vlsi.mat.optiq;
+package com.github.vlsi.mat.optiq.functions;
 
+import com.github.vlsi.mat.optiq.HeapReference;
 import org.eclipse.mat.SnapshotException;
 import org.eclipse.mat.snapshot.ISnapshot;
 import org.eclipse.mat.snapshot.model.*;
@@ -8,6 +9,11 @@ public class HeapFunctions {
     public static int get_id(Object r) {
         HeapReference ref = ensureHeapReference(r);
         return ref == null ? -1 : ref.getIObject().getObjectId();
+    }
+
+    public static String get_type(Object r) {
+        HeapReference ref = ensureHeapReference(r);
+        return ref == null ? "" : ref.getIObject().getClazz().getName();
     }
 
     public static String toString(Object r) {
