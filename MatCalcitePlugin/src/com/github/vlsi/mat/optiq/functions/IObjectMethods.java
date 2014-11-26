@@ -21,4 +21,8 @@ public class IObjectMethods {
             throw new IllegalArgumentException("Unable to resolve value " + name + " for object " + object, e);
         }
     }
+
+    public static HeapReference getReference(IObject object) {
+        return new HeapReference(object);
+    }
 }

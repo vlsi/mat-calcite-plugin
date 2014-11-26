@@ -59,9 +59,13 @@ public class ClassRowTypeCache {
 			List<Function<RexBuilderContext, RexNode>> resolvers = new ArrayList<Function<RexBuilderContext, RexNode>>();
 			List<String> names = new ArrayList<String>();
 			List<RelDataType> types = new ArrayList<RelDataType>();
-			names.add("@ID");
-			types.add(typeFactory.createJavaType(int.class));
-			resolvers.add(ObjectIdComputer.INSTANCE);
+//			names.add("@ID");
+//			types.add(typeFactory.createJavaType(int.class));
+//			resolvers.add(ObjectIdComputer.INSTANCE);
+
+			names.add("@THIS");
+			types.add(typeFactory.createJavaType(HeapReference.class));
+			resolvers.add(ThisComputer.INSTANCE);
 
 			names.add("@SHALLOW");
 			types.add(typeFactory.createJavaType(long.class));
@@ -125,12 +129,32 @@ public class ClassRowTypeCache {
 		}
 	}
 
-	static class ObjectIdComputer implements Function<RexBuilderContext, RexNode> {
-		public static final ObjectIdComputer INSTANCE = new ObjectIdComputer();
+//	static class ObjectIdComputer implements Function<RexBuilderContext, RexNode> {
+//		public static final ObjectIdComputer INSTANCE = new ObjectIdComputer();
+//
+//		@Override
+//		public RexNode apply(RexBuilderContext context) {
+//			return context.getIObjectId();
+//		}
+//	}
 
-		@Override
+	static class ThisComputer implements Function<RexBuilderContext, RexNode> {
+		public static final ThisComputer INSTANCE = new ThisComputer();
+
 		public RexNode apply(RexBuilderContext context) {
-			return context.getIObjectId();
+			RelOptCluster cluster = context.getCluster();
+			RelDataTypeFactory typeFactory = cluster.getTypeFactory();
+			final SqlFunction UDF =
+					new SqlUserDefinedFunction(
+							new SqlIdentifier("GET_REFERENCE", SqlParserPos.ZERO),
+							ReturnTypes.explicit(typeFactory.createJavaType(HeapReference.class)),
+							null,
+							OperandTypes.ANY_ANY,
+							ImmutableList.of(typeFactory.createTypeWithNullability(typeFactory.createJavaType(ISnapshot.class), false),
+											 typeFactory.createJavaType(int.class)),
+							ScalarFunctionImpl.create(ISnapshotMethods.class, "getReference")
+					);
+			return context.getBuilder().makeCall(UDF, context.getSnapshot(), context.getIObjectId());
 		}
 	}
 

@@ -59,12 +59,12 @@ public class QueryTest {
     @Test
     public void joinOptimization() throws SQLException {
         // Unfortunately, this is not yet optimized to snapshot.getObject(get_id(u.path))
-        returnsInOrder("explain plan for select u.\"@ID\", s.\"@RETAINED\" from \"java.lang.String\" s join \"java.net.URL\" u on (s.\"@ID\" = get_id(u.path))",
-                new String[]{"PLAN", "EnumerableCalcRel(expr#0..3=[{inputs}], @ID=[$t0], @RETAINED=[$t3])\n"
+        returnsInOrder("explain plan for select u.\"@THIS\", s.\"@RETAINED\" from \"java.lang.String\" s join \"java.net.URL\" u on (s.\"@THIS\" = u.path)",
+                new String[]{"PLAN", "EnumerableCalcRel(expr#0..3=[{inputs}], @THIS=[$t0], @RETAINED=[$t3])\n"
                         + "  EnumerableJoinRel(condition=[=($1, $2)], joinType=[inner])\n"
-                        + "    EnumerableCalcRel(expr#0=[{inputs}], expr#1=[0], expr#2=[GET_SNAPSHOT($t1)], expr#3=[GET_IOBJECT($t2, $t0)], expr#4=['path'], expr#5=[RESOLVE_REFERENCE($t3, $t4)], expr#6=[get_id($t5)], @ID=[$t0], $f15=[$t6])\n"
+                        + "    EnumerableCalcRel(expr#0=[{inputs}], expr#1=[0], expr#2=[GET_SNAPSHOT($t1)], expr#3=[GET_REFERENCE($t2, $t0)], expr#4=[GET_IOBJECT($t2, $t0)], expr#5=['path'], expr#6=[RESOLVE_REFERENCE($t4, $t5)], @THIS=[$t3], path=[$t6])\n"
                         + "      EnumerableTableAccessRel(table=[[HEAP, $ids$:java.net.URL]])\n"
-                        + "    EnumerableCalcRel(expr#0=[{inputs}], expr#1=[0], expr#2=[GET_SNAPSHOT($t1)], expr#3=[GET_RETAINED_SIZE($t2, $t0)], @ID=[$t0], @RETAINED=[$t3])\n"
+                        + "    EnumerableCalcRel(expr#0=[{inputs}], expr#1=[0], expr#2=[GET_SNAPSHOT($t1)], expr#3=[GET_REFERENCE($t2, $t0)], expr#4=[GET_RETAINED_SIZE($t2, $t0)], @THIS=[$t3], @RETAINED=[$t4])\n"
                         + "      EnumerableTableAccessRel(table=[[HEAP, $ids$:java.lang.String]])\n"});
     }
 
@@ -74,8 +74,8 @@ public class QueryTest {
     }
 
     @Test
-    public void selectIDColumn() throws SQLException {
-        execute("select \"@ID\" from \"java.util.HashMap\"", 2);
+    public void selectThisColumn() throws SQLException {
+        execute("select \"@THIS\" from \"java.util.HashMap\"", 2);
     }
 
     @Test

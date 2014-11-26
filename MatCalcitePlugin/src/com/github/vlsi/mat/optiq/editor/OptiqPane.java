@@ -135,10 +135,10 @@ public class OptiqPane extends CompositeHeapEditorPane {
 				+ "--   get_id(HeapReference) retrieves object identifier (e.g. for joins)\n"
 				+ "--   get_by_key(HeapReference, key) retrieves value from a HashMap\n"
 				+ "--   toString(any) returns string representation\n"
-				+ "select u.\"@ID\", s.\"@RETAINED\"\n"
+				+ "select u.\"@THIS\", s.\"@RETAINED\"\n"
 				+ "  from \"java.lang.String\" s\n"
 				+ "     , \"java.net.URL\" u\n"
-				+ " where s.\"@ID\" = get_id(u.path)\n");
+				+ " where s.\"@THIS\" = u.path\n");
 		return doc;
 	}
 

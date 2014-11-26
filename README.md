@@ -39,10 +39,10 @@ Join sample
 
 ```sql
 explain plan for
- select u."@ID", s."@RETAINED"
+ select u."@THIS", s."@RETAINED"
    from "java.lang.String" s
    join "java.net.URL" u
-     on (s."@ID" = get_id(u.path))
+     on s."@THIS" = u.path
 ```
 
 Here's execution plan:
@@ -50,9 +50,9 @@ Here's execution plan:
 ```
 EnumerableCalcRel(expr#0..3=[{inputs}], @ID=[$t0], @RETAINED=[$t3])
   EnumerableJoinRel(condition=[=($1, $2)], joinType=[inner])
-    EnumerableCalcRel(expr#0=[{inputs}], expr#1=[0], expr#2=[GET_SNAPSHOT($t1)], expr#3=[GET_IOBJECT($t2, $t0)], expr#4=['path'], expr#5=[RESOLVE_REFERENCE($t3, $t4)], expr#6=[get_id($t5)], @ID=[$t0], $f15=[$t6])
+    EnumerableCalcRel(expr#0=[{inputs}], expr#1=[0], expr#2=[GET_SNAPSHOT($t1)], expr#3=[GET_REFERENCE($t2, $t0)], expr#4=[GET_IOBJECT($t2, $t0)], expr#5=['path'], expr#6=[RESOLVE_REFERENCE($t4, $t5)], @THIS=[$t3], path=[$t6])
       EnumerableTableAccessRel(table=[[HEAP, $ids$:java.net.URL]])
-    EnumerableCalcRel(expr#0=[{inputs}], expr#1=[0], expr#2=[GET_SNAPSHOT($t1)], expr#3=[GET_RETAINED_SIZE($t2, $t0)], @ID=[$t0], @RETAINED=[$t3])
+    EnumerableCalcRel(expr#0=[{inputs}], expr#1=[0], expr#2=[GET_SNAPSHOT($t1)], expr#3=[GET_REFERENCE($t2, $t0)], expr#4=[GET_RETAINED_SIZE($t2, $t0)], @THIS=[$t3], @RETAINED=[$t4])
       EnumerableTableAccessRel(table=[[HEAP, $ids$:java.lang.String]])
 ```
 
@@ -70,9 +70,17 @@ Heap schema
 
  The following special columns are added:
 
-    @ID       | internal object identifier
+    @THIS     | reference to current object
     @SHALLOW  | shallow heap size of current instance
     @RETAINED | retained heap size of current instance
+
+ The following functions can be used to work with column which represents reference:
+
+    get_id    | internal object identifier for referenced object
+    get_type  | class name of referenced object
+    toString  | textual representation of referenced object
+    length    | length of referenced array
+    get_by_id | extracts value for given string representation of key for referenced HashMap
 
 Requirements
 ------------

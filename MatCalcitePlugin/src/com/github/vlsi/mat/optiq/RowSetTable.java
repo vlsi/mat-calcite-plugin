@@ -30,7 +30,7 @@ public class RowSetTable implements IResultTable {
 				clazz = String.class;
 			}
 			columns[i] = new Column(md.getColumnName(i + 1), clazz);
-			if (idColumnPosition == -1 && "@ID".equals(columns[i].getLabel()))
+			if (idColumnPosition == -1 && "@THIS".equals(columns[i].getLabel()))
 				idColumnPosition = i;
 		}
 		this.columns = columns;
@@ -65,7 +65,8 @@ public class RowSetTable implements IResultTable {
 
 			@Override
 			public int getObjectId() {
-				return (Integer) data[idColumnPosition];
+//				return (Integer) data[idColumnPosition];
+				return ((HeapReference)data[idColumnPosition]).getIObject().getObjectId();
 			}
 		};
 	}
