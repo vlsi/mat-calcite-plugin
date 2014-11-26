@@ -66,6 +66,18 @@ public class HeapFunctions {
         return null;
     }
 
+    public int length(Object r) {
+        HeapReference ref = ensureHeapReference(r);
+
+        if (ref == null) {
+            return -1;
+        }
+
+        IObject obj = ref.getIObject();
+
+        return obj instanceof IArray ? ((IArray)obj).getLength() : -1;
+    }
+
     private static HeapReference ensureHeapReference(Object r) {
         return (r == null || !(r instanceof HeapReference)) ?
                 null :
