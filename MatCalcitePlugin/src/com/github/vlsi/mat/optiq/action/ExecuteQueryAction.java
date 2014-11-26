@@ -29,6 +29,10 @@ public class ExecuteQueryAction extends Action {
 		{
 			query = queryString.getText();
 		}
+
+		// Temporary workaround for https://issues.apache.org/jira/browse/CALCITE-459
+		query = query + queryString.getLineDelimiter();
+
 		return query;
 	}
 
