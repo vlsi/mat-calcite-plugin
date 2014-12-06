@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <site>
-    <feature url="features/MatCalciteFeature_1.1.1.qualifier.jar" id="MatCalciteFeature" version="1.1.1.qualifier">
+    <feature url="features/MatCalciteFeature_1.2.0.jar" id="MatCalciteFeature" version="1.2.0">
         <category name="queries_category"/>
     </feature>
     <category-def name="queries_category" label="Queries">

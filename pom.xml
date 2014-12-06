@@ -5,7 +5,7 @@
 
     <groupId>com.github.vlsi.mat.calcite</groupId>
     <artifactId>parent</artifactId>
-    <version>1.1.1-SNAPSHOT</version>
+    <version>1.2.0</version>
     <packaging>pom</packaging>
     <name>MAT Calcite plugin parent</name>
 
@@ -50,6 +50,11 @@
                         <include>**/AllTests.class</include>
                     </includes>
                 </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.eclipse.tycho</groupId>
+                <artifactId>tycho-versions-plugin</artifactId>
+                <version>${tycho-version}</version>
             </plugin>
             <plugin>
                 <groupId>org.eclipse.tycho</groupId>

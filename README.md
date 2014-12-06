@@ -143,6 +143,18 @@ This library is distributed under terms of Apache 2 License
 
 Change log
 ----------
+v1.2.0
+  Released at bintray
+  `@THIS` column in each table (Alexey Makhmutov)
+  `length(obj)` function to get array length (Alexey Makhmutov)
+  `get_type(obj)` function to get class name (Alexey Makhmutov)
+  `get_by_key(obj, string)` function to extract value by key from HashMaps (Alexey Makhmutov)
+  Display superclasses fields in results (Alexey Makhmutov)
+  Scroll bars and remove word wrapping from Calcite SQL view
+  F10 hotkey for explain plan
+  Pretty print explain plan output
+  Fix query copy command after switching to other pane or page
+
 v1.1.1
   Updated to Apache Calcite 0.9.1, switch to double-quotes, enable maven-only build
 
