@@ -11,6 +11,11 @@ MAT Calcite plugin allows all the typical SQL operations (joins, filters, group 
 Query engine is implemented via [Apache Calcite](http://calcite.incubator.apache.org)
 See [Calcite SQL reference](https://github.com/apache/incubator-calcite/blob/master/doc/REFERENCE.md)
 
+Installation
+------------
+
+Use the following update repository to install the latest released version: http://dl.bintray.com/vlsi/eclipse/
+
 Sample
 ------
 
