@@ -124,7 +124,7 @@ public class ClassRowTypeCache {
 				}
 			}
 			return Pair.of(
-					typeFactory.createStructType(Pair.zip(names, types)),
+					typeFactory.createStructType(types, names),
 					resolvers);
 		}
 	}
