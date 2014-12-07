@@ -129,15 +129,6 @@ public class ClassRowTypeCache {
 		}
 	}
 
-//	static class ObjectIdComputer implements Function<RexBuilderContext, RexNode> {
-//		public static final ObjectIdComputer INSTANCE = new ObjectIdComputer();
-//
-//		@Override
-//		public RexNode apply(RexBuilderContext context) {
-//			return context.getIObjectId();
-//		}
-//	}
-
 	static class ThisComputer implements Function<RexBuilderContext, RexNode> {
 		public static final ThisComputer INSTANCE = new ThisComputer();
 
@@ -146,15 +137,14 @@ public class ClassRowTypeCache {
 			RelDataTypeFactory typeFactory = cluster.getTypeFactory();
 			final SqlFunction UDF =
 					new SqlUserDefinedFunction(
-							new SqlIdentifier("GET_REFERENCE", SqlParserPos.ZERO),
+							new SqlIdentifier("TO_REFERENCE", SqlParserPos.ZERO),
 							ReturnTypes.explicit(typeFactory.createJavaType(HeapReference.class)),
 							null,
-							OperandTypes.ANY_ANY,
-							ImmutableList.of(typeFactory.createTypeWithNullability(typeFactory.createJavaType(ISnapshot.class), false),
-											 typeFactory.createJavaType(int.class)),
-							ScalarFunctionImpl.create(ISnapshotMethods.class, "getReference")
+							OperandTypes.ANY,
+							ImmutableList.of(typeFactory.createTypeWithNullability(typeFactory.createJavaType(IObject.class), false)),
+							ScalarFunctionImpl.create(ISnapshotMethods.class, "toReference")
 					);
-			return context.getBuilder().makeCall(UDF, context.getSnapshot(), context.getIObjectId());
+			return context.getBuilder().makeCall(UDF, context.getIObject());
 		}
 	}
 

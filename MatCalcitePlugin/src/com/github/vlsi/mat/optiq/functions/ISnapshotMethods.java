@@ -30,7 +30,7 @@ public class ISnapshotMethods {
         }
     }
 
-    public static HeapReference getReference(ISnapshot snapshot, int id) {
-        return new HeapReference(getIObject(snapshot, id));
+    public static HeapReference toReference(IObject iObject) {
+        return new HeapReference(iObject);
     }
 }

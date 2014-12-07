@@ -62,9 +62,9 @@ public class QueryTest {
         returnsInOrder("explain plan for select u.\"@THIS\", s.\"@RETAINED\" from \"java.lang.String\" s join \"java.net.URL\" u on (s.\"@THIS\" = u.path)",
                 new String[]{"PLAN", "EnumerableCalcRel(expr#0..3=[{inputs}], @THIS=[$t0], @RETAINED=[$t3])\n"
                         + "  EnumerableJoinRel(condition=[=($1, $2)], joinType=[inner])\n"
-                        + "    EnumerableCalcRel(expr#0=[{inputs}], expr#1=[0], expr#2=[GET_SNAPSHOT($t1)], expr#3=[GET_REFERENCE($t2, $t0)], expr#4=[GET_IOBJECT($t2, $t0)], expr#5=['path'], expr#6=[RESOLVE_REFERENCE($t4, $t5)], @THIS=[$t3], path=[$t6])\n"
+                        + "    EnumerableCalcRel(expr#0=[{inputs}], expr#1=[0], expr#2=[GET_SNAPSHOT($t1)], expr#3=[GET_IOBJECT($t2, $t0)], expr#4=[TO_REFERENCE($t3)], expr#5=['path'], expr#6=[RESOLVE_REFERENCE($t3, $t5)], @THIS=[$t4], path=[$t6])\n"
                         + "      EnumerableTableAccessRel(table=[[HEAP, $ids$:java.net.URL]])\n"
-                        + "    EnumerableCalcRel(expr#0=[{inputs}], expr#1=[0], expr#2=[GET_SNAPSHOT($t1)], expr#3=[GET_REFERENCE($t2, $t0)], expr#4=[GET_RETAINED_SIZE($t2, $t0)], @THIS=[$t3], @RETAINED=[$t4])\n"
+                        + "    EnumerableCalcRel(expr#0=[{inputs}], expr#1=[0], expr#2=[GET_SNAPSHOT($t1)], expr#3=[GET_IOBJECT($t2, $t0)], expr#4=[TO_REFERENCE($t3)], expr#5=[GET_RETAINED_SIZE($t2, $t0)], @THIS=[$t4], @RETAINED=[$t5])\n"
                         + "      EnumerableTableAccessRel(table=[[HEAP, $ids$:java.lang.String]])\n"});
     }
 
