@@ -4,6 +4,7 @@ import org.eclipse.jface.action.Action;
 import org.eclipse.mat.ui.util.PaneState;
 import org.eclipse.swt.custom.StyledText;
 import com.github.vlsi.mat.optiq.editor.OptiqPane;
+import org.eclipse.ui.plugin.AbstractUIPlugin;
 
 import java.util.regex.Pattern;
 
@@ -19,6 +20,8 @@ public class ExecuteQueryAction extends Action {
 		this.pane = pane;
 		this.state = state;
 		this.doExplain = doExplain;
+		setText(doExplain?"Explain":"Run");
+		setImageDescriptor(AbstractUIPlugin.imageDescriptorFromPlugin("MatCalcitePlugin", doExplain?"icons/explain.png":"icons/run.png"));
 	}
 
 	private String getSelectedQuery() {

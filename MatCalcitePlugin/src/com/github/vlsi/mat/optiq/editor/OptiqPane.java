@@ -24,11 +24,13 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.SashForm;
 import org.eclipse.swt.custom.StyledText;
 import org.eclipse.swt.events.*;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.*;
 import org.eclipse.ui.actions.ActionFactory;
 import org.eclipse.ui.operations.RedoActionHandler;
 import org.eclipse.ui.operations.UndoActionHandler;
+import org.eclipse.ui.plugin.AbstractUIPlugin;
 
 public class OptiqPane extends CompositeHeapEditorPane {
 	private SourceViewer queryViewer;
@@ -154,7 +156,12 @@ public class OptiqPane extends CompositeHeapEditorPane {
 
 	@Override
 	public String getTitle() {
-		return "Calcite SQL";
+		return "Calcite";
+	}
+
+	@Override
+	public Image getTitleImage() {
+		return AbstractUIPlugin.imageDescriptorFromPlugin("MatCalcitePlugin", "icons/plugin.png").createImage();
 	}
 
 	private void makeActions() {
@@ -205,9 +212,8 @@ public class OptiqPane extends CompositeHeapEditorPane {
 	@Override
 	public void contributeToToolBar(IToolBarManager manager)
 	{
-		//TODO: need to prepare icons for actions
-//		manager.add(executeQueryAction);
-//		manager.add(explainQueryAction);
+		manager.add(executeQueryAction);
+		manager.add(explainQueryAction);
 		super.contributeToToolBar(manager);
 	}
 }

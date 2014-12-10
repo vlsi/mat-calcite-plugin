@@ -5,11 +5,13 @@ import org.eclipse.mat.ui.editor.MultiPaneEditor;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.plugin.AbstractUIPlugin;
+
 
 public class OpenOptiqAction extends Action {
 
 	public OpenOptiqAction() {
-		super("SQL");
+		super("SQL", AbstractUIPlugin.imageDescriptorFromPlugin("MatCalcitePlugin", "icons/plugin.png"));
 	}
 
 	@Override
