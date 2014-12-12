@@ -55,13 +55,11 @@ Here's execution plan:
 ```
 EnumerableCalcRel(expr#0..3=[{inputs}], @ID=[$t0], @RETAINED=[$t3])
   EnumerableJoinRel(condition=[=($1, $2)], joinType=[inner])
-    EnumerableCalcRel(expr#0=[{inputs}], expr#1=[0], expr#2=[GET_SNAPSHOT($t1)], expr#3=[GET_REFERENCE($t2, $t0)], expr#4=[GET_IOBJECT($t2, $t0)], expr#5=['path'], expr#6=[RESOLVE_REFERENCE($t4, $t5)], @THIS=[$t3], path=[$t6])
+    EnumerableCalcRel(expr#0=[{inputs}], expr#1=[0], expr#2=[GET_SNAPSHOT($t1)], expr#3=[GET_IOBJECT($t2, $t0)], expr#4=[TO_REFERENCE($t3)], expr#5=['path'], expr#6=[RESOLVE_REFERENCE($t3, $t5)], @THIS=[$t4], path=[$t6])
       EnumerableTableAccessRel(table=[[HEAP, $ids$:java.net.URL]])
-    EnumerableCalcRel(expr#0=[{inputs}], expr#1=[0], expr#2=[GET_SNAPSHOT($t1)], expr#3=[GET_REFERENCE($t2, $t0)], expr#4=[GET_RETAINED_SIZE($t2, $t0)], @THIS=[$t3], @RETAINED=[$t4])
+    EnumerableCalcRel(expr#0=[{inputs}], expr#1=[0], expr#2=[GET_SNAPSHOT($t1)], expr#3=[GET_IOBJECT($t2, $t0)], expr#4=[TO_REFERENCE($t3)], expr#5=[GET_RETAINED_SIZE($t2, $t0)], @THIS=[$t4], @RETAINED=[$t5])
       EnumerableTableAccessRel(table=[[HEAP, $ids$:java.lang.String]])
 ```
-
-Here we do not yet optimize `s."@ID" = get_id(u.path)` join to `snapshot.getObject(get_id(u.path))`, however non-required columns are eliminated.
 
 Heap schema
 -----------
@@ -140,32 +138,6 @@ Roadmap
 License
 -------
 This library is distributed under terms of Apache 2 License
-
-Change log
-----------
-v1.2.0
-  Released at bintray
-  `@THIS` column in each table (Alexey Makhmutov)
-  `length(obj)` function to get array length (Alexey Makhmutov)
-  `get_type(obj)` function to get class name (Alexey Makhmutov)
-  `get_by_key(obj, string)` function to extract value by key from HashMaps (Alexey Makhmutov)
-  Display superclasses fields in results (Alexey Makhmutov)
-  Scroll bars and remove word wrapping from Calcite SQL view
-  F10 hotkey for explain plan
-  Pretty print explain plan output
-  Fix query copy command after switching to other pane or page
-
-v1.1.1
-  Updated to Apache Calcite 0.9.1, switch to double-quotes, enable maven-only build
-
-v1.1
-  Undo/redo support, syntax highlighting
-
-v1.0.1
-  Updated optiq to 0.4.18: enable case-sensitive identifiers by default, back-tick quotes
-
-v1.0.0
-  Proof of concept.
 
 Author
 ------
