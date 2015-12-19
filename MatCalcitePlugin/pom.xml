@@ -17,7 +17,7 @@
     <dependencies>
         <dependency>
             <groupId>com.github.vlsi.mat.calcite</groupId>
-            <artifactId>dependencies</artifactId>
+            <artifactId>MatCalciteDependencies</artifactId>
             <version>${project.version}</version>
         </dependency>
     </dependencies>
@@ -67,9 +67,9 @@
                     <appArgLine>-product org.eclipse.mat.ui.rcp.MemoryAnalyzer</appArgLine>
                     <repositories>
                         <repository>
-                            <id>luna</id>
+                            <id>Eclipse</id>
                             <layout>p2</layout>
-                            <url>http://download.eclipse.org/releases/luna</url>
+                            <url>${eclipse-repository}</url>
                         </repository>
                     </repositories>
                     <dependencies>

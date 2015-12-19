@@ -4,7 +4,7 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.github.vlsi.mat.calcite</groupId>
-    <artifactId>dependencies</artifactId>
+    <artifactId>MatCalciteDependencies</artifactId>
     <version>1.3.0-SNAPSHOT</version>
     <packaging>bundle</packaging>
 

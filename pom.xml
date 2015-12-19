@@ -11,11 +11,12 @@
 
     <properties>
         <tycho-version>0.21.0</tycho-version>
+        <eclipse-repository>http://download.eclipse.org/releases/luna</eclipse-repository>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
     <modules>
-        <module>luna</module>
+        <module>MatCalciteTargetPlatform</module>
         <module>MatCalcitePlugin</module>
         <module>MatCalciteFeature</module>
         <module>MatCalciteTest</module>
@@ -24,9 +25,9 @@
 
     <repositories>
         <repository>
-            <id>luna</id>
+            <id>Eclipse</id>
             <layout>p2</layout>
-            <url>http://download.eclipse.org/releases/luna</url>
+            <url>${eclipse-repository}</url>
         </repository>
     </repositories>
 
@@ -65,7 +66,7 @@
                     <target>
                         <artifact>
                             <groupId>com.github.vlsi.mat.calcite</groupId>
-                            <artifactId>luna</artifactId>
+                            <artifactId>MatCalciteTargetPlatform</artifactId>
                             <version>${project.version}</version>
                         </artifact>
                     </target>

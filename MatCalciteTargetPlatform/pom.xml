@@ -4,10 +4,10 @@
 	xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
 	<modelVersion>4.0.0</modelVersion>
 
-	<artifactId>luna</artifactId>
+	<artifactId>MatCalciteTargetPlatform</artifactId>
 	<version>1.3.0-SNAPSHOT</version>
 	<packaging>eclipse-target-definition</packaging>
-	<name>Eclipse luna target definition</name>
+	<name>Eclipse target definition</name>
 
 	<parent>
 		<artifactId>parent</artifactId>
