@@ -11,7 +11,7 @@
 
     <properties>
         <tycho-version>0.21.0</tycho-version>
-        <eclipse-repository>http://download.eclipse.org/releases/luna</eclipse-repository>
+        <eclipse-repository>http://download.eclipse.org/releases/mars</eclipse-repository>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
