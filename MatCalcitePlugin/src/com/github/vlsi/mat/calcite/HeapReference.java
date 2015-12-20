@@ -24,9 +24,7 @@ public class HeapReference implements Comparable<HeapReference> {
 
         HeapReference that = (HeapReference) o1;
 
-        if (!o.equals(that.o)) return false;
-
-        return true;
+        return o.equals(that.o);
     }
 
     @Override

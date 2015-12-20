@@ -55,7 +55,6 @@ public class ClassRowTypeCache {
 		@Override
 		public Pair<RelDataType, List<Function<RexBuilderContext, RexNode>>> load(
 				IClass clazz) throws Exception {
-			ISnapshot snapshot = clazz.getSnapshot();
 			List<Function<RexBuilderContext, RexNode>> resolvers = new ArrayList<Function<RexBuilderContext, RexNode>>();
 			List<String> names = new ArrayList<String>();
 			List<RelDataType> types = new ArrayList<RelDataType>();
