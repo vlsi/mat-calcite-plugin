@@ -134,13 +134,18 @@ public class CalcitePane extends CompositeHeapEditorPane {
 				+ "--   \"java.lang.BigInteger\" list of all BigIntegers\n"
 				+ "--   \"instanceof java.lang.BigInteger\" BigIntegers and all subclasses\n"
 				+ "-- Functions:\n"
-				+ "--   get_id(HeapReference) retrieves object identifier (e.g. for joins)\n"
-				+ "--   get_by_key(HeapReference, key) retrieves value from a HashMap\n"
 				+ "--   toString(any) returns string representation\n"
-				+ "select u.\"@THIS\", s.\"@RETAINED\"\n"
+				+ "--   getType(any) returns class name of referenced object\n"
+				+ "--   shallowSize(any) returns shallow heap size\n"
+				+ "--   retainedSize(any) returns retained heap size\n"
+				+ "--   length(array) returns length of array reference\n"
+				+ "--   getSize(collection or map or array) returns size of collection or array, or number of non-null elements in array\n"
+				+ "--   getByKey(map, key) returns element of map for key with given string representation\n"
+				+ "--   getField(any, field name) returns value of field for given object\n"
+				+ "select u.this, retainedSize(s.this) retained_size\n"
 				+ "  from \"java.lang.String\" s\n"
 				+ "     , \"java.net.URL\" u\n"
-				+ " where s.\"@THIS\" = u.path\n");
+				+ " where s.this = u.path\n");
 		return doc;
 	}
 
