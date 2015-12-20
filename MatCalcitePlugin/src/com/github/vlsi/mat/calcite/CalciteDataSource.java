@@ -30,7 +30,7 @@ public class CalciteDataSource
 			Class.forName("org.apache.calcite.jdbc.Driver");
 		} catch (ClassNotFoundException e) {
 			throw new SQLException(
-					"Unable to load Caclite JDBC driver", e);
+					"Unable to load Calcite JDBC driver", e);
 		}
 		Properties info = new Properties();
 		info.put("lex", "JAVA");

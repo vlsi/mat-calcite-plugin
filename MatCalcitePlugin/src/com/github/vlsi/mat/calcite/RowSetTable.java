@@ -30,7 +30,7 @@ public class RowSetTable implements IResultTable {
 				clazz = String.class;
 			}
 			columns[i] = new Column(md.getColumnName(i + 1), clazz);
-			if (idColumnPosition == -1 && "@THIS".equals(columns[i].getLabel()))
+			if (idColumnPosition == -1 && "this".equals(columns[i].getLabel()))
 				idColumnPosition = i;
 		}
 		this.columns = columns;

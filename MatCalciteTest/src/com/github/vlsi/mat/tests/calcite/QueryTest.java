@@ -59,12 +59,12 @@ public class QueryTest {
     @Test
     public void joinOptimization() throws SQLException {
         // Unfortunately, this is not yet optimized to snapshot.getObject(get_id(u.path))
-        returnsInOrder("explain plan for select u.\"@THIS\", s.\"@RETAINED\" from \"java.lang.String\" s join \"java.net.URL\" u on (s.\"@THIS\" = u.path)",
-                new String[]{"PLAN", "EnumerableCalc(expr#0..3=[{inputs}], @THIS=[$t0], @RETAINED=[$t3])\n"
+        returnsInOrder("explain plan for select u.this, retainedSize(s.this) from \"java.lang.String\" s join \"java.net.URL\" u on (s.this = u.path)",
+                new String[]{"PLAN", "EnumerableCalc(expr#0..2=[{inputs}], expr#3=[retainedSize($t2)], this=[$t0], EXPR$1=[$t3])\n"
                         + "  EnumerableJoin(condition=[=($1, $2)], joinType=[inner])\n"
-                        + "    EnumerableCalc(expr#0=[{inputs}], expr#1=[0], expr#2=[GET_SNAPSHOT($t1)], expr#3=[GET_IOBJECT($t2, $t0)], expr#4=[TO_REFERENCE($t3)], expr#5=['path'], expr#6=[RESOLVE_REFERENCE($t3, $t5)], @THIS=[$t4], path=[$t6])\n"
+                        + "    EnumerableCalc(expr#0=[{inputs}], expr#1=[0], expr#2=[GET_SNAPSHOT($t1)], expr#3=[GET_IOBJECT($t2, $t0)], expr#4=[TO_REFERENCE($t3)], expr#5=['path'], expr#6=[RESOLVE_REFERENCE($t3, $t5)], this=[$t4], path=[$t6])\n"
                         + "      EnumerableTableScan(table=[[HEAP, $ids$:java.net.URL]])\n"
-                        + "    EnumerableCalc(expr#0=[{inputs}], expr#1=[0], expr#2=[GET_SNAPSHOT($t1)], expr#3=[GET_IOBJECT($t2, $t0)], expr#4=[TO_REFERENCE($t3)], expr#5=[GET_RETAINED_SIZE($t2, $t0)], @THIS=[$t4], @RETAINED=[$t5])\n"
+                        + "    EnumerableCalc(expr#0=[{inputs}], expr#1=[0], expr#2=[GET_SNAPSHOT($t1)], expr#3=[GET_IOBJECT($t2, $t0)], expr#4=[TO_REFERENCE($t3)], this=[$t4])\n"
                         + "      EnumerableTableScan(table=[[HEAP, $ids$:java.lang.String]])\n"});
     }
 
@@ -75,27 +75,34 @@ public class QueryTest {
 
     @Test
     public void selectThisColumn() throws SQLException {
-        execute("select \"@THIS\" from \"java.util.HashMap\"", 2);
+        execute("select this from \"java.util.HashMap\"", 2);
     }
 
     @Test
-    public void selectShallowColumn() throws SQLException {
-        execute("select \"@SHALLOW\" from \"java.util.HashMap\"", 2);
+    public void selectShallowSizeFunction() throws SQLException {
+        returnsInOrder("select sum(shallowSize(this)) shallow_size from \"java.util.HashMap\"",
+                new String[]{"shallow_size", "3840"});
+    }
+
+    @Test
+    public void selectRetainedSizeFunction() throws SQLException {
+        returnsInOrder("select sum(retainedSize(this)) retained_size from \"java.util.HashMap\"",
+                new String[]{"retained_size", "114976"});
     }
 
     @Test
     public void testReadme() throws SQLException {
-        execute("explain plan for select toString(file) file, count(*) cnt, sum(\"@RETAINED\") sum_retained, sum(\"@SHALLOW\") sum_shallow\n"
+        execute("explain plan for select toString(file) file, count(*) cnt, sum(retainedSize(this)) sum_retained, sum(shallowSize(this)) sum_shallow\n"
                 + "  from \"java.net.URL\"\n"
                 + " group by toString(file)\n"
                 + "having count(*)>1\n"
-                + " order by sum(\"@RETAINED\") desc", 5);
+                + " order by sum(shallowSize(this)) desc", 5);
 
-        execute("select toString(file) file, count(*) cnt, sum(\"@RETAINED\") sum_retained, sum(\"@SHALLOW\") sum_shallow\n"
+        execute("select toString(file) file, count(*) cnt, sum(retainedSize(this)) sum_retained, sum(shallowSize(this)) sum_shallow\n"
                 + "  from \"java.net.URL\"\n"
                 + " group by toString(file)\n"
                 + "having count(*)>1\n"
-                + " order by sum(\"@RETAINED\") desc", 5);
+                + " order by sum(retainedSize(this)) desc", 5);
     }
 
     private void returnsInOrder(String sql, Object[] expected) throws SQLException {

@@ -22,11 +22,11 @@ Sample
 Query that lists duplicate URLs:
 
 ```sql
-select toString(file) file, count(*) cnt, sum("@RETAINED") sum_retained, sum("@SHALLOW") sum_shallow
+select toString(file) file, count(*) cnt, sum(retainedSize(this)) sum_retained, sum(shallowSize(this)) sum_shallow
   from "java.net.URL"
  group by toString(file)
 having count(*)>1
- order by sum("@RETAINED") desc
+ order by sum(retainedSize(this)) desc
 ```
 
 To get an explain plan, use "explain plan for select ...":
@@ -35,7 +35,7 @@ To get an explain plan, use "explain plan for select ...":
 EnumerableSort(sort0=[$2], dir0=[DESC])
   View (expr#0..3=[{inputs}], expr#4=[1], expr#5=[>($t1, $t4)], proj#0..3=[{exprs}], $condition=[$t5])
     EnumerableAggregate(group=[{0}], cnt=[COUNT()], sum_retained=[$SUM0($1)], sum_shallow=[$SUM0($2)])
-      View (expr#0=[{inputs}], expr#1=[0], expr#2=[GET_SNAPSHOT($t1)], expr#3=[GET_IOBJECT($t2, $t0)], expr#4=['file'], expr#5=[RESOLVE_REFERENCE($t3, $t4)], expr#6=[toString($t5)], expr#7=[GET_RETAINED_SIZE($t2, $t0)], expr#8=[GET_SHALLOW_SIZE($t2, $t0)], file=[$t6], @RETAINED=[$t7], @SHALLOW=[$t8])
+      View (expr#0=[{inputs}], expr#1=[0], expr#2=[GET_SNAPSHOT($t1)], expr#3=[GET_IOBJECT($t2, $t0)], expr#4=['file'], expr#5=[RESOLVE_REFERENCE($t3, $t4)], expr#6=[toString($t5)], expr#7=[TO_REFERENCE($t3)], expr#8=[retainedSize($t7)], expr#9=[shallowSize($t7)], file=[$t6], $f1=[$t8], $f2=[$t9])
         GetObjectIdsByClass (class=java.net.URL)
 ```
 
@@ -43,21 +43,20 @@ Join sample
 -----------
 
 ```sql
-explain plan for
- select u."@THIS", s."@RETAINED"
+ select u.this, retainedSize(s.this)
    from "java.lang.String" s
    join "java.net.URL" u
-     on s."@THIS" = u.path
+     on s.this = u.path
 ```
 
 Here's execution plan:
 
 ```
-View (expr#0..3=[{inputs}], @THIS=[$t0], @RETAINED=[$t3])
+View (expr#0..2=[{inputs}], expr#3=[retainedSize($t2)], this=[$t0], EXPR$1=[$t3])
   HashJoin (condition=[=($1, $2)], joinType=[inner])
-    View (expr#0=[{inputs}], expr#1=[0], expr#2=[GET_SNAPSHOT($t1)], expr#3=[GET_IOBJECT($t2, $t0)], expr#4=[TO_REFERENCE($t3)], expr#5=['path'], expr#6=[RESOLVE_REFERENCE($t3, $t5)], @THIS=[$t4], path=[$t6])
+    View (expr#0=[{inputs}], expr#1=[0], expr#2=[GET_SNAPSHOT($t1)], expr#3=[GET_IOBJECT($t2, $t0)], expr#4=[TO_REFERENCE($t3)], expr#5=['path'], expr#6=[RESOLVE_REFERENCE($t3, $t5)], this=[$t4], path=[$t6])
       GetObjectIdsByClass (class=java.net.URL)
-    View (expr#0=[{inputs}], expr#1=[0], expr#2=[GET_SNAPSHOT($t1)], expr#3=[GET_IOBJECT($t2, $t0)], expr#4=[TO_REFERENCE($t3)], expr#5=[GET_RETAINED_SIZE($t2, $t0)], @THIS=[$t4], @RETAINED=[$t5])
+    View (expr#0=[{inputs}], expr#1=[0], expr#2=[GET_SNAPSHOT($t1)], expr#3=[GET_IOBJECT($t2, $t0)], expr#4=[TO_REFERENCE($t3)], this=[$t4])
       GetObjectIdsByClass (class=java.lang.String)
 ```
 
@@ -73,21 +72,24 @@ Heap schema
 
  The following special columns are added:
 
-    @THIS     | reference to current object
-    @SHALLOW  | shallow heap size of current instance
-    @RETAINED | retained heap size of current instance
+    this         | reference to current object
 
  The following functions can be used to work with column which represents reference:
 
-    get_id    | internal object identifier for referenced object
-    get_type  | class name of referenced object
-    toString  | textual representation of referenced object
-    length    | length of referenced array
-    get_by_id | extracts value for given string representation of key for referenced HashMap
+    getId        | internal object identifier for referenced object
+    getType      | class name of referenced object
+    toString     | textual representation of referenced object
+    shallowSize  | shallow heap size of referenced object
+    retainedSize | retained heap size for referenced object
+    length       | length of referenced array
+    getSize      | size of referenced collection, map or count of non-null elements in array
+    getByKey     | extracts value for given string representation of key for referenced map
+    getField     | obtains value of field with specified name for referenced object
 
 Requirements
 ------------
 Java 1.7
+Memory Analyzer Tool 1.5 or higher
 
 
 Building

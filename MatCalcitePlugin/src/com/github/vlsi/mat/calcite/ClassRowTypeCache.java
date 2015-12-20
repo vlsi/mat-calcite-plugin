@@ -62,17 +62,17 @@ public class ClassRowTypeCache {
 //			types.add(typeFactory.createJavaType(int.class));
 //			resolvers.add(ObjectIdComputer.INSTANCE);
 
-			names.add("@THIS");
+			names.add("this");
 			types.add(typeFactory.createJavaType(HeapReference.class));
 			resolvers.add(ThisComputer.INSTANCE);
 
-			names.add("@SHALLOW");
-			types.add(typeFactory.createJavaType(long.class));
-			resolvers.add(ShallowSizeComputer.INSTANCE);
+//			names.add("@SHALLOW");
+//			types.add(typeFactory.createJavaType(long.class));
+//			resolvers.add(ShallowSizeComputer.INSTANCE);
 
-			names.add("@RETAINED");
-			types.add(typeFactory.createJavaType(long.class));
-			resolvers.add(RetainedSizeComputer.INSTANCE);
+//			names.add("@RETAINED");
+//			types.add(typeFactory.createJavaType(long.class));
+//			resolvers.add(RetainedSizeComputer.INSTANCE);
 
 			for(; clazz != null; clazz = clazz.getSuperClass())
 			{
@@ -147,45 +147,45 @@ public class ClassRowTypeCache {
 		}
 	}
 
-	static class ShallowSizeComputer implements Function<RexBuilderContext, RexNode> {
-		public static final ShallowSizeComputer INSTANCE = new ShallowSizeComputer();
-
-		@Override
-		public RexNode apply(RexBuilderContext context) {
-			RelOptCluster cluster = context.getCluster();
-			RelDataTypeFactory typeFactory = cluster.getTypeFactory();
-			final SqlFunction UDF =
-					new SqlUserDefinedFunction(
-							new SqlIdentifier("GET_SHALLOW_SIZE", SqlParserPos.ZERO),
-							ReturnTypes.explicit(typeFactory.createJavaType(long.class)),
-							null,
-							OperandTypes.ANY_ANY,
-							ImmutableList.of(typeFactory.createTypeWithNullability(typeFactory.createJavaType(ISnapshot.class), false),
-									typeFactory.createJavaType(int.class)),
-							ScalarFunctionImpl.create(ISnapshotMethods.class, "getShallowSize"));
-			return context.getBuilder().makeCall(UDF, context.getSnapshot(), context.getIObjectId());
-		}
-	}
-
-	static class RetainedSizeComputer implements Function<RexBuilderContext, RexNode> {
-		public static final RetainedSizeComputer INSTANCE = new RetainedSizeComputer();
-
-		@Override
-		public RexNode apply(RexBuilderContext context) {
-			RelOptCluster cluster = context.getCluster();
-			RelDataTypeFactory typeFactory = cluster.getTypeFactory();
-			final SqlFunction UDF =
-					new SqlUserDefinedFunction(
-							new SqlIdentifier("GET_RETAINED_SIZE", SqlParserPos.ZERO),
-							ReturnTypes.explicit(typeFactory.createJavaType(long.class)),
-							null,
-							OperandTypes.ANY_ANY,
-							ImmutableList.of(typeFactory.createTypeWithNullability(typeFactory.createJavaType(ISnapshot.class), false),
-									typeFactory.createJavaType(int.class)),
-							ScalarFunctionImpl.create(ISnapshotMethods.class, "getRetainedSize"));
-			return context.getBuilder().makeCall(UDF, context.getSnapshot(), context.getIObjectId());
-		}
-	}
+//	static class ShallowSizeComputer implements Function<RexBuilderContext, RexNode> {
+//		public static final ShallowSizeComputer INSTANCE = new ShallowSizeComputer();
+//
+//		@Override
+//		public RexNode apply(RexBuilderContext context) {
+//			RelOptCluster cluster = context.getCluster();
+//			RelDataTypeFactory typeFactory = cluster.getTypeFactory();
+//			final SqlFunction UDF =
+//					new SqlUserDefinedFunction(
+//							new SqlIdentifier("GET_SHALLOW_SIZE", SqlParserPos.ZERO),
+//							ReturnTypes.explicit(typeFactory.createJavaType(long.class)),
+//							null,
+//							OperandTypes.ANY_ANY,
+//							ImmutableList.of(typeFactory.createTypeWithNullability(typeFactory.createJavaType(ISnapshot.class), false),
+//									typeFactory.createJavaType(int.class)),
+//							ScalarFunctionImpl.create(ISnapshotMethods.class, "getShallowSize"));
+//			return context.getBuilder().makeCall(UDF, context.getSnapshot(), context.getIObjectId());
+//		}
+//	}
+//
+//	static class RetainedSizeComputer implements Function<RexBuilderContext, RexNode> {
+//		public static final RetainedSizeComputer INSTANCE = new RetainedSizeComputer();
+//
+//		@Override
+//		public RexNode apply(RexBuilderContext context) {
+//			RelOptCluster cluster = context.getCluster();
+//			RelDataTypeFactory typeFactory = cluster.getTypeFactory();
+//			final SqlFunction UDF =
+//					new SqlUserDefinedFunction(
+//							new SqlIdentifier("GET_RETAINED_SIZE", SqlParserPos.ZERO),
+//							ReturnTypes.explicit(typeFactory.createJavaType(long.class)),
+//							null,
+//							OperandTypes.ANY_ANY,
+//							ImmutableList.of(typeFactory.createTypeWithNullability(typeFactory.createJavaType(ISnapshot.class), false),
+//									typeFactory.createJavaType(int.class)),
+//							ScalarFunctionImpl.create(ISnapshotMethods.class, "getRetainedSize"));
+//			return context.getBuilder().makeCall(UDF, context.getSnapshot(), context.getIObjectId());
+//		}
+//	}
 
 
 	static class SimplePropertyComputer implements Function<RexBuilderContext, RexNode> {

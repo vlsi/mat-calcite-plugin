@@ -11,13 +11,13 @@ import java.util.Map;
 public class HeapFunctions {
 
     @SuppressWarnings("unused")
-    public static int get_id(Object r) {
+    public static int getId(Object r) {
         HeapReference ref = ensureHeapReference(r);
         return ref == null ? -1 : ref.getIObject().getObjectId();
     }
 
     @SuppressWarnings("unused")
-    public static String get_type(Object r) {
+    public static String getType(Object r) {
         HeapReference ref = ensureHeapReference(r);
         return ref == null ? "" : ref.getIObject().getClazz().getName();
     }
@@ -29,7 +29,7 @@ public class HeapFunctions {
     }
 
     @SuppressWarnings("unused")
-    public static Object get_by_key(Object r, String key) {
+    public static Object getByKey(Object r, String key) {
         HeapReference ref = ensureHeapReference(r);
         if (ref == null) {
             return null;
@@ -48,7 +48,7 @@ public class HeapFunctions {
     }
 
     @SuppressWarnings("unused")
-    public static int get_size(Object r) {
+    public static int getSize(Object r) {
         HeapReference ref = ensureHeapReference(r);
         if (ref == null) {
             return -1;
@@ -107,23 +107,18 @@ public class HeapFunctions {
     }
 
     @SuppressWarnings("unused")
-    public static HeapReference get_reference(Object r, String fieldName) {
+    public static Object getField(Object r, String fieldName) {
         HeapReference ref = ensureHeapReference(r);
         if (ref == null) {
             return null;
         }
 
-        return IObjectMethods.resolveReferenceValue(ref.getIObject(), fieldName);
-    }
-
-    @SuppressWarnings("unused")
-    public static Object get_field(Object r, String fieldName) {
-        HeapReference ref = ensureHeapReference(r);
-        if (ref == null) {
-            return null;
+        Object value = IObjectMethods.resolveSimpleValue(ref.getIObject(), fieldName);
+        if (value instanceof IObject) {
+            return HeapReference.valueOf((IObject)value);
+        } else {
+            return value;
         }
-
-        return IObjectMethods.resolveSimpleValue(ref.getIObject(), fieldName);
     }
 
     private static HeapReference ensureHeapReference(Object r) {
