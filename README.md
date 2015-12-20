@@ -8,8 +8,8 @@ This plugin for [Eclipse Memory Analyzer](http://www.eclipse.org/mat) allows to 
 While MAT does have a query language, it does NOT allow to join, sort and group results.
 MAT Calcite plugin allows all the typical SQL operations (joins, filters, group by, order by, etc)
 
-Query engine is implemented via [Apache Calcite](http://calcite.incubator.apache.org)
-See [Calcite SQL reference](https://github.com/apache/incubator-calcite/blob/master/doc/REFERENCE.md)
+Query engine is implemented via [Apache Calcite](https://calcite.apache.org)
+See [Calcite SQL reference](https://calcite.apache.org/docs/reference.html)
 
 Installation
 ------------
@@ -32,11 +32,11 @@ having count(*)>1
 To get an explain plan, use "explain plan for select ...":
 
 ```
-EnumerableSortRel(sort0=[$2], dir0=[DESC])
-  EnumerableCalcRel(expr#0..3=[{inputs}], expr#4=[1], expr#5=[>($t1, $t4)], proj#0..3=[{exprs}], $condition=[$t5])
-    EnumerableAggregateRel(group=[{0}], cnt=[COUNT()], sum_retained=[SUM($1)], sum_shallow=[SUM($2)])
-      EnumerableCalcRel(expr#0=[{inputs}], expr#1=[0], expr#2=[GET_SNAPSHOT($t1)], expr#3=[GET_IOBJECT($t2, $t0)], expr#4=['file'], expr#5=[RESOLVE_REFERENCE($t3, $t4)], expr#6=[toString($t5)], expr#7=[GET_RETAINED_SIZE($t2, $t0)], expr#8=[GET_SHALLOW_SIZE($t2, $t0)], file=[$t6], @RETAINED=[$t7], @SHALLOW=[$t8])
-        EnumerableTableAccessRel(table=[[HEAP, $ids$:java.net.URL]])
+EnumerableSort(sort0=[$2], dir0=[DESC])
+  View (expr#0..3=[{inputs}], expr#4=[1], expr#5=[>($t1, $t4)], proj#0..3=[{exprs}], $condition=[$t5])
+    EnumerableAggregate(group=[{0}], cnt=[COUNT()], sum_retained=[$SUM0($1)], sum_shallow=[$SUM0($2)])
+      View (expr#0=[{inputs}], expr#1=[0], expr#2=[GET_SNAPSHOT($t1)], expr#3=[GET_IOBJECT($t2, $t0)], expr#4=['file'], expr#5=[RESOLVE_REFERENCE($t3, $t4)], expr#6=[toString($t5)], expr#7=[GET_RETAINED_SIZE($t2, $t0)], expr#8=[GET_SHALLOW_SIZE($t2, $t0)], file=[$t6], @RETAINED=[$t7], @SHALLOW=[$t8])
+        GetObjectIdsByClass (class=java.net.URL)
 ```
 
 Join sample
@@ -53,12 +53,12 @@ explain plan for
 Here's execution plan:
 
 ```
-EnumerableCalcRel(expr#0..3=[{inputs}], @ID=[$t0], @RETAINED=[$t3])
-  EnumerableJoinRel(condition=[=($1, $2)], joinType=[inner])
-    EnumerableCalcRel(expr#0=[{inputs}], expr#1=[0], expr#2=[GET_SNAPSHOT($t1)], expr#3=[GET_IOBJECT($t2, $t0)], expr#4=[TO_REFERENCE($t3)], expr#5=['path'], expr#6=[RESOLVE_REFERENCE($t3, $t5)], @THIS=[$t4], path=[$t6])
-      EnumerableTableAccessRel(table=[[HEAP, $ids$:java.net.URL]])
-    EnumerableCalcRel(expr#0=[{inputs}], expr#1=[0], expr#2=[GET_SNAPSHOT($t1)], expr#3=[GET_IOBJECT($t2, $t0)], expr#4=[TO_REFERENCE($t3)], expr#5=[GET_RETAINED_SIZE($t2, $t0)], @THIS=[$t4], @RETAINED=[$t5])
-      EnumerableTableAccessRel(table=[[HEAP, $ids$:java.lang.String]])
+View (expr#0..3=[{inputs}], @THIS=[$t0], @RETAINED=[$t3])
+  HashJoin (condition=[=($1, $2)], joinType=[inner])
+    View (expr#0=[{inputs}], expr#1=[0], expr#2=[GET_SNAPSHOT($t1)], expr#3=[GET_IOBJECT($t2, $t0)], expr#4=[TO_REFERENCE($t3)], expr#5=['path'], expr#6=[RESOLVE_REFERENCE($t3, $t5)], @THIS=[$t4], path=[$t6])
+      GetObjectIdsByClass (class=java.net.URL)
+    View (expr#0=[{inputs}], expr#1=[0], expr#2=[GET_SNAPSHOT($t1)], expr#3=[GET_IOBJECT($t2, $t0)], expr#4=[TO_REFERENCE($t3)], expr#5=[GET_RETAINED_SIZE($t2, $t0)], @THIS=[$t4], @RETAINED=[$t5])
+      GetObjectIdsByClass (class=java.lang.String)
 ```
 
 Heap schema
@@ -100,7 +100,7 @@ So we use two-phase approach: bundle the dependencies in a single jar, then use 
 1. Build dependencies.jar
 
     ```
-    cd dependencies
+    cd MatCalciteDependencies
     mvn install
     ```
 
@@ -113,7 +113,7 @@ So we use two-phase approach: bundle the dependencies in a single jar, then use 
     mvn install # from the top-level folder
     ```
 
-    Note: this will copy `dependencies.jar` to `MatCalcitePlugin/MatCalcitePlugin/target/dependency` so Eclipse can find it.
+    Note: this will copy `MatCalciteDependencies` to `MatCalcitePlugin/MatCalcitePlugin/target/dependency` so Eclipse can find it.
 
     The final repository (aka "update site") with the plugin will be created in `eclipse-repository/target/eclipse-repository-1.0.0-SNAPSHOT.zip`
 

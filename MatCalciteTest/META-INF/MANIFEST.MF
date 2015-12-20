@@ -9,5 +9,5 @@ Require-Bundle: org.junit,
  org.eclipse.mat.parser;bundle-version="1.4.0",
  org.eclipse.mat.ui;bundle-version="1.4.0",
  org.eclipse.mat.hprof;bundle-version="1.4.0"
-Import-Package: com.github.vlsi.mat.optiq,
+Import-Package: com.github.vlsi.mat.calcite,
  com.google.common.base
