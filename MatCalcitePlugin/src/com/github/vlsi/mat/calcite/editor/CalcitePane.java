@@ -135,6 +135,7 @@ public class CalcitePane extends CompositeHeapEditorPane {
 				+ "--   \"instanceof java.lang.BigInteger\" BigIntegers and all subclasses\n"
 				+ "-- Functions:\n"
 				+ "--   toString(any) returns string representation\n"
+				+ "--   getAddress(any) returns address of referenced object\n"
 				+ "--   getType(any) returns class name of referenced object\n"
 				+ "--   shallowSize(any) returns shallow heap size\n"
 				+ "--   retainedSize(any) returns retained heap size\n"

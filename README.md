@@ -77,6 +77,7 @@ Heap schema
  The following functions can be used to work with column which represents reference:
 
     getId        | internal object identifier for referenced object
+    getAddress   | memory address for referenced object
     getType      | class name of referenced object
     toString     | textual representation of referenced object
     shallowSize  | shallow heap size of referenced object

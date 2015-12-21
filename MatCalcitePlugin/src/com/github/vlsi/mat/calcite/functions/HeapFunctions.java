@@ -121,6 +121,16 @@ public class HeapFunctions {
         }
     }
 
+    @SuppressWarnings("unused")
+    public static long getAddress(Object r) {
+        HeapReference ref = ensureHeapReference(r);
+        if (ref == null) {
+            return -1;
+        }
+
+        return ref.getIObject().getObjectAddress();
+    }
+
     private static HeapReference ensureHeapReference(Object r) {
         return (r == null || !(r instanceof HeapReference)) ?
                 null :
