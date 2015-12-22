@@ -4,6 +4,7 @@ import com.github.vlsi.mat.calcite.HeapReference;
 import org.eclipse.mat.SnapshotException;
 import org.eclipse.mat.inspections.collectionextract.CollectionExtractionUtils;
 import org.eclipse.mat.inspections.collectionextract.ICollectionExtractor;
+import org.eclipse.mat.snapshot.ISnapshot;
 import org.eclipse.mat.snapshot.model.*;
 
 import java.util.Map;
@@ -129,6 +130,27 @@ public class HeapFunctions {
         }
 
         return ref.getIObject().getObjectAddress();
+    }
+
+    @SuppressWarnings("unused")
+    public static long toLong(String value) {
+        return Long.decode(value);
+    }
+
+    @SuppressWarnings("unused")
+    public static Object getDominator(Object r) {
+        HeapReference ref = ensureHeapReference(r);
+        if (ref == null) {
+            return null;
+        }
+
+        try {
+            ISnapshot snapshot = ref.getIObject().getSnapshot();
+            return HeapReference.valueOf(snapshot.getObject(snapshot.getImmediateDominatorId(ref.getIObject().getObjectId())));
+        } catch (SnapshotException e) {
+            throw new RuntimeException("Cannot obtain immediate dominator object for "+r, e);
+        }
+
     }
 
     private static HeapReference ensureHeapReference(Object r) {

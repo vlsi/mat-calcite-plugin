@@ -1,5 +1,6 @@
 package com.github.vlsi.mat.calcite;
 
+import com.github.vlsi.mat.calcite.functions.TableFunctions;
 import com.github.vlsi.mat.calcite.functions.HeapFunctions;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableMap.Builder;
@@ -52,6 +53,7 @@ public class HeapSchema extends AbstractSchema
 
         ImmutableMultimap.Builder<String, Function> b = ImmutableMultimap.builder();
         b.putAll(ScalarFunctionImpl.createAll(HeapFunctions.class));
+        b.putAll(TableFunctions.createAll());
         functionMultimap = b.build();
     }
 
