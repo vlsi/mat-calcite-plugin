@@ -114,6 +114,9 @@ public class PackageSchema extends AbstractSchema {
                 defaultSchema.addClass("instanceof."+fullClassName, childrenTable);
             }
 
+            // Add thread stacks table
+            defaultSchema.getPackage("heap").addClass("ThreadStackFrames", new SnapshotThreadStacksTable(snapshot));
+
             return defaultSchema;
         } catch (SnapshotException e) {
             throw new RuntimeException("Cannot resolve package schemes", e);

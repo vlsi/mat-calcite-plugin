@@ -96,6 +96,12 @@ public class QueryTest {
     }
 
     @Test
+    public void testStackTraces() throws SQLException {
+        returnsInOrder("select count(*) CNT from heap.ThreadStackFrames",
+                new String[]{"CNT", "39"});
+    }
+
+    @Test
     public void countStrings() throws SQLException {
         returnsInOrder("select count(*) CNT from java.lang.String",
                 new String[]{"CNT", "3256"});

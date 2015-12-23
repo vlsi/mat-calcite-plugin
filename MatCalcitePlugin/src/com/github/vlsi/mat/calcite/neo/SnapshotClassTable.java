@@ -227,95 +227,28 @@ public class SnapshotClassTable extends AbstractTable implements ScannableTable 
         }
     }
 
-    private static class ClassesEnumerator implements Enumerator<Object[]> {
-        private final IClass[] classes;
+    private static class ClassesEnumerator extends GroupEnumerator<IClass, int[], Object[]> {
         private final Field[] fields;
 
-        private int currentClass = -1;
-        private int currentObject = -1;
-        private int[] objects;
-        private Object[] currentResult;
-
         public ClassesEnumerator(IClass[] classes, Field[] fields) {
-            this.classes = classes;
+            super(classes);
             this.fields = fields;
         }
 
-        @SuppressWarnings("unchecked")
         @Override
-        public Object[] current() {
-            if (currentResult == null) {
-                throw new NoSuchElementException();
-            } else {
-                return currentResult;
-            }
+        protected int[] resolveGroup(IClass snapshotClass) throws Exception {
+            return snapshotClass.getObjectIds();
         }
 
         @Override
-        public boolean moveNext() {
-            do {
-                if (advanceObject()) {
-                    return true;
-                }
-            } while (advanceClass());
-            return false;
+        protected int rowsCount(int[] rows) {
+            return rows.length;
         }
 
         @Override
-        public void reset() {
-            currentClass = -1;
-            currentObject = -1;
-            currentResult = null;
-        }
-
-        @Override
-        public void close() {
-            reset();
-        }
-
-        private boolean advanceObject() {
-            if (currentClass == -1) {
-                return false;
-            } else if (currentObject < objects.length - 1) {
-                currentObject++;
-                resolveObject();
-                return true;
-            } else {
-                return false;
-            }
-        }
-
-        private boolean advanceClass() {
-            if (currentClass < classes.length - 1) {
-                currentClass++;
-                currentObject = -1;
-                resolveClass();
-                return true;
-            } else {
-                currentResult = null;
-                return false;
-            }
-        }
-
-        private void resolveClass() {
-            try {
-                objects = classes[currentClass].getObjectIds();
-            } catch (SnapshotException e) {
-                throw new RuntimeException(e);
-            }
-        }
-
-        private void resolveObject() {
-            try {
-                currentResult = resolveObject(classes[currentClass], objects[currentObject], fields);
-            } catch (SnapshotException e) {
-                throw new RuntimeException(e);
-            }
-        }
-
-        private Object[] resolveObject(IClass snapshotClass, int objectId, Field[] fields) throws SnapshotException {
+        protected Object[] resolveRow(IClass snapshotClass, int[] rows, int currentRow) throws Exception {
             Object[] result = new Object[fields.length];
-            IObject object = snapshotClass.getSnapshot().getObject(objectId);
+            IObject object = snapshotClass.getSnapshot().getObject(rows[currentRow]);
             for (int i = 0; i < fields.length; i++) {
                 result[i] = fields[i].resolve(object);
             }
