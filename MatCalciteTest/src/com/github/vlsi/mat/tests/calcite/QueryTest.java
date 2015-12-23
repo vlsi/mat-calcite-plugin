@@ -52,11 +52,16 @@ public class QueryTest {
 
     @Test
     public void countStrings() throws SQLException {
-        returnsInOrder("select count(*) CNT from \"java.lang.String\"",
+        returnsInOrder("select count(*) CNT from java.lang.String",
                 new String[]{"CNT", "3256"});
     }
 
     @Test
+    public void arrayCase() throws SQLException {
+        execute("select toString(l.this) from java.lang.\"Object[]\" l", 1);
+    }
+
+//    @Test
     public void joinOptimization() throws SQLException {
         // Unfortunately, this is not yet optimized to snapshot.getObject(get_id(u.path))
         returnsInOrder("explain plan for select u.this, retainedSize(s.this) from \"java.lang.String\" s join \"java.net.URL\" u on (s.this = u.path)",
@@ -70,36 +75,36 @@ public class QueryTest {
 
     @Test
     public void selectAllColumns() throws SQLException {
-        execute("select * from \"java.util.HashMap\"", 2);
+        execute("select * from java.util.HashMap", 2);
     }
 
     @Test
     public void selectThisColumn() throws SQLException {
-        execute("select this from \"java.util.HashMap\"", 2);
+        execute("select this from java.util.HashMap", 2);
     }
 
     @Test
     public void selectShallowSizeFunction() throws SQLException {
-        returnsInOrder("select sum(shallowSize(this)) shallow_size from \"java.util.HashMap\"",
+        returnsInOrder("select sum(shallowSize(this)) shallow_size from java.util.HashMap",
                 new String[]{"shallow_size", "3840"});
     }
 
     @Test
     public void selectRetainedSizeFunction() throws SQLException {
-        returnsInOrder("select sum(retainedSize(this)) retained_size from \"java.util.HashMap\"",
+        returnsInOrder("select sum(retainedSize(this)) retained_size from java.util.HashMap",
                 new String[]{"retained_size", "114976"});
     }
 
     @Test
     public void testReadme() throws SQLException {
         execute("explain plan for select toString(file) file, count(*) cnt, sum(retainedSize(this)) sum_retained, sum(shallowSize(this)) sum_shallow\n"
-                + "  from \"java.net.URL\"\n"
+                + "  from java.net.URL\n"
                 + " group by toString(file)\n"
                 + "having count(*)>1\n"
                 + " order by sum(shallowSize(this)) desc", 5);
 
         execute("select toString(file) file, count(*) cnt, sum(retainedSize(this)) sum_retained, sum(shallowSize(this)) sum_shallow\n"
-                + "  from \"java.net.URL\"\n"
+                + "  from java.net.URL\n"
                 + " group by toString(file)\n"
                 + "having count(*)>1\n"
                 + " order by sum(retainedSize(this)) desc", 5);

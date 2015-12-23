@@ -28,6 +28,8 @@ public class TableFunctions {
         ImmutableMultimap.Builder<String, TableFunction> builder = ImmutableMultimap.builder();
         builder.put("getValues", TableFunctionImpl.create(TableFunctions.class, "getValues"));
         builder.put("getRetainedSet", TableFunctionImpl.create(TableFunctions.class, "getRetainedSet"));
+        builder.put("getOutboundReferences", TableFunctionImpl.create(TableFunctions.class, "getOutboundReferences"));
+        builder.put("getInboundReferences", TableFunctionImpl.create(TableFunctions.class, "getInboundReferences"));
         return builder.build();
     }
 

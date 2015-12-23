@@ -18,6 +18,12 @@ public class HeapFunctions {
     }
 
     @SuppressWarnings("unused")
+    public static Object getClass(Object r) {
+        HeapReference ref = ensureHeapReference(r);
+        return ref == null ? null : HeapReference.valueOf(ref.getIObject().getClazz());
+    }
+
+    @SuppressWarnings("unused")
     public static String getType(Object r) {
         HeapReference ref = ensureHeapReference(r);
         return ref == null ? "" : ref.getIObject().getClazz().getName();
@@ -27,6 +33,17 @@ public class HeapFunctions {
     public static String toString(Object r) {
         if (r == null) return null;
         return r.toString();
+    }
+
+    public static String introspect(Object r) {
+        if (r instanceof HeapReference) {
+            return "HeapReference: "+toString(r);
+        } else if (r instanceof Object[]) {
+            return "Array, length = "+((Object[])r).length;
+        } else
+        {
+            return "Primitive type: "+toString(r);
+        }
     }
 
     @SuppressWarnings("unused")

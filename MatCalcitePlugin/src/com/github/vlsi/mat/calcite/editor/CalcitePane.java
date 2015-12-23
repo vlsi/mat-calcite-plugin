@@ -50,7 +50,7 @@ public class CalcitePane extends CompositeHeapEditorPane {
 		queryViewer = new SourceViewer(sash, null, SWT.H_SCROLL | SWT.V_SCROLL | SWT.MULTI);
 		queryViewer.configure(new CalciteSourceViewerConfiguration());
 		queryString = queryViewer.getTextWidget();
-		// The following setBackground(getBackround) results in proper white background in MACOS.
+		// The following setBackground(getBackground) results in proper white background in MACOS.
 		// No sure why the background is gray otherwise.
 		queryString.setBackground(queryString.getBackground());
 		queryString.setFont(JFaceResources.getFont(JFaceResources.TEXT_FONT));

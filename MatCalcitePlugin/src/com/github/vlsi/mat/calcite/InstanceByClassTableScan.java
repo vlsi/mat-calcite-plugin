@@ -16,7 +16,7 @@ public class InstanceByClassTableScan extends TableScan
     private final InstanceByClassTable instanceByClassTable;
 
     public InstanceByClassTableScan(RelOptCluster cluster, RelOptTable relOptTable, InstanceByClassTable instanceByClassTable) {
-        super(cluster, cluster.traitSetOf(), relOptTable);
+        super(cluster, cluster.traitSet(), relOptTable);
         this.instanceByClassTable = instanceByClassTable;
     }
 

@@ -2,11 +2,13 @@ package com.github.vlsi.mat.calcite;
 
 import com.github.vlsi.mat.calcite.functions.TableFunctions;
 import com.github.vlsi.mat.calcite.functions.HeapFunctions;
+import com.github.vlsi.mat.calcite.neo.PackageSchema;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableMap.Builder;
 import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.Multimap;
 import org.apache.calcite.schema.Function;
+import org.apache.calcite.schema.Schema;
 import org.apache.calcite.schema.Table;
 import org.apache.calcite.schema.impl.AbstractSchema;
 import org.apache.calcite.schema.impl.ScalarFunctionImpl;
@@ -23,6 +25,7 @@ public class HeapSchema extends AbstractSchema
 {
     private Map<String, Table> tableMap;
     private Multimap<String, Function> functionMultimap;
+    private Map<String, Schema> subSchemes;
 
     public HeapSchema(final ISnapshot snapshot) {
         Collection<IClass> classes;
@@ -33,7 +36,7 @@ public class HeapSchema extends AbstractSchema
             classes = Collections.emptyList();
         }
         Builder<String, Table> builder = ImmutableMap.builder();
-        HashSet<String> knownClasses = new HashSet<String>((int) (classes.size() / 0.75f));
+        HashSet<String> knownClasses = new HashSet<>((int) (classes.size() / 0.75f));
         for (IClass klass : classes) {
             String className = klass.getName();
             if (!knownClasses.add(className))
@@ -55,6 +58,10 @@ public class HeapSchema extends AbstractSchema
         b.putAll(ScalarFunctionImpl.createAll(HeapFunctions.class));
         b.putAll(TableFunctions.createAll());
         functionMultimap = b.build();
+
+        Builder<String, Schema> schemaBuilder = ImmutableMap.builder();
+//        schemaBuilder.put("lerm", PackageSchema.resolveSchema(snapshot));
+        subSchemes = schemaBuilder.build();
     }
 
     @Override
@@ -65,5 +72,10 @@ public class HeapSchema extends AbstractSchema
     @Override
     protected Map<String, Table> getTableMap() {
         return tableMap;
+    }
+
+    @Override
+    protected Map<String, Schema> getSubSchemaMap() {
+        return subSchemes;
     }
 }
