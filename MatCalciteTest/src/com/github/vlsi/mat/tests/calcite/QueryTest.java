@@ -51,6 +51,51 @@ public class QueryTest {
     }
 
     @Test
+    public void testRegularClassName() throws SQLException {
+        execute("select * from java.util.HashMap", 1);
+    }
+
+    @Test
+    public void testQuotedClassName() throws SQLException {
+        execute("select * from \"java.util.HashMap\"", 1);
+    }
+
+    @Test
+    public void testRegularArrayName() throws SQLException {
+        execute("select * from java.lang.\"Object[]\"", 1);
+    }
+
+    @Test
+    public void testQuotedArrayName() throws SQLException {
+         execute("select * from \"java.lang.Object[]\"", 1);
+    }
+
+    @Test
+    public void testRegularNestedClassName() throws SQLException {
+         execute("select * from java.util.\"HashMap$Node\"",1);
+    }
+
+    @Test
+    public void testQuotedNestedClassName() throws SQLException {
+        execute("select * from \"java.util.HashMap$Node\"",1);
+    }
+
+    @Test
+    public void testInstanceOfName() throws SQLException {
+        execute("select * from instanceof.java.util.HashMap", 1);
+    }
+
+    @Test
+    public void testInstanceOfNestedClassName() throws SQLException {
+        execute("select * from instanceof.java.util.\"HashMap$Node\"", 1);
+    }
+
+    @Test
+    public void testInstanceOfQuotedClassName() throws SQLException {
+        execute("select * from \"instanceof.java.util.HashMap$Node\"",1);
+    }
+
+    @Test
     public void countStrings() throws SQLException {
         returnsInOrder("select count(*) CNT from java.lang.String",
                 new String[]{"CNT", "3256"});

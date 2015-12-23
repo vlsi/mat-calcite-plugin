@@ -2,49 +2,38 @@ package com.github.vlsi.mat.calcite.neo;
 
 import com.github.vlsi.mat.calcite.HeapReference;
 import com.google.common.collect.ImmutableList;
-import org.apache.calcite.adapter.java.AbstractQueryableTable;
-import org.apache.calcite.linq4j.BaseQueryable;
-import org.apache.calcite.linq4j.Enumerator;
-import org.apache.calcite.linq4j.QueryProvider;
-import org.apache.calcite.linq4j.Queryable;
+import org.apache.calcite.DataContext;
+import org.apache.calcite.linq4j.*;
 import org.apache.calcite.rel.type.RelDataType;
 import org.apache.calcite.rel.type.RelDataTypeFactory;
-import org.apache.calcite.schema.SchemaPlus;
-import org.apache.calcite.schema.Statistic;
-import org.apache.calcite.schema.Statistics;
+import org.apache.calcite.schema.*;
+import org.apache.calcite.schema.impl.AbstractTable;
 import org.apache.calcite.util.ImmutableBitSet;
 import org.eclipse.mat.SnapshotException;
+import org.eclipse.mat.snapshot.ISnapshot;
 import org.eclipse.mat.snapshot.model.FieldDescriptor;
 import org.eclipse.mat.snapshot.model.IClass;
 import org.eclipse.mat.snapshot.model.IObject;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.NoSuchElementException;
+import java.util.*;
 
-public class SnapshotClassTable extends AbstractQueryableTable {
-    private final IClass[] classes;
-    private Field[] fields;
+public class SnapshotClassTable extends AbstractTable implements ScannableTable {
+    private final ISnapshot snapshot;
+    private final String className;
+    private final boolean includeSubClasses;
 
-    public SnapshotClassTable(List<IClass> classes) {
-        super(Object[].class);
-        this.classes = classes.toArray(new IClass[classes.size()]);
-    }
+    private Field[] fields; // Will be calculated on first invocation
 
-    @Override
-    public <T> Queryable<T> asQueryable(QueryProvider queryProvider, SchemaPlus schema, String expression) {
-        return new BaseQueryable<T>(null, Object[].class, null) {
-            @Override
-            public Enumerator<T> enumerator() {
-                return new ClassesEnumerator<>(classes, getFields());
-            }
-        };
+    public SnapshotClassTable(ISnapshot snapshot, String className, boolean includeSubClasses) {
+        this.snapshot = snapshot;
+        this.className = className;
+        this.includeSubClasses = includeSubClasses;
     }
 
     @Override
     public Statistic getStatistic() {
         int classesCount = 0;
-        for (IClass snapshotClass : classes) {
+        for (IClass snapshotClass : getClasses()) {
             classesCount += snapshotClass.getNumberOfObjects();
         }
         return Statistics.of(classesCount, ImmutableList.of(ImmutableBitSet.of(1)));
@@ -92,18 +81,63 @@ public class SnapshotClassTable extends AbstractQueryableTable {
         return builder.build();
     }
 
+    @Override
+    public Enumerable<Object[]> scan(DataContext dataContext) {
+        return new AbstractEnumerable<Object[]>() {
+            @Override
+            public Enumerator<Object[]> enumerator() {
+                return new ClassesEnumerator(getClasses(), getFields());
+            }
+        };
+    }
+
+    private IClass[] getClasses() {
+        try {
+            Collection<IClass> classes = snapshot.getClassesByName(className, includeSubClasses);
+            return classes.toArray(new IClass[classes.size()]);
+        } catch (SnapshotException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private List<Field> resolveClassesFields() {
+        try {
+            List<Field> currentFields = null;
+            for (IClass currentClass : snapshot.getClassesByName(className, false)) {
+                if (currentFields == null) {
+                    currentFields = resolveClassFields(currentClass);
+                } else {
+                    HashSet<Field> checkFields = new HashSet<>(resolveClassFields(currentClass));
+                    for (Iterator<Field> it = currentFields.iterator(); it.hasNext();) {
+                        if (!checkFields.contains(it.next())) {
+                            it.remove();
+                        }
+                    }
+                }
+            }
+            return currentFields;
+        } catch (SnapshotException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private List<Field> resolveClassFields(final IClass snapshotClass) {
+        List<Field> fields = new ArrayList<>();
+        for (IClass currentClass = snapshotClass; currentClass != null; currentClass = currentClass.getSuperClass()) {
+            for (FieldDescriptor descriptor : currentClass.getFieldDescriptors()) {
+                fields.add(new Field(descriptor));
+            }
+        }
+        return fields;
+    }
+
     private Field[] getFields() {
         if (this.fields == null) {
             List<Field> fields = new ArrayList<>();
             // First is virtual 'this' column
             fields.add(new Field());
             // Now, add all fields from given class and its superclasses
-            for (IClass snapshotClass = classes[0]; snapshotClass != null; snapshotClass = snapshotClass.getSuperClass()) {
-                for (FieldDescriptor descriptor : snapshotClass.getFieldDescriptors()) {
-                    fields.add(new Field(descriptor));
-                }
-
-            }
+            fields.addAll(resolveClassesFields());
             this.fields = fields.toArray(new Field[fields.size()]);
         }
         return this.fields;
@@ -174,9 +208,26 @@ public class SnapshotClassTable extends AbstractQueryableTable {
         public Object resolve(IObject object) {
             return resolver.resolve(object, getName());
         }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+
+            Field field = (Field) o;
+
+            return type == field.type && name.equals(field.name);
+        }
+
+        @Override
+        public int hashCode() {
+            int result = name.hashCode();
+            result = 31 * result + type;
+            return result;
+        }
     }
 
-    private static class ClassesEnumerator<T> implements Enumerator<T> {
+    private static class ClassesEnumerator implements Enumerator<Object[]> {
         private final IClass[] classes;
         private final Field[] fields;
 
@@ -192,14 +243,11 @@ public class SnapshotClassTable extends AbstractQueryableTable {
 
         @SuppressWarnings("unchecked")
         @Override
-        public T current() {
+        public Object[] current() {
             if (currentResult == null) {
                 throw new NoSuchElementException();
             } else {
-                // It looks like hack, but if there is only one element in the row, then we should return
-                // its value, not the array (otherwise, the entire array will be handled as column value).
-                // It
-                return (T)(currentResult.length == 1 ? currentResult[0] : currentResult);
+                return currentResult;
             }
         }
 
