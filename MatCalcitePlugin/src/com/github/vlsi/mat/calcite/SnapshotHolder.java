@@ -20,7 +20,7 @@ public class SnapshotHolder {
             if (ref.get() == snapshot)
                 return i;
         }
-        SNAPSHOTS.add(new WeakReference<ISnapshot>(snapshot));
+        SNAPSHOTS.add(new WeakReference<>(snapshot));
         return SNAPSHOTS.size() - 1;
     }
 }

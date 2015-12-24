@@ -1,6 +1,7 @@
 package com.github.vlsi.mat.calcite.neo;
 
 import com.github.vlsi.mat.calcite.functions.HeapFunctions;
+import com.github.vlsi.mat.calcite.functions.ReferenceFunction;
 import com.github.vlsi.mat.calcite.functions.TableFunctions;
 import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.Multimap;
@@ -87,6 +88,7 @@ public class PackageSchema extends AbstractSchema {
             ImmutableMultimap.Builder<String, Function> builder = ImmutableMultimap.builder();
             builder.putAll(ScalarFunctionImpl.createAll(HeapFunctions.class));
             builder.putAll(TableFunctions.createAll());
+            builder.put("getReference", new ReferenceFunction(snapshot));
             ImmutableMultimap<String, Function> functions = builder.build();
 
             // Create default schema
