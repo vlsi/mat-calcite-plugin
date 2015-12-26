@@ -131,8 +131,8 @@ public class TableFunctions {
     }
 
     private static class HeapReferenceTable extends AbstractQueryableTable {
-        private final static List<ImmutableBitSet> UNIQUE_KEYS_STATISTICS = ImmutableList.of(ImmutableBitSet.of(1));
-        private final static List<ImmutableBitSet> NON_UNIQUE_KEYS_STATISTICS = ImmutableList.of(ImmutableBitSet.of(0));
+        private final static List<ImmutableBitSet> UNIQUE_KEYS_STATISTICS = ImmutableList.of(ImmutableBitSet.of(0));
+        private final static List<ImmutableBitSet> NON_UNIQUE_KEYS_STATISTICS = ImmutableList.of(ImmutableBitSet.of());
 
         private final Collection<HeapReference> references;
         private final boolean unique;

@@ -36,7 +36,7 @@ public class SnapshotClassTable extends AbstractTable implements ScannableTable 
         for (IClass snapshotClass : getClasses()) {
             classesCount += snapshotClass.getNumberOfObjects();
         }
-        return Statistics.of(classesCount, ImmutableList.of(ImmutableBitSet.of(1)));
+        return Statistics.of(classesCount, ImmutableList.of(ImmutableBitSet.of(0)));
     }
 
     @Override

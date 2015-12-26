@@ -1,7 +1,6 @@
 package com.github.vlsi.mat.calcite.neo;
 
 import com.github.vlsi.mat.calcite.functions.HeapFunctions;
-import com.github.vlsi.mat.calcite.functions.ReferenceFunction;
 import com.github.vlsi.mat.calcite.functions.SnapshotFunctions;
 import com.github.vlsi.mat.calcite.functions.TableFunctions;
 import com.google.common.collect.ImmutableMultimap;
