@@ -23,7 +23,7 @@ Query that lists duplicate URLs:
 
 ```sql
 select toString(file) file, count(*) cnt, sum(retainedSize(this)) sum_retained, sum(shallowSize(this)) sum_shallow
-  from "java.net.URL"
+  from java.net.URL
  group by toString(file)
 having count(*)>1
  order by sum(retainedSize(this)) desc
@@ -62,6 +62,21 @@ View (expr#0..2=[{inputs}], expr#3=[retainedSize($t2)], this=[$t0], EXPR$1=[$t3]
 
 Heap schema
 -----------
+
+    heap (default schema)
+    +- java (sub-schema name)
+       +- util (sub-schema name)
+          +- HashMap (table name).
+             This "table" would return all the instances of java.util.HashMap without subclasses
+    +- instanceof
+       +- java
+          +- util
+             +- HashMap (table name).
+                This would return HashMap instances as well as subclass instances (e.g. LinkedHashMap)
+    +- "java.util.HashMap" (table name)
+       This can be used as alternative.
+    +- ThreadStackFrames (table name)
+       Returns thread stack traces and local variable info
 
 ### Each java class maps to a table. The table lists instances without subclasses
  For instance: "java.lang.Object", "java.lang.String"

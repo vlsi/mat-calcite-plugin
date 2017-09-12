@@ -201,6 +201,16 @@ public class QueryTest {
                 + " group by toString(file)\n"
                 + "having count(*)>1\n"
                 + " order by sum(retainedSize(this)) desc", 5);
+
+        execute("explain plan for select u.this, retainedSize(s.this)\n" +
+                "   from java.lang.String s\n" +
+                "   join java.net.URL u\n" +
+                "     on s.this = u.path", 10);
+
+        execute("select u.this, retainedSize(s.this)\n" +
+                "   from java.lang.String s\n" +
+                "   join java.net.URL u\n" +
+                "     on s.this = u.path", 10);
     }
 
     private void returnsInOrder(String sql, Object[] expected) throws SQLException {
