@@ -1,4 +1,4 @@
-package com.github.vlsi.mat.calcite;
+package com.github.vlsi.mat.calcite.schema.objects;
 
 import org.eclipse.mat.SnapshotException;
 import org.eclipse.mat.snapshot.ISnapshot;
@@ -22,8 +22,8 @@ public class IClassesList {
         return getClasses(false);
     }
 
-    public IClass getFirstClass() {
-        return getClasses(true).iterator().next();
+    public Collection<IClass> getRootClasses() {
+        return getClasses(false);
     }
 
     public double getTotalObjects() {
@@ -45,5 +45,13 @@ public class IClassesList {
             throw new IllegalStateException("Unable to get class " + className);
         }
         return classesByName;
+    }
+
+    @Override
+    public String toString() {
+        return "IClassesList{" +
+                "className='" + className + '\'' +
+                ", includeSubClasses=" + includeSubClasses +
+                '}';
     }
 }

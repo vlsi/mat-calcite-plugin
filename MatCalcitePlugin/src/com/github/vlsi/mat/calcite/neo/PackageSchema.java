@@ -1,10 +1,15 @@
 package com.github.vlsi.mat.calcite.neo;
 
+import com.github.vlsi.mat.calcite.schema.objects.IClassesList;
+import com.github.vlsi.mat.calcite.schema.objects.InstanceByClassTable;
+import com.github.vlsi.mat.calcite.schema.objects.InstanceIdsByClassTable;
 import com.github.vlsi.mat.calcite.functions.HeapFunctions;
 import com.github.vlsi.mat.calcite.functions.SnapshotFunctions;
 import com.github.vlsi.mat.calcite.functions.TableFunctions;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.Multimap;
+
 import org.apache.calcite.schema.Function;
 import org.apache.calcite.schema.Schema;
 import org.apache.calcite.schema.Table;
@@ -22,7 +27,7 @@ public class PackageSchema extends AbstractSchema {
     private final Map<String, Table> classes = new HashMap<>();
 
     private PackageSchema() {
-        this(ImmutableMultimap.<String, Function>builder().build());
+        this(ImmutableMultimap.<String, Function>of());
     }
 
     private PackageSchema(Multimap<String, Function> functions) {
@@ -45,11 +50,14 @@ public class PackageSchema extends AbstractSchema {
         }
     }
 
+    private void addClass(String className, IClassesList classesList) {
+        addClass(className, new InstanceByClassTable(classesList));
+        addClass("$ids$:" + className, new InstanceIdsByClassTable(classesList));
+    }
+
     @Override
     protected Map<String, Schema> getSubSchemaMap() {
-        Map<String, Schema> schemaMap = new HashMap<>();
-        schemaMap.putAll(subPackages);
-        return Collections.unmodifiableMap(schemaMap);
+        return ImmutableMap.<String, Schema>copyOf(subPackages);
     }
 
     @Override
@@ -101,19 +109,31 @@ public class PackageSchema extends AbstractSchema {
                 classesNames.add(iClass.getName());
             }
 
+            PackageSchema instanceOfPackage = defaultSchema.getPackage("instanceof");
+
             // Add all classes to schema
             for (String fullClassName : classesNames) {
-                String className = getClassName(fullClassName);
+                IClassesList classOnly = new IClassesList(snapshot, fullClassName, false);
 
-                // Add table to target schema and default schema
-                SnapshotClassTable regularTable = new SnapshotClassTable(snapshot, fullClassName, false);
-                getPackage(defaultSchema, fullClassName).addClass(className, regularTable);
-                defaultSchema.addClass(fullClassName, regularTable);
+                // Make class available via "package.name.ClassName" (full class name in a root schema)
+                defaultSchema.addClass(fullClassName, classOnly);
+
+                String simpleClassName = getClassName(fullClassName);
+
+                // Make class available via package.name.ClassName (schema.schema.Class)
+                PackageSchema packageSchema = getPackage(defaultSchema, fullClassName);
+                packageSchema.addClass(simpleClassName, classOnly);
 
                 // Add instanceof
-                SnapshotClassTable childrenTable = new SnapshotClassTable(snapshot, fullClassName, true);
-                getPackage(defaultSchema.getPackage("instanceof"), fullClassName).addClass(className, childrenTable);
-                defaultSchema.addClass("instanceof."+fullClassName, childrenTable);
+                IClassesList withSubClasses = new IClassesList(snapshot, fullClassName, true);
+
+                // Make class available via "instanceof.package.name.ClassName"
+                defaultSchema.addClass("instanceof." + fullClassName, withSubClasses);
+
+                // Make class available via instanceof.package.name.ClassName
+                PackageSchema instanceOfSchema = getPackage(instanceOfPackage, fullClassName);
+                instanceOfSchema.addClass(simpleClassName, withSubClasses);
+
             }
 
             // Add thread stacks table

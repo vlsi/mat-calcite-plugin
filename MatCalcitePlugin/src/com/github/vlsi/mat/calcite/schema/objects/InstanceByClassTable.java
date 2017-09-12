@@ -1,8 +1,9 @@
-package com.github.vlsi.mat.calcite;
+package com.github.vlsi.mat.calcite.schema.objects;
 
 import com.github.vlsi.mat.calcite.rex.RexBuilderContext;
 import com.google.common.base.Function;
 import com.google.common.collect.ImmutableList;
+
 import org.apache.calcite.plan.RelOptTable;
 import org.apache.calcite.rel.RelNode;
 import org.apache.calcite.rel.type.RelDataType;
@@ -15,7 +16,6 @@ import org.apache.calcite.schema.impl.AbstractTable;
 import org.apache.calcite.util.ImmutableBitSet;
 import org.apache.calcite.util.Pair;
 import org.eclipse.mat.snapshot.ISnapshot;
-import org.eclipse.mat.snapshot.model.IClass;
 
 import java.util.List;
 import java.util.concurrent.ExecutionException;
@@ -37,15 +37,13 @@ public class InstanceByClassTable extends AbstractTable implements TranslatableT
 
     @Override
     public RelDataType getRowType(RelDataTypeFactory typeFactory) {
-        IClass clazz = classesList.getFirstClass();
-
         Pair<RelDataType, List<Function<RexBuilderContext, RexNode>>> typeAndResolvers;
         try {
             typeAndResolvers = ClassRowTypeCache.CACHE.get(typeFactory).get(
-                    clazz);
+                    classesList);
         } catch (ExecutionException e) {
             throw new IllegalStateException(
-                    "Unable to identify row type for class " + clazz.getName());
+                    "Unable to identify row type for class " + classesList);
         }
         this.resolvers = typeAndResolvers.right;
 

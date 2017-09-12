@@ -1,7 +1,5 @@
-package com.github.vlsi.mat.calcite.rules;
+package com.github.vlsi.mat.calcite.schema.objects;
 
-import com.github.vlsi.mat.calcite.InstanceByClassTable;
-import com.github.vlsi.mat.calcite.InstanceByClassTableScan;
 import com.github.vlsi.mat.calcite.rex.RexBuilderContext;
 import com.github.vlsi.mat.calcite.SnapshotHolder;
 import com.github.vlsi.mat.calcite.rex.ExecutionRexBuilderContext;
@@ -11,8 +9,7 @@ import org.apache.calcite.rel.logical.LogicalTableScan;
 import org.apache.calcite.rex.RexInputRef;
 import org.apache.calcite.rex.RexNode;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 public class InstanceAccessByClassIdRule extends RelOptRule
 {
@@ -29,7 +26,7 @@ public class InstanceAccessByClassIdRule extends RelOptRule
         RelOptSchema schema = table.getRelOptSchema();
         List<String> indexName = new ArrayList<String>(table.getQualifiedName());
         indexName.set(indexName.size() - 1, "$ids$:" + indexName.get(indexName.size() - 1));
-        LogicalTableScan ids = new LogicalTableScan(scan.getCluster(), schema.getTableForMember(indexName));
+        LogicalTableScan ids = LogicalTableScan.create(scan.getCluster(), schema.getTableForMember(indexName));
 
         InstanceByClassTable instanceByClassTable = table.unwrap(InstanceByClassTable.class);
         int snapshotId = SnapshotHolder.put(instanceByClassTable.snapshot);

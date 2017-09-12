@@ -1,13 +1,9 @@
-package com.github.vlsi.mat.calcite;
+package com.github.vlsi.mat.calcite.schema.objects;
 
-import com.github.vlsi.mat.calcite.rules.InstanceAccessByClassIdRule;
-import com.github.vlsi.mat.calcite.rules.PushProjectPastJoinRule;
-import org.apache.calcite.plan.RelOptCluster;
-import org.apache.calcite.plan.RelOptPlanner;
-import org.apache.calcite.plan.RelOptTable;
-import org.apache.calcite.plan.RelTraitSet;
+import org.apache.calcite.plan.*;
 import org.apache.calcite.rel.RelNode;
 import org.apache.calcite.rel.core.TableScan;
+import org.apache.calcite.rel.rules.ProjectJoinTransposeRule;
 
 import java.util.List;
 
@@ -23,8 +19,7 @@ public class InstanceByClassTableScan extends TableScan
     @Override
     public void register(RelOptPlanner planner) {
         planner.addRule(InstanceAccessByClassIdRule.INSTANCE);
-        // Workaround until this rule is fixed in Calcite
-        planner.addRule(PushProjectPastJoinRule.INSTANCE);
+        planner.addRule(ProjectJoinTransposeRule.INSTANCE);
         // Does not yet work.
         // These rules should convert join (a."@ID" = :var) to "snapshot.getObject(:var)"
 //        planner.addRule(NestedLoopsJoinRule.INSTANCE);

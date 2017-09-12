@@ -1,4 +1,4 @@
-package com.github.vlsi.mat.calcite;
+package com.github.vlsi.mat.calcite.schema.objects;
 
 import com.google.common.base.Function;
 import com.google.common.collect.FluentIterable;
