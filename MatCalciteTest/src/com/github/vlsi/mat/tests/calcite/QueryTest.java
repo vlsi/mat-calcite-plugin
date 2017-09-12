@@ -96,9 +96,25 @@ public class QueryTest {
     }
 
     @Test
-    public void testStackTraces() throws SQLException {
+    public void testStackTraceCount() throws SQLException {
         returnsInOrder("select count(*) CNT from heap.ThreadStackFrames",
                 new String[]{"CNT", "39"});
+    }
+
+    @Test
+    public void testStackTraces() throws SQLException {
+        returnsInOrder("select thread, depth, text from heap.ThreadStackFrames order by 1, 2, 3 limit 2",
+                new String[]{"thread|depth|text",
+                        "Finalizer|0|at java.lang.Object.wait(J)V (Native Method)",
+                        "Finalizer|1|at java.lang.ref.ReferenceQueue.remove(J)Ljava/lang/ref/Reference; (ReferenceQueue.java:142)"});
+    }
+
+    @Test
+    public void testStackTracesUnnest() throws SQLException {
+        returnsInOrder("select thread, depth, text, obj.va from heap.ThreadStackFrames frm, unnest(frm.objects) obj(va) order by 1, 2, 3 limit 2",
+                new String[]{"thread|depth|text|va",
+                        "Finalizer|1|at java.lang.ref.ReferenceQueue.remove(J)Ljava/lang/ref/Reference; (ReferenceQueue.java:142)|java.lang.ref.ReferenceQueue @ 0x7bfe391c0",
+                        "Finalizer|1|at java.lang.ref.ReferenceQueue.remove(J)Ljava/lang/ref/Reference; (ReferenceQueue.java:142)|java.lang.ref.ReferenceQueue$Lock @ 0x7bfe391b0"});
     }
 
     @Test
@@ -135,6 +151,26 @@ public class QueryTest {
     }
 
     @Test
+    public void selectThisDotField() throws SQLException {
+        returnsInOrder("select sum(hm.size) sum_hm_size from java.util.HashMap hm", new String[]{"sum_hm_size", "922"});
+    }
+
+    @Test
+    public void selectShallow() throws SQLException {
+        returnsInOrder("select sum(cast(hm.this['@shallow'] as bigint)) sum_shallow from java.util.HashMap hm", new String[]{"sum_shallow", "3840"});
+    }
+
+    @Test
+    public void selectThisMapField() throws SQLException {
+        returnsInOrder("select count(this['table'][0]) count_first_entry from java.util.HashMap", new String[]{"count_first_entry", "71"});
+    }
+
+    @Test
+    public void selectThisMapFieldMatSyntax() throws SQLException {
+        returnsInOrder("select count(this['table.[0]']) count_first_entry from java.util.HashMap", new String[]{"count_first_entry", "71"});
+    }
+
+    @Test
     public void selectShallowSizeFunction() throws SQLException {
         returnsInOrder("select sum(shallowSize(this)) shallow_size from java.util.HashMap",
                 new String[]{"shallow_size", "3840"});
@@ -144,6 +180,12 @@ public class QueryTest {
     public void selectRetainedSizeFunction() throws SQLException {
         returnsInOrder("select sum(retainedSize(this)) retained_size from java.util.HashMap",
                 new String[]{"retained_size", "114976"});
+    }
+
+    @Test
+    public void selectOutboundReferences() throws SQLException {
+        returnsInOrder("select sum(retainedSize(og.this)) retained_size from java.util.HashMap hm, lateral (select * from table(getOutboundReferences(hm.this))) as og(this)",
+                new String[]{"retained_size", "113712"});
     }
 
     @Test

@@ -13,6 +13,7 @@ import org.apache.calcite.schema.ScannableTable;
 import org.apache.calcite.schema.Statistic;
 import org.apache.calcite.schema.Statistics;
 import org.apache.calcite.schema.impl.AbstractTable;
+import org.apache.calcite.sql.type.SqlTypeName;
 import org.apache.calcite.util.ImmutableBitSet;
 import org.eclipse.mat.SnapshotException;
 import org.eclipse.mat.snapshot.ISnapshot;
@@ -42,10 +43,11 @@ public class SnapshotThreadStacksTable extends AbstractTable implements Scannabl
     @Override
     public RelDataType getRowType(RelDataTypeFactory typeFactory) {
         RelDataTypeFactory.FieldInfoBuilder builder = typeFactory.builder();
-        builder.add("thread", typeFactory.createJavaType(HeapReference.class));
+        RelDataType anyType = typeFactory.createSqlType(SqlTypeName.ANY);
+        builder.add("thread", anyType);
         builder.add("depth", typeFactory.createJavaType(int.class));
         builder.add("text", typeFactory.createJavaType(String.class));
-        builder.add("objects", typeFactory.createMultisetType(typeFactory.createJavaType(HeapReference.class), -1));
+        builder.add("objects", typeFactory.createMultisetType(anyType, -1));
         return builder.build();
     }
 

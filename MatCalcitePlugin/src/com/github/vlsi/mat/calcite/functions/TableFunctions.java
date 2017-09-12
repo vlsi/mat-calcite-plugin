@@ -10,6 +10,7 @@ import org.apache.calcite.rel.type.RelDataType;
 import org.apache.calcite.rel.type.RelDataTypeFactory;
 import org.apache.calcite.schema.*;
 import org.apache.calcite.schema.impl.TableFunctionImpl;
+import org.apache.calcite.sql.type.SqlTypeName;
 import org.apache.calcite.util.ImmutableBitSet;
 import org.eclipse.mat.SnapshotException;
 import org.eclipse.mat.inspections.collectionextract.CollectionExtractionUtils;
@@ -157,7 +158,7 @@ public class TableFunctions {
 
         @Override
         public RelDataType getRowType(RelDataTypeFactory relDataTypeFactory) {
-            return relDataTypeFactory.builder().add("this",  relDataTypeFactory.createJavaType(HeapReference.class)).build();
+            return relDataTypeFactory.builder().add("this",  relDataTypeFactory.createSqlType(SqlTypeName.ANY)).build();
         }
 
         @Override
