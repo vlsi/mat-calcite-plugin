@@ -11,7 +11,7 @@ import org.eclipse.ui.plugin.AbstractUIPlugin;
 public class OpenCalciteAction extends Action {
 
 	public OpenCalciteAction() {
-		super("SQL", AbstractUIPlugin.imageDescriptorFromPlugin("MatCalcitePlugin", "icons/plugin.png"));
+		super("SQL", AbstractUIPlugin.imageDescriptorFromPlugin("MatCalcitePlugin", "resources/icons/plugin.png"));
 	}
 
 	@Override

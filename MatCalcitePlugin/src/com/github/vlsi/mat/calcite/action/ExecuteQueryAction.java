@@ -21,7 +21,7 @@ public class ExecuteQueryAction extends Action {
 		this.state = state;
 		this.doExplain = doExplain;
 		setText(doExplain?"Explain":"Run");
-		setImageDescriptor(AbstractUIPlugin.imageDescriptorFromPlugin("MatCalcitePlugin", doExplain?"icons/explain.png":"icons/run.png"));
+		setImageDescriptor(AbstractUIPlugin.imageDescriptorFromPlugin("MatCalcitePlugin", doExplain?"resources/icons/explain.png":"resources/icons/run.png"));
 	}
 
 	private String getSelectedQuery() {

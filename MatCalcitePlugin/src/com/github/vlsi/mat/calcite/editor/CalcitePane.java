@@ -173,7 +173,7 @@ public class CalcitePane extends CompositeHeapEditorPane {
 
 	@Override
 	public Image getTitleImage() {
-		return AbstractUIPlugin.imageDescriptorFromPlugin("MatCalcitePlugin", "icons/plugin.png").createImage();
+		return AbstractUIPlugin.imageDescriptorFromPlugin("MatCalcitePlugin", "resources/icons/plugin.png").createImage();
 	}
 
 	private void makeActions() {

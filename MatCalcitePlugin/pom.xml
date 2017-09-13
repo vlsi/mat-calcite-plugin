@@ -26,7 +26,9 @@
         <sourceDirectory>src</sourceDirectory>
         <resources>
             <resource>
+                <!-- Include resources/icons/... as resources/icons/... to match build.properties configuration (bin.includes) -->
                 <directory>resources</directory>
+                <targetPath>resources</targetPath>
             </resource>
         </resources>
 
