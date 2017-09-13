@@ -10,7 +10,7 @@
     <name>MAT Calcite plugin parent</name>
 
     <properties>
-        <tycho-version>0.21.0</tycho-version>
+        <tycho-version>1.0.0</tycho-version>
         <eclipse-repository>http://download.eclipse.org/releases/mars</eclipse-repository>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.source>1.7</maven.compiler.source>
@@ -49,6 +49,7 @@
                     <argLine>-ea -Xmx768m -Dcalcite.debug=true</argLine>
                     <!--<debugPort>5005</debugPort>-->
                     <!--<testFailureIgnore>true</testFailureIgnore>-->
+                    <showEclipseLog>true</showEclipseLog>
                     <includes>
                         <include>**/AllTests.class</include>
                     </includes>

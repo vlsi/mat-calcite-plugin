@@ -60,6 +60,21 @@
                 </executions>
             </plugin>
             <plugin>
+                <groupId>org.eclipse.tycho</groupId>
+                <artifactId>tycho-compiler-plugin</artifactId>
+                <version>${tycho-version}</version>
+                <configuration>
+                    <verbose>true</verbose>
+                    <extraClasspathElements>
+                        <extraClasspathElement>
+                            <groupId>com.github.vlsi.mat.calcite</groupId>
+                            <artifactId>MatCalciteDependencies</artifactId>
+                            <version>${project.version}</version>
+                        </extraClasspathElement>
+                    </extraClasspathElements>
+                </configuration>
+            </plugin>
+            <plugin>
                 <groupId>org.eclipse.tycho.extras</groupId>
                 <artifactId>tycho-eclipserun-plugin</artifactId>
                 <version>${tycho-version}</version>

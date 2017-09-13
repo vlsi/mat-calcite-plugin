@@ -7,6 +7,7 @@ import com.google.common.cache.LoadingCache;
 import org.apache.calcite.jdbc.CalciteConnection;
 import org.apache.calcite.schema.Schema;
 import org.apache.calcite.schema.SchemaPlus;
+import org.codehaus.commons.compiler.CompilerFactoryFactory;
 import org.eclipse.mat.snapshot.ISnapshot;
 
 import java.sql.*;
@@ -25,8 +26,12 @@ public class CalciteDataSource {
                 }
             });
 
+    private static boolean initCompilerDone;
+
     public static Connection getConnection(ISnapshot snapshot)
             throws SQLException {
+        initJanino();
+
         try {
             Class.forName("org.apache.calcite.jdbc.Driver");
         } catch (ClassNotFoundException e) {
@@ -58,6 +63,29 @@ public class CalciteDataSource {
         con.setSchema("HEAP");
 
         return connection;
+    }
+
+    private static void initJanino() throws SQLException {
+        // For unknown reason, threadContextClassLoader.getResource("org.codehaus.commons.compiler.properties")
+        // returns null when accessed via BundleClassLoader
+        // We make a shortcut
+        // Some OSGi WA might probably exist
+        if (initCompilerDone) {
+            return;
+        }
+        initCompilerDone = true;
+        Thread currentThread = Thread.currentThread();
+        ClassLoader cl = currentThread.getContextClassLoader();
+        try{
+            currentThread.setContextClassLoader(CompilerFactoryFactory.class.getClassLoader());
+            if (CompilerFactoryFactory.getDefaultCompilerFactory() == null) {
+                throw new SQLException("Janino compiler is not initialized: CompilerFactoryFactory.getDefaultCompilerFactory() == null");
+            };
+        } catch (Exception e) {
+            throw new SQLException("Unable to load Janino compiler", e);
+        } finally {
+            currentThread.setContextClassLoader(cl);
+        }
     }
 
     public static void close(ResultSet rs, Statement st, Connection con) {
