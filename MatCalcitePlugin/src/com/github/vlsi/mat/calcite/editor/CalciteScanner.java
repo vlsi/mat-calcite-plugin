@@ -6,6 +6,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.github.vlsi.mat.calcite.CalciteDataSource;
+import org.apache.calcite.config.CalciteConnectionConfig;
+import org.apache.calcite.jdbc.CalciteConnection;
 import org.apache.calcite.sql.parser.SqlAbstractParserImpl;
 import org.eclipse.jface.text.TextAttribute;
 import org.eclipse.jface.text.rules.IRule;
@@ -36,7 +38,7 @@ public class CalciteScanner extends RuleBasedScanner {
 
 		@Override
 		public boolean isWordPart(char c) {
-			return Character.isJavaIdentifierPart(c);
+			return Character.isJavaIdentifierPart(c) || c == '.';
 		}
 	}
 
