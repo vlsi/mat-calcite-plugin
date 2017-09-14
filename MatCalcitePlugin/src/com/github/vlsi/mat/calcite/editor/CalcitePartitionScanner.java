@@ -12,6 +12,7 @@ public class CalcitePartitionScanner extends RuleBasedPartitionScanner {
 	public static final String SQL_COMMENT = "__calcite_comment"; //$NON-NLS-1$
 	public static final String SQL_STRING = "__calcite_string"; //$NON-NLS-1$
 	public static final String SQL_QUOTED_IDENTIFIER = "__calcite_quoted_identifier"; //$NON-NLS-1$
+	public static final String OTHER = "__calcite_other"; //$NON-NLS-1$
 
 	public CalcitePartitionScanner() {
 		IToken comment = new Token(SQL_COMMENT);

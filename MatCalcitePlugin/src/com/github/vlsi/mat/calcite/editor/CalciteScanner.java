@@ -5,9 +5,6 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.github.vlsi.mat.calcite.CalciteDataSource;
-import org.apache.calcite.config.CalciteConnectionConfig;
-import org.apache.calcite.jdbc.CalciteConnection;
 import org.apache.calcite.sql.parser.SqlAbstractParserImpl;
 import org.eclipse.jface.text.TextAttribute;
 import org.eclipse.jface.text.rules.IRule;
@@ -20,6 +17,7 @@ import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.widgets.Display;
 
+import com.github.vlsi.mat.calcite.CalciteDataSource;
 import com.google.common.base.Splitter;
 
 public class CalciteScanner extends RuleBasedScanner {
@@ -45,11 +43,13 @@ public class CalciteScanner extends RuleBasedScanner {
 	public CalciteScanner() {
 		List<IRule> rules = new ArrayList<IRule>();
 
+		Token other = new Token(CalcitePartitionScanner.OTHER);
 		Token keywordToken = new Token(new TextAttribute(new Color(
 				Display.getCurrent(), new RGB(127, 0, 85))));
 
+		// "other" class is importantThis is required so Eclipse does not try to highlight in the middle of the words
 		WordRule keywordRule = new WordRule(new CalciteWordDetector(),
-				Token.UNDEFINED, true);
+				other, true);
 
 		// Get keyword list from Calcite
 		Connection con = null;
