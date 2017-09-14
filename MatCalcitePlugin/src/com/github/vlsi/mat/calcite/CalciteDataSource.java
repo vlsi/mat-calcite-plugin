@@ -41,6 +41,7 @@ public class CalciteDataSource {
         Properties info = new Properties();
         info.put("lex", "JAVA");
         info.put("quoting", "DOUBLE_QUOTE");
+        info.put("conformance", "LENIENT"); // enable cross apply, etc
         Connection connection = DriverManager.getConnection(
                 "jdbc:calcite:", info);
         CalciteConnection con = connection

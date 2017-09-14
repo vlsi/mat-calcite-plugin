@@ -102,6 +102,21 @@ Heap schema
     getByKey     | extracts value for given string representation of key for referenced map
     getField     | obtains value of field with specified name for referenced object
 
+ The following table functions are supported
+
+    getValues(ref)             | returns all values of a Java collection
+    getRetainedSet(ref)        | returns the set of retained objects
+    getOutboundReferences(ref) | returns outbound references (name, this) pairs
+    getInboundReferences(ref)  | returns inbound references (this)
+
+ `CROSS APPLY` and `OUTER APPLY` might be used to call table functions:
+
+```sql
+select u.this, refs.name, refs.this reference
+  from java.net.URL u
+ cross apply table(getOutboundReferences(u.this)) refs
+```
+
 Requirements
 ------------
 Java 1.7

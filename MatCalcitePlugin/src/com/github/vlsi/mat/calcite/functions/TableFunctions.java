@@ -1,14 +1,23 @@
 package com.github.vlsi.mat.calcite.functions;
 
-import com.github.vlsi.mat.calcite.HeapReference;
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMultimap;
-import com.google.common.collect.Multimap;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+
 import org.apache.calcite.adapter.java.AbstractQueryableTable;
-import org.apache.calcite.linq4j.*;
+import org.apache.calcite.linq4j.BaseQueryable;
+import org.apache.calcite.linq4j.Enumerator;
+import org.apache.calcite.linq4j.Linq4j;
+import org.apache.calcite.linq4j.QueryProvider;
+import org.apache.calcite.linq4j.Queryable;
 import org.apache.calcite.rel.type.RelDataType;
 import org.apache.calcite.rel.type.RelDataTypeFactory;
-import org.apache.calcite.schema.*;
+import org.apache.calcite.schema.QueryableTable;
+import org.apache.calcite.schema.SchemaPlus;
+import org.apache.calcite.schema.Statistic;
+import org.apache.calcite.schema.Statistics;
+import org.apache.calcite.schema.TableFunction;
 import org.apache.calcite.schema.impl.TableFunctionImpl;
 import org.apache.calcite.sql.type.SqlTypeName;
 import org.apache.calcite.util.ImmutableBitSet;
@@ -16,12 +25,14 @@ import org.eclipse.mat.SnapshotException;
 import org.eclipse.mat.inspections.collectionextract.CollectionExtractionUtils;
 import org.eclipse.mat.inspections.collectionextract.ICollectionExtractor;
 import org.eclipse.mat.snapshot.ISnapshot;
+import org.eclipse.mat.snapshot.model.NamedReference;
 import org.eclipse.mat.util.VoidProgressListener;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
+import com.github.vlsi.mat.calcite.HeapReference;
+import com.github.vlsi.mat.calcite.schema.references.OutboundReferencesTable;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMultimap;
+import com.google.common.collect.Multimap;
 
 public class TableFunctions {
 
@@ -79,23 +90,14 @@ public class TableFunctions {
 
     @SuppressWarnings("unused")
     public static QueryableTable getOutboundReferences(Object r) {
-        List<HeapReference> references;
+        List<NamedReference> references;
         if (!(r instanceof HeapReference)) {
             references = Collections.emptyList();
         } else {
             HeapReference ref = (HeapReference)r;
-            ISnapshot snapshot = ref.getIObject().getSnapshot();
-            try {
-                references = collectReferences
-                        (
-                                snapshot,
-                                snapshot.getOutboundReferentIds(ref.getIObject().getObjectId())
-                        );
-            } catch (SnapshotException e) {
-                throw new RuntimeException("Cannot extract outbound references from "+r, e);
-            }
+            references = ref.getIObject().getOutboundReferences();
         }
-        return new HeapReferenceTable(references, true);
+        return new OutboundReferencesTable(references);
     }
 
     @SuppressWarnings("unused")
