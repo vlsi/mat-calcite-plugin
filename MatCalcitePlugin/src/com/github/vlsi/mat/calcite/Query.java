@@ -4,6 +4,7 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.Statement;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import javax.sql.rowset.CachedRowSet;
@@ -26,7 +27,8 @@ import org.eclipse.mat.util.IProgressListener;
 public class Query implements IQuery {
 	public static final Pattern EXPLAIN_PLAN = Pattern.compile("explain\\s+plan\\s+for", Pattern.CASE_INSENSITIVE);
 	public static final Pattern TRIM_ENUMERABLE = Pattern.compile("Enumerable(\\w+)Rel");
-	public static final Pattern RENAME_INDEX = Pattern.compile("EnumerableTableScan\\(table=\\[\\[HEAP, \\$ids\\$:([^]]+)\\]\\]\\)");
+	// EnumerableTableScan(table=[[HEAP, java, net, $ids$:URL]])
+	public static final Pattern RENAME_INDEX = Pattern.compile("EnumerableTableScan\\(table=\\[\\[HEAP, ((?:[^\\$][^,\\]]*+, )*+)\\$ids\\$:([^]]+)\\]\\]\\)");
 	public static final Pattern RENAME_JOIN = Pattern.compile("EnumerableJoin");
 	public static final Pattern RENAME_CALC = Pattern.compile("EnumerableCalc");
 
@@ -59,7 +61,16 @@ public class Query implements IQuery {
 				rowSet.absolute(1);
 				String plan = rowSet.getString(1);
 				System.out.println("plan = " + plan);
-				plan = RENAME_INDEX.matcher(plan).replaceAll("GetObjectIdsByClass (class=$1)");
+				{
+					Matcher ind = RENAME_INDEX.matcher(plan);
+					StringBuffer sb = new StringBuffer();
+					while (ind.find()) {
+						String className = ind.group(1).replace(", ", ".") + ind.group(2);
+						ind.appendReplacement(sb, "GetObjectIdsByClass (class=" + className + ")");
+					}
+					ind.appendTail(sb);
+					plan = sb.toString();
+				}
 				plan = RENAME_JOIN.matcher(plan).replaceAll("HashJoin ");
 				plan = RENAME_CALC.matcher(plan).replaceAll("View ");
 				plan = TRIM_ENUMERABLE.matcher(plan).replaceAll("$1 ");
