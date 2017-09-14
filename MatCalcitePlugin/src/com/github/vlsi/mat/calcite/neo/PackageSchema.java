@@ -15,6 +15,7 @@ import org.apache.calcite.schema.Schema;
 import org.apache.calcite.schema.Table;
 import org.apache.calcite.schema.impl.AbstractSchema;
 import org.apache.calcite.schema.impl.ScalarFunctionImpl;
+import org.apache.calcite.sql.advise.SqlAdvisorGetHintsFunction;
 import org.eclipse.mat.SnapshotException;
 import org.eclipse.mat.snapshot.ISnapshot;
 import org.eclipse.mat.snapshot.model.IClass;
@@ -97,6 +98,7 @@ public class PackageSchema extends AbstractSchema {
             builder.putAll(ScalarFunctionImpl.createAll(HeapFunctions.class));
             builder.putAll(TableFunctions.createAll());
             builder.putAll(SnapshotFunctions.createAll(snapshot));
+            builder.put("getHints", new SqlAdvisorGetHintsFunction());
             ImmutableMultimap<String, Function> functions = builder.build();
 
             // Create default schema

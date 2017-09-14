@@ -1,12 +1,18 @@
 package com.github.vlsi.mat.calcite.editor;
 
 import org.eclipse.jface.text.IDocument;
+import org.eclipse.jface.text.contentassist.ContentAssistant;
+import org.eclipse.jface.text.contentassist.IContentAssistProcessor;
+import org.eclipse.jface.text.contentassist.IContentAssistant;
 import org.eclipse.jface.text.hyperlink.IHyperlinkPresenter;
 import org.eclipse.jface.text.presentation.IPresentationReconciler;
 import org.eclipse.jface.text.presentation.PresentationReconciler;
 import org.eclipse.jface.text.rules.DefaultDamagerRepairer;
 import org.eclipse.jface.text.source.ISourceViewer;
 import org.eclipse.jface.text.source.SourceViewerConfiguration;
+import org.eclipse.mat.ui.snapshot.panes.oql.contentAssist.OQLContentAssistantProcessor;
+
+import java.util.Scanner;
 
 public class CalciteSourceViewerConfiguration extends SourceViewerConfiguration {
 	@Override
@@ -32,6 +38,17 @@ public class CalciteSourceViewerConfiguration extends SourceViewerConfiguration 
 	at OpenCalciteAction.run(OpenCalciteAction.java:22)
 		 */
 		return null;
+	}
+
+	@Override
+	public IContentAssistant getContentAssistant(ISourceViewer sourceViewer) {
+		IContentAssistProcessor proc = new CalciteContentAssistantProcessor();
+		ContentAssistant assistant = new ContentAssistant();
+		assistant.enableAutoActivation(true);
+		assistant.setAutoActivationDelay(500);
+		assistant.setContentAssistProcessor(proc, IDocument.DEFAULT_CONTENT_TYPE);
+		assistant.setContentAssistProcessor(proc, CalcitePartitionScanner.SQL_QUOTED_IDENTIFIER);
+		return assistant;
 	}
 
 	@Override

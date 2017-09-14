@@ -11,6 +11,7 @@ import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IDocumentPartitioner;
 import org.eclipse.jface.text.IUndoManagerExtension;
 import org.eclipse.jface.text.rules.FastPartitioner;
+import org.eclipse.jface.text.source.ISourceViewer;
 import org.eclipse.jface.text.source.SourceViewer;
 import org.eclipse.jface.text.source.SourceViewerConfiguration;
 import org.eclipse.mat.query.IResult;
@@ -40,6 +41,7 @@ public class CalcitePane extends CompositeHeapEditorPane {
 	private ExecuteQueryAction explainQueryAction;
 	private Action copyQueryStringAction;
 	private Action commentLineAction;
+	private Action contentAssistAction;
 
 	public CalcitePane() {
 	}
@@ -68,7 +70,7 @@ public class CalcitePane extends CompositeHeapEditorPane {
 			public void keyPressed(KeyEvent e) {
 				if (e.keyCode == ' ' && (e.stateMask & SWT.CTRL) != 0) {
 					// ctrl space combination for content assist
-					// contentAssistAction.run();
+					contentAssistAction.run();
 				} else if (e.character == '/' && (e.stateMask & SWT.MOD1) != 0) {
 					commentLineAction.run();
 					e.doit = false;
@@ -188,6 +190,12 @@ public class CalcitePane extends CompositeHeapEditorPane {
 			}
 		};
 		this.copyQueryStringAction.setAccelerator(globalAction.getAccelerator());
+		this.contentAssistAction = new Action() {
+			@Override
+			public void run() {
+				queryViewer.doOperation(ISourceViewer.CONTENTASSIST_PROPOSALS);
+			}
+		};
 	}
 
 	public StyledText getQueryString() {
