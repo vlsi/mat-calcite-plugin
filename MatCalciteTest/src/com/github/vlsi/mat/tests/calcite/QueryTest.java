@@ -183,21 +183,15 @@ public class QueryTest {
     }
 
     @Test
-    public void selectOutboundReferencesTab() throws SQLException {
-        returnsInOrder("select refs.* from java.util.HashMap hm, lateral (select * from table(getOutboundReferences(hm.this))) as refs limit 2",
-                new String[]{"retained_size", "113712"});
-    }
-
-    @Test
     public void selectOutboundReferences() throws SQLException {
-        returnsInOrder("select sum(retainedSize(og.this)) retained_size, count(og.name) from java.util.HashMap hm, lateral (select * from table(getOutboundReferences(hm.this))) as og(name, this)",
-                new String[]{"retained_size", "113712"});
+        returnsInOrder("select sum(retainedSize(og.this)) retained_size, count(og.name) cnt_name from java.util.HashMap hm, lateral (select * from table(getOutboundReferences(hm.this))) as og(name, this)",
+                new String[]{"retained_size|cnt_name", "113712|155"});
     }
 
     @Test
     public void selectOutboundReferencesCrossApply() throws SQLException {
-        returnsInOrder("select sum(retainedSize(og.this)) retained_size, count(og.name) from java.util.HashMap hm cross apply table(getOutboundReferences(hm.this)) as og(name, this)",
-                new String[]{"retained_size", "113712"});
+        returnsInOrder("select sum(retainedSize(og.this)) retained_size, count(og.name) cnt_name from java.util.HashMap hm cross apply table(getOutboundReferences(hm.this)) as og(name, this)",
+                new String[]{"retained_size|cnt_name", "113712|155"});
     }
 
     @Test
