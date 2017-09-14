@@ -183,8 +183,20 @@ public class QueryTest {
     }
 
     @Test
+    public void selectOutboundReferencesTab() throws SQLException {
+        returnsInOrder("select refs.* from java.util.HashMap hm, lateral (select * from table(getOutboundReferences(hm.this))) as refs limit 2",
+                new String[]{"retained_size", "113712"});
+    }
+
+    @Test
     public void selectOutboundReferences() throws SQLException {
-        returnsInOrder("select sum(retainedSize(og.this)) retained_size from java.util.HashMap hm, lateral (select * from table(getOutboundReferences(hm.this))) as og(this)",
+        returnsInOrder("select sum(retainedSize(og.this)) retained_size, count(og.name) from java.util.HashMap hm, lateral (select * from table(getOutboundReferences(hm.this))) as og(name, this)",
+                new String[]{"retained_size", "113712"});
+    }
+
+    @Test
+    public void selectOutboundReferencesCrossApply() throws SQLException {
+        returnsInOrder("select sum(retainedSize(og.this)) retained_size, count(og.name) from java.util.HashMap hm cross apply table(getOutboundReferences(hm.this)) as og(name, this)",
                 new String[]{"retained_size", "113712"});
     }
 
@@ -214,7 +226,12 @@ public class QueryTest {
     }
 
     private void returnsInOrder(String sql, Object[] expected) throws SQLException {
-        Object[] actuals = executeToCSV(sql).toArray();
+        Object[] actuals = new Object[0];
+        try {
+            actuals = executeToCSV(sql).toArray();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
         System.out.println("Arrays.toString(expected) = " + Arrays.toString(expected));
         System.out.println("Arrays.toString(actuals) = " + Arrays.toString(actuals));
         Assert.assertArrayEquals(sql, nnl(expected), nnl(actuals));
