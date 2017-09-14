@@ -46,10 +46,9 @@
                 <artifactId>tycho-surefire-plugin</artifactId>
                 <version>${tycho-version}</version>
                 <configuration>
-                    <argLine>-ea -Xmx768m -Dcalcite.debug=true</argLine>
+                    <argLine>-ea -Xmx768m -Dcalcite.debug=${calcite.debug}</argLine>
                     <!--<debugPort>5005</debugPort>-->
                     <!--<testFailureIgnore>true</testFailureIgnore>-->
-                    <showEclipseLog>true</showEclipseLog>
                     <includes>
                         <include>**/AllTests.class</include>
                     </includes>

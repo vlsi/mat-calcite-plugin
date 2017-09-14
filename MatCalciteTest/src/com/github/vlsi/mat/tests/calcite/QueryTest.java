@@ -230,7 +230,7 @@ public class QueryTest {
         try {
             actuals = executeToCSV(sql).toArray();
         } catch (SQLException e) {
-            e.printStackTrace();
+            e.printStackTrace(); // tycho-surefire-plugin forces trimStackTrace=true
         }
         System.out.println("Arrays.toString(expected) = " + Arrays.toString(expected));
         System.out.println("Arrays.toString(actuals) = " + Arrays.toString(actuals));
@@ -240,39 +240,49 @@ public class QueryTest {
     private List<String> executeToCSV(String sql) throws SQLException {
         List<String> res = new ArrayList<String>();
         System.out.println("sql = " + sql);
-        Connection con = CalciteDataSource.getConnection(snapshot);
-        PreparedStatement ps = con.prepareStatement(sql);
-        ResultSet rs = ps.executeQuery();
-        ResultSetMetaData md = rs.getMetaData();
-        Joiner joiner = Joiner.on('|');
-        List<String> row = new ArrayList<String>();
-        final int columnCount = md.getColumnCount();
-        for (int i = 1; i <= columnCount; i++) {
-            row.add(md.getColumnName(i));
-        }
-        res.add(joiner.join(row));
-        while(rs.next()) {
-            row.clear();
+        try (Connection con = CalciteDataSource.getConnection(snapshot)) {
+            PreparedStatement ps = con.prepareStatement(sql);
+            ResultSet rs = ps.executeQuery();
+            ResultSetMetaData md = rs.getMetaData();
+            Joiner joiner = Joiner.on('|');
+            List<String> row = new ArrayList<String>();
+            final int columnCount = md.getColumnCount();
             for (int i = 1; i <= columnCount; i++) {
-                row.add(String.valueOf(rs.getObject(i)));
+                row.add(md.getColumnName(i));
             }
             res.add(joiner.join(row));
+            while(rs.next()) {
+                row.clear();
+                for (int i = 1; i <= columnCount; i++) {
+                    row.add(String.valueOf(rs.getObject(i)));
+                }
+                res.add(joiner.join(row));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace(); // tycho-surefire-plugin forces trimStackTrace=true
+            throw e;
         }
         return res;
     }
 
     private void execute(String sql, int limit) throws SQLException {
         System.out.println("sql = " + sql);
-        Connection con = CalciteDataSource.getConnection(snapshot);
-        PreparedStatement ps = con.prepareStatement(sql);
-        ResultSet rs = ps.executeQuery();
-        ResultSetMetaData md = rs.getMetaData();
-        for (int j = 0; rs.next() && j < limit; j++) {
-            for (int i = 1; i <= md.getColumnCount(); i++) {
-                System.out.println(md.getColumnName(i) + ": " + String.valueOf(rs.getObject(i)));
+
+        try (Connection con = CalciteDataSource.getConnection(snapshot)) {
+            PreparedStatement ps = null;
+            ResultSet rs = null;
+            ps = con.prepareStatement(sql);
+            rs = ps.executeQuery();
+            ResultSetMetaData md = rs.getMetaData();
+            for (int j = 0; rs.next() && j < limit; j++) {
+                for (int i = 1; i <= md.getColumnCount(); i++) {
+                    System.out.println(md.getColumnName(i) + ": " + String.valueOf(rs.getObject(i)));
+                }
+                System.out.println();
             }
-            System.out.println();
+        } catch (SQLException e) {
+            e.printStackTrace(); // tycho-surefire-plugin forces trimStackTrace=true
+            throw e;
         }
-        CalciteDataSource.close(rs, ps, con);
     }
 }
