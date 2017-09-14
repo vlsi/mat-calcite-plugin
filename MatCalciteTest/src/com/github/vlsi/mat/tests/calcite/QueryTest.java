@@ -196,13 +196,13 @@ public class QueryTest {
 
     @Test
     public void testReadme() throws SQLException {
-        execute("explain plan for select toString(file) file, count(*) cnt, sum(retainedSize(this)) sum_retained, sum(shallowSize(this)) sum_shallow\n"
+        execute("explain plan for select toString(file) file_str, count(*) cnt, sum(retainedSize(this)) sum_retained, sum(shallowSize(this)) sum_shallow\n"
                 + "  from java.net.URL\n"
                 + " group by toString(file)\n"
                 + "having count(*)>1\n"
                 + " order by sum(shallowSize(this)) desc", 5);
 
-        execute("select toString(file) file, count(*) cnt, sum(retainedSize(this)) sum_retained, sum(shallowSize(this)) sum_shallow\n"
+        execute("select toString(file) file_str, count(*) cnt, sum(retainedSize(this)) sum_retained, sum(shallowSize(this)) sum_shallow\n"
                 + "  from java.net.URL\n"
                 + " group by toString(file)\n"
                 + "having count(*)>1\n"
