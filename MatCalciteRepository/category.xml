@@ -1,11 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <site>
-    <feature url="features/MatCalciteFeature_1.3.0.qualifier.jar" id="MatCalciteFeature" version="1.3.0.qualifier">
-        <category name="queries_category"/>
+    <feature id="MatCalciteFeature" version="0.0.0">
+        <category name="queries.category"/>
     </feature>
-    <category-def name="queries_category" label="Queries">
+    <feature id="MatCalciteFeature.source" version="0.0.0">
+        <category name="queries.source.category"/>
+    </feature>
+    <category-def name="queries.category" label="SQL for Memory Analyzer">
         <description>
             Extended queries for MAT
+        </description>
+    </category-def>
+    <category-def name="queries.source.category" label="SQL for Memory Analyzer (Source)">
+        <description>
+            Extended queries for MAT (source code)
         </description>
     </category-def>
 </site>
