@@ -24,8 +24,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class CalciteContentAssistantProcessor implements IContentAssistProcessor {
-    @Override
-    public ICompletionProposal[] computeCompletionProposals(ITextViewer iTextViewer, int offset) {
+    public static ISnapshot getSnapshot() {
         IWorkbenchPage page = PlatformUI.getWorkbench()
                 .getActiveWorkbenchWindow().getActivePage();
         IEditorPart part = page == null ? null : page.getActiveEditor();
@@ -35,6 +34,12 @@ public class CalciteContentAssistantProcessor implements IContentAssistProcessor
         }
         IQueryContext queryContext = ((MultiPaneEditor) part).getQueryContext();
         ISnapshot snapshot = (ISnapshot) queryContext.get(ISnapshot.class, null);
+        return snapshot;
+    }
+
+    @Override
+    public ICompletionProposal[] computeCompletionProposals(ITextViewer iTextViewer, int offset) {
+        ISnapshot snapshot = getSnapshot();
 
         String sql = iTextViewer.getDocument().get();
 

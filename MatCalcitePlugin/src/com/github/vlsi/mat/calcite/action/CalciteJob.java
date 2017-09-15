@@ -1,6 +1,8 @@
 package com.github.vlsi.mat.calcite.action;
 
-import com.github.vlsi.mat.calcite.editor.CalcitePane;
+import java.io.PrintWriter;
+import java.io.StringWriter;
+
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
@@ -13,8 +15,7 @@ import org.eclipse.mat.ui.editor.AbstractPaneJob;
 import org.eclipse.mat.ui.util.PaneState;
 import org.eclipse.mat.ui.util.ProgressMonitorWrapper;
 
-import java.io.PrintWriter;
-import java.io.StringWriter;
+import com.github.vlsi.mat.calcite.editor.CalcitePane;
 
 public class CalciteJob extends AbstractPaneJob {
 
@@ -50,7 +51,12 @@ public class CalciteJob extends AbstractPaneJob {
 			calcitePane.getQueryString().getDisplay().asyncExec(new Runnable() {
 				@Override
 				public void run() {
+					String keyError = calcitePane.highlightError(e);
+
 					StringWriter sw = new StringWriter();
+					if (keyError != null) {
+						sw.append(keyError).append("\n");
+					}
 					if (sql != null)
 						sw.append(sql).append('\n');
 					e.printStackTrace(new PrintWriter(sw));

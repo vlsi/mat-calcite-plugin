@@ -7,6 +7,7 @@
 - New functions: `getId`, `getAddress`, `getType`, `getId`, `toString`, `shallowSize`, `retainedSize`, `length`, `getSize`, `getByKey`, `getField` (Alexey Makhmutov)
 - Table functions: `getValues`, `getRetainedSet`, `getOutboundReferences`, `getInboundReferences` (Alexey Makhmutov)
 - `CROSS APPLY`, `OUTER APPLY` sytax to call table functions
+- Error highlight in the SQL editor
 
 ### Changed
 - `@THIS` column is renamed to `this`

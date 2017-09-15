@@ -1,17 +1,22 @@
 package com.github.vlsi.mat.calcite.editor;
 
-import com.github.vlsi.mat.calcite.action.CommentLineAction;
-import com.github.vlsi.mat.calcite.action.ExecuteQueryAction;
+import org.apache.calcite.runtime.CalciteContextException;
+import org.apache.calcite.sql.parser.SqlParseException;
+import org.apache.calcite.sql.parser.SqlParserPos;
+import org.apache.calcite.sql.parser.SqlParserUtil;
 import org.eclipse.core.commands.operations.IUndoContext;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IToolBarManager;
+import org.eclipse.jface.preference.JFacePreferences;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.text.Document;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IDocumentPartitioner;
 import org.eclipse.jface.text.IUndoManagerExtension;
 import org.eclipse.jface.text.rules.FastPartitioner;
+import org.eclipse.jface.text.source.CompositeRuler;
 import org.eclipse.jface.text.source.ISourceViewer;
+import org.eclipse.jface.text.source.LineNumberRulerColumn;
 import org.eclipse.jface.text.source.SourceViewer;
 import org.eclipse.jface.text.source.SourceViewerConfiguration;
 import org.eclipse.mat.query.IResult;
@@ -23,15 +28,29 @@ import org.eclipse.mat.ui.util.PaneState;
 import org.eclipse.mat.ui.util.PaneState.PaneType;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.SashForm;
+import org.eclipse.swt.custom.StyleRange;
 import org.eclipse.swt.custom.StyledText;
-import org.eclipse.swt.events.*;
+import org.eclipse.swt.events.FocusEvent;
+import org.eclipse.swt.events.FocusListener;
+import org.eclipse.swt.events.KeyAdapter;
+import org.eclipse.swt.events.KeyEvent;
+import org.eclipse.swt.events.TraverseEvent;
+import org.eclipse.swt.events.TraverseListener;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.ui.*;
+import org.eclipse.ui.IActionBars;
+import org.eclipse.ui.IEditorInput;
+import org.eclipse.ui.IEditorSite;
+import org.eclipse.ui.IWorkbenchCommandConstants;
+import org.eclipse.ui.IWorkbenchWindow;
+import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.actions.ActionFactory;
 import org.eclipse.ui.operations.RedoActionHandler;
 import org.eclipse.ui.operations.UndoActionHandler;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
+
+import com.github.vlsi.mat.calcite.action.CommentLineAction;
+import com.github.vlsi.mat.calcite.action.ExecuteQueryAction;
 
 public class CalcitePane extends CompositeHeapEditorPane {
 	private SourceViewer queryViewer;
@@ -49,7 +68,11 @@ public class CalcitePane extends CompositeHeapEditorPane {
 	@Override
 	public void createPartControl(Composite parent) {
 		SashForm sash = new SashForm(parent, SWT.VERTICAL | SWT.SMOOTH);
-		queryViewer = new SourceViewer(sash, null, SWT.H_SCROLL | SWT.V_SCROLL | SWT.MULTI);
+
+		int VERTICAL_RULER_WIDTH = 12;
+		CompositeRuler ruler = new CompositeRuler(VERTICAL_RULER_WIDTH);
+		ruler.addDecorator(0, new LineNumberRulerColumn());
+		queryViewer = new SourceViewer(sash, ruler, SWT.H_SCROLL | SWT.V_SCROLL | SWT.MULTI);
 		queryViewer.configure(new CalciteSourceViewerConfiguration());
 		queryString = queryViewer.getTextWidget();
 		// The following setBackground(getBackground) results in proper white background in MACOS.
@@ -200,6 +223,39 @@ public class CalcitePane extends CompositeHeapEditorPane {
 
 	public StyledText getQueryString() {
 		return queryString;
+	}
+
+	public String highlightError(Throwable e) {
+		Throwable t;
+		SqlParserPos errPos = null;
+		for(t = e; t!=null; t = t.getCause()) {
+			if (t instanceof CalciteContextException) {
+				CalciteContextException cce = (CalciteContextException) t;
+				errPos = new SqlParserPos(cce.getPosLine(), cce.getPosColumn(),
+						cce.getEndPosLine(), cce.getEndPosColumn());
+				break;
+			}
+			if (t instanceof SqlParseException) {
+				SqlParseException spe = (SqlParseException) t;
+				errPos = spe.getPos();
+				break;
+			}
+		}
+		if (errPos == null) {
+			return null;
+		}
+
+		String sql = queryViewer.getDocument().get();
+		StyleRange style = new StyleRange();
+		int start = SqlParserUtil.lineColToIndex(sql, errPos.getLineNum(), errPos.getColumnNum());
+		int end = SqlParserUtil.lineColToIndex(sql, errPos.getEndLineNum(), errPos.getEndColumnNum()) + 1;
+		style.start = start;
+		style.length = end - start;
+		style.foreground = JFaceResources.getColorRegistry().get(JFacePreferences.ERROR_COLOR);
+		style.underline = true;
+		style.underlineStyle = SWT.UNDERLINE_SQUIGGLE;
+		queryString.replaceStyleRanges(start, end - start, new StyleRange[] { style });
+		return t.getMessage();
 	}
 
 	public void initQueryResult(QueryResult queryResult, PaneState state) {
