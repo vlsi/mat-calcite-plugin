@@ -23,14 +23,14 @@ To disable Eclipse Oxygen in MAT 1.7.0, perform the following:
 1. Uncheck `Eclipse Oxygen`
 1. Click `Ok`
 
-TL;DR: use the following update repository to install the latest released version: https://dl.bintray.com/vlsi/eclipse/
+TL;DR: use the following update repository to install the latest released version: https://dl.bintray.com/vlsi/eclipse/updates/
 
 To install Calcite SQL plugin, perform the following:
 1. Open `Help`, `Install New Software...`
 1. **For MAT 1.7.0**: in case you have not disabled Eclipse Oxygen update site, click `Available Software Sites` and disable Oxygen there
 1. Click `Add`, it will open a `Add Repository` window
 1. Type `Calcite SQL plugin site` to the `Name` field
-1. Type `https://dl.bintray.com/vlsi/eclipse/` to the `Location` field
+1. Type `https://dl.bintray.com/vlsi/eclipse/updates/` to the `Location` field
 1. Click `Ok`
 1. All the checkboxes can be left by default (`Show only latest version`, `Group items by category`, ...)
 1. Check `Queries` category
@@ -38,6 +38,8 @@ To install Calcite SQL plugin, perform the following:
 1. Click `Next` (Installation Details)
 1. Accept License
 1. Click `Finish` and restart MAT
+
+The following update site can be used to get development builds: https://dl.bintray.com/vlsi/eclipse-test/updates/
 
 Sample
 ------
