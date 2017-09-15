@@ -35,7 +35,7 @@ To install Calcite SQL plugin, perform the following:
 1. Type `https://dl.bintray.com/vlsi/eclipse/updates/` to the `Location` field
 1. Click `Ok`
 1. All the checkboxes can be left by default (`Show only latest version`, `Group items by category`, ...)
-1. Check `Queries` category
+1. Check `SQL for Memory Analyzer` category
 1. Click `Next` (Available Software)
 1. Click `Next` (Installation Details)
 1. Accept License
