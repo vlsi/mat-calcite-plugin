@@ -14,10 +14,10 @@ script:
   - |
     if [ -n "$TRAVIS_TAG" ]; then
       # Deploy a release version
-      mvn --settings settings.xml -Dbintray.repo=eclipse -Prelease-mat-calcite clean verify
+      mvn --settings settings.xml -Dbintray.repository=eclipse -Prelease-mat-calcite clean verify
     elif [ "$TRAVIS_BRANCH" = "master" ]; then
       # Deploy dev version
-      mvn --settings settings.xml -Dbintray.repo=eclipse-test -Prelease-mat-calcite clean verify
+      mvn --settings settings.xml -Dbintray.repository=eclipse-test -Prelease-mat-calcite clean verify
     else
       # check pull request
       mvn clean verify
