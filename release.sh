@@ -26,7 +26,7 @@ read -p "About to release v$RELEASE_VERSION to master" &&\
 git tag v$RELEASE_VERSION &&\
 git push origin v$RELEASE_VERSION &&\
 mvn tycho-versions:set-version -DnewVersion=$NEXT_VERSION-SNAPSHOT &&\
-(cd MatCalciteDependencies && mvn versions:set -DnewVersion=$RELEASE_VERSION-SNAPSHOT && mvn versions:commit) &&\
+(cd MatCalciteDependencies && mvn versions:set -DnewVersion=$NEXT_VERSION-SNAPSHOT && mvn versions:commit) &&\
 git add -u &&\
 git commit -m "Prepare for next development iteration" &&\
 git push
