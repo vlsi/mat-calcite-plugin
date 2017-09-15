@@ -11,7 +11,7 @@
     <properties>
         <maven-antrun-plugin.version>1.7</maven-antrun-plugin.version>
         <!-- The name of your own Bintray repository -->
-        <bintray.repo>eclipse-test</bintray.repo>
+        <bintray.repo>${bintray.repo}</bintray.repo>
         <!-- The name of your own Bintray repository's package for releases -->
         <bintray.package>mat-calcite-plugin</bintray.package>
         <!-- The label for the Composite sites -->

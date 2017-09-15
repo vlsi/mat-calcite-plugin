@@ -1,0 +1,35 @@
+sudo: false
+language: java
+jdk:
+  - openjdk8
+cache:
+  directories:
+    - $HOME/.m2
+env:
+  global:
+    - DISPLAY=:99.0
+install:
+  - (cd MatCalciteDependencies && mvn install)
+script:
+  - |
+    if [ -n "$TRAVIS_TAG" ]; then
+      # Deploy a release version
+      mvn --settings settings.xml -Dbintray.repo=eclipse -Prelease-mat-calcite clean verify
+    elif [ "$TRAVIS_BRANCH" = "master" ]; then
+      # Deploy dev version
+      mvn --settings settings.xml -Dbintray.repo=eclipse-test -Prelease-mat-calcite clean verify
+    else
+      # check pull request
+      mvn clean verify
+    fi
+
+deploy:
+  provider: releases
+  api_key:
+    secure: "Pj2LGYrSWmIoaCHNsiYIr563AyEZPZWPsSb2gD52bNTUOKegKNXLopKlpFBTVYen1U0mc/6zweIWaGVIjZdG3/vDydBp/fcBEogNIARND0ICPKZ4d78a2nhq3mdC6nnTUnvrkl6s2vwq9YunobePM5U97qRWIWREKHGrjDPN9xU="
+  file_glob: true
+  file: "MatCalciteRepository/target/MatCalciteRepository-*.zip"
+  skip_cleanup: true
+  on:
+    tags: true
+    repo: vlsi/mat-calcite-plugin
