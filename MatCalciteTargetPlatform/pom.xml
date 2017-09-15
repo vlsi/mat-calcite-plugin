@@ -5,14 +5,14 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<artifactId>MatCalciteTargetPlatform</artifactId>
-	<version>1.3.0</version>
+	<version>1.4.0-SNAPSHOT</version>
 	<packaging>eclipse-target-definition</packaging>
 	<name>Eclipse target definition</name>
 
 	<parent>
 		<artifactId>parent</artifactId>
 		<groupId>com.github.vlsi.mat.calcite</groupId>
-		<version>1.3.0</version>
+		<version>1.4.0-SNAPSHOT</version>
 	</parent>
 
 </project>
