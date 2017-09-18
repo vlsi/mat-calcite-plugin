@@ -1,54 +1,9 @@
 package com.github.vlsi.mat.tests.calcite;
 
-import com.github.vlsi.mat.calcite.CalciteDataSource;
-import com.google.common.base.Joiner;
-import org.eclipse.mat.SnapshotException;
-import org.eclipse.mat.snapshot.ISnapshot;
-import org.eclipse.mat.snapshot.SnapshotFactory;
-import org.eclipse.mat.util.VoidProgressListener;
-import org.junit.AfterClass;
-import org.junit.Assert;
-import org.junit.BeforeClass;
 import org.junit.Test;
+import java.sql.SQLException;
 
-import java.io.File;
-import java.sql.*;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
-public class QueryTest {
-    static ISnapshot snapshot;
-
-    /**
-     * Transforms both \r\n and \r to \n
-     */
-    private static String nnl(String text) {
-        return text.replace("\r\n", "\n").replace("\r", "\n");
-    }
-
-    private static Object[] nnl(Object[] array) {
-        for (int i = 0; i<array.length; i++) {
-            if (array[i] instanceof String) {
-                array[i] = nnl((String)array[i]);
-            }
-        }
-        return array;
-    }
-
-
-    @BeforeClass
-    public static void openSnapshot() throws SnapshotException {
-        File file = new File("dumps", "mvn1m_jdk18.hprof");
-        System.out.println("exists = " + file.exists() + ", file = " + file.getAbsolutePath());
-        snapshot = SnapshotFactory.openSnapshot(file, new VoidProgressListener());
-    }
-
-    @AfterClass
-    public static void closeSnapshot() {
-        SnapshotFactory.dispose(snapshot);
-        snapshot = null;
-    }
+public class BasicQueriesTests extends SampleHeapDumpTests {
 
     @Test
     public void testRegularClassName() throws SQLException {
@@ -98,29 +53,31 @@ public class QueryTest {
     @Test
     public void testStackTraceCount() throws SQLException {
         returnsInOrder("select count(*) CNT from heap.ThreadStackFrames",
-                new String[]{"CNT", "39"});
+                       "CNT",
+                       "39");
     }
 
     @Test
     public void testStackTraces() throws SQLException {
         returnsInOrder("select thread, depth, text from heap.ThreadStackFrames order by 1, 2, 3 limit 2",
-                new String[]{"thread|depth|text",
-                        "Finalizer|0|at java.lang.Object.wait(J)V (Native Method)",
-                        "Finalizer|1|at java.lang.ref.ReferenceQueue.remove(J)Ljava/lang/ref/Reference; (ReferenceQueue.java:142)"});
+                       "thread|depth|text",
+                       "Finalizer|0|at java.lang.Object.wait(J)V (Native Method)",
+                       "Finalizer|1|at java.lang.ref.ReferenceQueue.remove(J)Ljava/lang/ref/Reference; (ReferenceQueue.java:142)");
     }
 
     @Test
     public void testStackTracesUnnest() throws SQLException {
         returnsInOrder("select thread, depth, text, obj.va from heap.ThreadStackFrames frm, unnest(frm.objects) obj(va) order by 1, 2, 3 limit 2",
-                new String[]{"thread|depth|text|va",
-                        "Finalizer|1|at java.lang.ref.ReferenceQueue.remove(J)Ljava/lang/ref/Reference; (ReferenceQueue.java:142)|java.lang.ref.ReferenceQueue @ 0x7bfe391c0",
-                        "Finalizer|1|at java.lang.ref.ReferenceQueue.remove(J)Ljava/lang/ref/Reference; (ReferenceQueue.java:142)|java.lang.ref.ReferenceQueue$Lock @ 0x7bfe391b0"});
+                       "thread|depth|text|va",
+                       "Finalizer|1|at java.lang.ref.ReferenceQueue.remove(J)Ljava/lang/ref/Reference; (ReferenceQueue.java:142)|java.lang.ref.ReferenceQueue @ 0x7bfe391c0",
+                       "Finalizer|1|at java.lang.ref.ReferenceQueue.remove(J)Ljava/lang/ref/Reference; (ReferenceQueue.java:142)|java.lang.ref.ReferenceQueue$Lock @ 0x7bfe391b0");
     }
 
     @Test
     public void countStrings() throws SQLException {
         returnsInOrder("select count(*) CNT from java.lang.String",
-                new String[]{"CNT", "3256"});
+                       "CNT",
+                       "3256");
     }
 
     @Test
@@ -132,12 +89,13 @@ public class QueryTest {
     public void joinOptimization() throws SQLException {
         // Unfortunately, this is not yet optimized to snapshot.getObject(get_id(u.path))
         returnsInOrder("explain plan for select u.this, retainedSize(s.this) from \"java.lang.String\" s join \"java.net.URL\" u on (s.this = u.path)",
-                new String[]{"PLAN", "EnumerableCalc(expr#0..2=[{inputs}], expr#3=[retainedSize($t2)], this=[$t0], EXPR$1=[$t3])\n"
+                       "PLAN",
+                        "EnumerableCalc(expr#0..2=[{inputs}], expr#3=[retainedSize($t2)], this=[$t0], EXPR$1=[$t3])\n"
                         + "  EnumerableJoin(condition=[=($1, $2)], joinType=[inner])\n"
                         + "    EnumerableCalc(expr#0=[{inputs}], expr#1=[0], expr#2=[GET_SNAPSHOT($t1)], expr#3=[GET_IOBJECT($t2, $t0)], expr#4=[TO_REFERENCE($t3)], expr#5=['path'], expr#6=[RESOLVE_REFERENCE($t3, $t5)], this=[$t4], path=[$t6])\n"
                         + "      EnumerableTableScan(table=[[HEAP, $ids$:java.net.URL]])\n"
                         + "    EnumerableCalc(expr#0=[{inputs}], expr#1=[0], expr#2=[GET_SNAPSHOT($t1)], expr#3=[GET_IOBJECT($t2, $t0)], expr#4=[TO_REFERENCE($t3)], this=[$t4])\n"
-                        + "      EnumerableTableScan(table=[[HEAP, $ids$:java.lang.String]])\n"});
+                        + "      EnumerableTableScan(table=[[HEAP, $ids$:java.lang.String]])\n");
     }
 
     @Test
@@ -152,46 +110,58 @@ public class QueryTest {
 
     @Test
     public void selectThisDotField() throws SQLException {
-        returnsInOrder("select sum(hm.size) sum_hm_size from java.util.HashMap hm", new String[]{"sum_hm_size", "922"});
+        returnsInOrder("select sum(hm.size) sum_hm_size from java.util.HashMap hm",
+                       "sum_hm_size",
+                       "922");
     }
 
     @Test
     public void selectShallow() throws SQLException {
-        returnsInOrder("select sum(cast(hm.this['@shallow'] as bigint)) sum_shallow from java.util.HashMap hm", new String[]{"sum_shallow", "3840"});
+        returnsInOrder("select sum(cast(hm.this['@shallow'] as bigint)) sum_shallow from java.util.HashMap hm",
+                       "sum_shallow",
+                       "3840");
     }
 
     @Test
     public void selectThisMapField() throws SQLException {
-        returnsInOrder("select count(this['table'][0]) count_first_entry from java.util.HashMap", new String[]{"count_first_entry", "71"});
+        returnsInOrder("select count(this['table'][0]) count_first_entry from java.util.HashMap", 
+                       "count_first_entry",
+                       "71");
     }
 
     @Test
     public void selectThisMapFieldMatSyntax() throws SQLException {
-        returnsInOrder("select count(this['table.[0]']) count_first_entry from java.util.HashMap", new String[]{"count_first_entry", "71"});
+        returnsInOrder("select count(this['table.[0]']) count_first_entry from java.util.HashMap",
+                       "count_first_entry",
+                       "71");
     }
 
     @Test
     public void selectShallowSizeFunction() throws SQLException {
         returnsInOrder("select sum(shallowSize(this)) shallow_size from java.util.HashMap",
-                new String[]{"shallow_size", "3840"});
+                       "shallow_size",
+                       "3840");
     }
 
     @Test
     public void selectRetainedSizeFunction() throws SQLException {
         returnsInOrder("select sum(retainedSize(this)) retained_size from java.util.HashMap",
-                new String[]{"retained_size", "114976"});
+                       "retained_size",
+                       "114976");
     }
 
     @Test
     public void selectOutboundReferences() throws SQLException {
         returnsInOrder("select sum(retainedSize(og.this)) retained_size, count(og.name) cnt_name from java.util.HashMap hm, lateral (select * from table(getOutboundReferences(hm.this))) as og(name, this)",
-                new String[]{"retained_size|cnt_name", "113712|155"});
+                       "retained_size|cnt_name",
+                       "113712|155");
     }
 
     @Test
     public void selectOutboundReferencesCrossApply() throws SQLException {
         returnsInOrder("select sum(retainedSize(og.this)) retained_size, count(og.name) cnt_name from java.util.HashMap hm cross apply table(getOutboundReferences(hm.this)) as og(name, this)",
-                new String[]{"retained_size|cnt_name", "113712|155"});
+                       "retained_size|cnt_name",
+                       "113712|155");
     }
 
     @Test
@@ -217,66 +187,5 @@ public class QueryTest {
                 "   from java.lang.String s\n" +
                 "   join java.net.URL u\n" +
                 "     on s.this = u.path", 10);
-    }
-
-    private void returnsInOrder(String sql, Object[] expected) throws SQLException {
-        Object[] actuals = new Object[0];
-        try {
-            actuals = executeToCSV(sql).toArray();
-        } catch (SQLException e) {
-            e.printStackTrace(); // tycho-surefire-plugin forces trimStackTrace=true
-        }
-        System.out.println("Arrays.toString(expected) = " + Arrays.toString(expected));
-        System.out.println("Arrays.toString(actuals) = " + Arrays.toString(actuals));
-        Assert.assertArrayEquals(sql, nnl(expected), nnl(actuals));
-    }
-
-    private List<String> executeToCSV(String sql) throws SQLException {
-        List<String> res = new ArrayList<String>();
-        System.out.println("sql = " + sql);
-        try (Connection con = CalciteDataSource.getConnection(snapshot)) {
-            PreparedStatement ps = con.prepareStatement(sql);
-            ResultSet rs = ps.executeQuery();
-            ResultSetMetaData md = rs.getMetaData();
-            Joiner joiner = Joiner.on('|');
-            List<String> row = new ArrayList<String>();
-            final int columnCount = md.getColumnCount();
-            for (int i = 1; i <= columnCount; i++) {
-                row.add(md.getColumnName(i));
-            }
-            res.add(joiner.join(row));
-            while(rs.next()) {
-                row.clear();
-                for (int i = 1; i <= columnCount; i++) {
-                    row.add(String.valueOf(rs.getObject(i)));
-                }
-                res.add(joiner.join(row));
-            }
-        } catch (SQLException e) {
-            e.printStackTrace(); // tycho-surefire-plugin forces trimStackTrace=true
-            throw e;
-        }
-        return res;
-    }
-
-    private void execute(String sql, int limit) throws SQLException {
-        System.out.println("sql = " + sql);
-
-        try (Connection con = CalciteDataSource.getConnection(snapshot)) {
-            PreparedStatement ps = null;
-            ResultSet rs = null;
-            ps = con.prepareStatement(sql);
-            rs = ps.executeQuery();
-            ResultSetMetaData md = rs.getMetaData();
-            for (int j = 0; rs.next() && j < limit; j++) {
-                for (int i = 1; i <= md.getColumnCount(); i++) {
-                    System.out.println(md.getColumnName(i) + ": " + String.valueOf(rs.getObject(i)));
-                }
-                System.out.println();
-            }
-        } catch (SQLException e) {
-            e.printStackTrace(); // tycho-surefire-plugin forces trimStackTrace=true
-            throw e;
-        }
     }
 }
