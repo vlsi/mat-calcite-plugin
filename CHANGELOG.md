@@ -1,4 +1,6 @@
 ## [Unreleased]
+### Changed
+- `ThreadStackFrames` is moved to `native` schema
 
 ### Fixed
 - Autocomplete is improved in lots of cases

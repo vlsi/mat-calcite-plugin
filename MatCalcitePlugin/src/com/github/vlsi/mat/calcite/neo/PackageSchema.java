@@ -139,7 +139,7 @@ public class PackageSchema extends AbstractSchema {
             }
 
             // Add thread stacks table
-            defaultSchema.getPackage("heap").addClass("ThreadStackFrames", new SnapshotThreadStacksTable(snapshot));
+            defaultSchema.getPackage("native").addClass("ThreadStackFrames", new SnapshotThreadStacksTable(snapshot));
 
             return defaultSchema;
         } catch (SnapshotException e) {

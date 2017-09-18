@@ -52,14 +52,14 @@ public class BasicQueriesTests extends SampleHeapDumpTests {
 
     @Test
     public void testStackTraceCount() throws SQLException {
-        returnsInOrder("select count(*) CNT from heap.ThreadStackFrames",
+        returnsInOrder("select count(*) CNT from native.ThreadStackFrames",
                        "CNT",
                        "39");
     }
 
     @Test
     public void testStackTraces() throws SQLException {
-        returnsInOrder("select thread, depth, text from heap.ThreadStackFrames order by 1, 2, 3 limit 2",
+        returnsInOrder("select thread, depth, text from native.ThreadStackFrames order by 1, 2, 3 limit 2",
                        "thread|depth|text",
                        "Finalizer|0|at java.lang.Object.wait(J)V (Native Method)",
                        "Finalizer|1|at java.lang.ref.ReferenceQueue.remove(J)Ljava/lang/ref/Reference; (ReferenceQueue.java:142)");
@@ -67,7 +67,7 @@ public class BasicQueriesTests extends SampleHeapDumpTests {
 
     @Test
     public void testStackTracesUnnest() throws SQLException {
-        returnsInOrder("select thread, depth, text, obj.va from heap.ThreadStackFrames frm, unnest(frm.objects) obj(va) order by 1, 2, 3 limit 2",
+        returnsInOrder("select thread, depth, text, obj.va from native.ThreadStackFrames frm, unnest(frm.objects) obj(va) order by 1, 2, 3 limit 2",
                        "thread|depth|text|va",
                        "Finalizer|1|at java.lang.ref.ReferenceQueue.remove(J)Ljava/lang/ref/Reference; (ReferenceQueue.java:142)|java.lang.ref.ReferenceQueue @ 0x7bfe391c0",
                        "Finalizer|1|at java.lang.ref.ReferenceQueue.remove(J)Ljava/lang/ref/Reference; (ReferenceQueue.java:142)|java.lang.ref.ReferenceQueue$Lock @ 0x7bfe391b0");

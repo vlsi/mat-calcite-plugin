@@ -102,7 +102,7 @@ Heap schema
                 This would return HashMap instances as well as subclass instances (e.g. LinkedHashMap)
     +- "java.util.HashMap" (table name)
        This can be used as alternative.
-    +- ThreadStackFrames (table name)
+    +- native.ThreadStackFrames (table name)
        Returns thread stack traces and local variable info
 
 ### Each java class maps to a table. The table lists instances without subclasses
