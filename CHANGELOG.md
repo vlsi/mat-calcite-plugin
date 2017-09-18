@@ -11,7 +11,7 @@
 - Ability to access properties via `[...]` operation. For instance `x.this['field']`
 - New functions: `getId`, `getAddress`, `getType`, `getId`, `toString`, `shallowSize`, `retainedSize`, `length`, `getSize`, `getByKey`, `getField` (Alexey Makhmutov)
 - Table functions: `getValues`, `getRetainedSet`, `getOutboundReferences`, `getInboundReferences` (Alexey Makhmutov)
-- `CROSS APPLY`, `OUTER APPLY` sytax to call table functions
+- `CROSS APPLY`, `OUTER APPLY` syntax to call table functions
 - Error highlight in the SQL editor
 - Highlight of known heap functions
 
