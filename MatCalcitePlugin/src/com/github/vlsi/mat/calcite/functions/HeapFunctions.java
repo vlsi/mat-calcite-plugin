@@ -46,6 +46,10 @@ public class HeapFunctions {
         }
     }
 
+    private static Object resolveReference(Object value) {
+        return value instanceof IObject ? HeapReference.valueOf((IObject)value) : value;
+    }
+
     @SuppressWarnings("unused")
     public static Object getByKey(Object r, String key) {
         HeapReference ref = ensureHeapReference(r);
@@ -56,7 +60,7 @@ public class HeapFunctions {
         try {
             for (Map.Entry<IObject, IObject> entry : CollectionExtractionUtils.extractMap(ref.getIObject())) {
                 if (key.equals(toString(entry.getKey()))) {
-                    return entry.getValue();
+                    return resolveReference(entry.getValue());
                 }
             }
             return null;
@@ -131,12 +135,7 @@ public class HeapFunctions {
             return null;
         }
 
-        Object value = IObjectMethods.resolveSimpleValue(ref.getIObject(), fieldName);
-        if (value instanceof IObject) {
-            return HeapReference.valueOf((IObject)value);
-        } else {
-            return value;
-        }
+        return resolveReference(IObjectMethods.resolveSimpleValue(ref.getIObject(), fieldName));
     }
 
     @SuppressWarnings("unused")
