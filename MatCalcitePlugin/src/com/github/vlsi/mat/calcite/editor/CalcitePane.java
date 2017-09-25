@@ -161,7 +161,7 @@ public class CalcitePane extends CompositeHeapEditorPane {
 				+ "--   instanceof.java.lang.\"HashMap$Entry\" Entry and all subclasses\n"
 				+ "-- Virtual columns:\n"
 				+ "--   this['@shallow'] -- returns shallow heap size\n"
-				+ "--   this['@retained'] -- returns shallow heap size\n"
+				+ "--   this['@retained'] -- returns retained heap size\n"
 				+ "--   this['fieldName'] -- the same as getField(this, 'fieldName')\n"
 				+ "--   this['a.b.c'] -- the same as this['a']['b']['c']\n"
 				+ "-- Functions:\n"
