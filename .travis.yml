@@ -13,13 +13,13 @@ install:
 script:
   - |
     if [ -n "$TRAVIS_TAG" ]; then
-      # Deploy a release version
+      echo Deploy a release version
       mvn --settings settings.xml -Dbintray.repository=eclipse -Prelease-mat-calcite clean verify
     elif [ "$TRAVIS_BRANCH" = "master" ]; then
-      # Deploy dev version
+      echo Deploy dev version
       mvn --settings settings.xml -Dbintray.repository=eclipse-test -Prelease-mat-calcite clean verify
     else
-      # check pull request
+      echo Check pull request
       mvn clean verify
     fi
 
