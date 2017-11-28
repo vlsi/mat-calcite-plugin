@@ -146,7 +146,7 @@ select u.this, refs.name, refs.this reference
 
 Requirements
 ------------
-Java 1.7
+Java 1.8 as a build JDK. The code should still be Java 1.7 compatible.
 Memory Analyzer Tool 1.5 or higher
 
 
