@@ -1,4 +1,7 @@
 ## [Unreleased]
+### Added
+- New functions: `asMap`, `getMapEntries`
+
 ### Changed
 - `ThreadStackFrames` is moved to `native` schema
 

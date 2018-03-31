@@ -135,6 +135,8 @@ Heap schema
     getRetainedSet(ref)        | returns the set of retained objects
     getOutboundReferences(ref) | returns outbound references (name, this) pairs
     getInboundReferences(ref)  | returns inbound references (this)
+    asMap(ref)                 | converts Java Map to SQL MAP, so it can be used like asMap(ref)['key']
+    getMapEntries(ref)         | unnests Map as (key, value) tuples 
 
  `CROSS APPLY` and `OUTER APPLY` might be used to call table functions:
 

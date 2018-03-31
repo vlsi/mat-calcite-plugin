@@ -6,7 +6,8 @@ import org.junit.runners.Suite;
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
         BasicQueriesTests.class,
-        GetByKeyTests.class
+        GetByKeyTests.class,
+        TableFunctionsTests.class
 })
 public class AllTests {
 }

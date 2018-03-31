@@ -188,4 +188,10 @@ public class BasicQueriesTests extends SampleHeapDumpTests {
                 "   join java.net.URL u\n" +
                 "     on s.this = u.path", 10);
     }
+
+    @Test
+    public void testAsMap() throws SQLException {
+        returnsInOrder("select getField(asMap(m.this)['org.codehaus.plexus.classworlds'],'pkgName') pkgName from java.util.HashMap m where m.size = 4",
+                "pkgName","org.codehaus.plexus.classworlds");
+    }
 }

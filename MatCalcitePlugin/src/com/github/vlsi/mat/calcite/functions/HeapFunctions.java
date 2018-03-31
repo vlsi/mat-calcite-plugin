@@ -9,7 +9,7 @@ import org.eclipse.mat.snapshot.model.*;
 
 import java.util.Map;
 
-public class HeapFunctions {
+public class HeapFunctions extends HeapFunctionsBase {
 
     @SuppressWarnings("unused")
     public static int getId(Object r) {
@@ -37,17 +37,12 @@ public class HeapFunctions {
 
     public static String introspect(Object r) {
         if (r instanceof HeapReference) {
-            return "HeapReference: "+toString(r);
+            return "HeapReference: " + toString(r);
         } else if (r instanceof Object[]) {
-            return "Array, length = "+((Object[])r).length;
-        } else
-        {
-            return "Primitive type: "+toString(r);
+            return "Array, length = " + ((Object[]) r).length;
+        } else {
+            return "Primitive type: " + toString(r);
         }
-    }
-
-    private static Object resolveReference(Object value) {
-        return value instanceof IObject ? HeapReference.valueOf((IObject)value) : value;
     }
 
     @SuppressWarnings("unused")
@@ -164,21 +159,9 @@ public class HeapFunctions {
             ISnapshot snapshot = ref.getIObject().getSnapshot();
             return HeapReference.valueOf(snapshot.getObject(snapshot.getImmediateDominatorId(ref.getIObject().getObjectId())));
         } catch (SnapshotException e) {
-            throw new RuntimeException("Cannot obtain immediate dominator object for "+r, e);
+            throw new RuntimeException("Cannot obtain immediate dominator object for " + r, e);
         }
 
     }
 
-    private static HeapReference ensureHeapReference(Object r) {
-        return (r == null || !(r instanceof HeapReference)) ?
-                null :
-                (HeapReference) r;
-    }
-
-    private static String toString(IObject o) {
-        String classSpecific = o.getClassSpecificName();
-        if (classSpecific != null)
-            return classSpecific;
-        return o.getDisplayName();
-    }
 }
