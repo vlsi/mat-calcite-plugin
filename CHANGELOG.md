@@ -1,6 +1,7 @@
 ## [Unreleased]
 ### Added
 - New functions: `asMap`, `getMapEntries`
+- Support entries extraction from Dexx HashMap
 
 ### Changed
 - `ThreadStackFrames` is moved to `native` schema

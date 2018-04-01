@@ -7,6 +7,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+import com.github.vlsi.mat.calcite.collections.CollectionsActions;
 import org.apache.calcite.adapter.java.AbstractQueryableTable;
 import org.apache.calcite.linq4j.BaseQueryable;
 import org.apache.calcite.linq4j.Enumerator;
@@ -79,7 +80,7 @@ public class TableFunctions {
         } else {
             HeapReference ref = (HeapReference) r;
             try {
-                ExtractedMap extractedMap = CollectionExtractionUtils.extractMap(ref.getIObject());
+                ExtractedMap extractedMap = CollectionsActions.extractMap(ref.getIObject());
                 if (extractedMap == null) {
                     references = Collections.emptyList();
                 } else {

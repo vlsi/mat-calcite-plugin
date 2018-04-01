@@ -1,6 +1,7 @@
 package com.github.vlsi.mat.calcite.functions;
 
 import com.github.vlsi.mat.calcite.HeapReference;
+import com.github.vlsi.mat.calcite.collections.CollectionsActions;
 import org.eclipse.mat.SnapshotException;
 import org.eclipse.mat.inspections.collectionextract.CollectionExtractionUtils;
 import org.eclipse.mat.inspections.collectionextract.ICollectionExtractor;
@@ -53,7 +54,7 @@ public class HeapFunctions extends HeapFunctionsBase {
         }
 
         try {
-            for (Map.Entry<IObject, IObject> entry : CollectionExtractionUtils.extractMap(ref.getIObject())) {
+            for (Map.Entry<IObject, IObject> entry : CollectionsActions.extractMap(ref.getIObject())) {
                 if (key.equals(toString(entry.getKey()))) {
                     return resolveReference(entry.getValue());
                 }

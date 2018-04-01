@@ -1,6 +1,7 @@
 package com.github.vlsi.mat.calcite.functions;
 
 import com.github.vlsi.mat.calcite.HeapReference;
+import com.github.vlsi.mat.calcite.collections.CollectionsActions;
 import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.Multimap;
 import org.apache.calcite.adapter.enumerable.CallImplementor;
@@ -56,7 +57,7 @@ public class MapFunctions extends HeapFunctionsBase {
         }
 
         try {
-            ExtractedMap extractedMap = CollectionExtractionUtils.extractMap(ref.getIObject());
+            ExtractedMap extractedMap = CollectionsActions.extractMap(ref.getIObject());
             if (extractedMap == null) {
                 return Collections.emptyMap();
             } else {
