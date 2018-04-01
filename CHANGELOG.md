@@ -2,6 +2,7 @@
 ### Added
 - New functions: `asMap`, `getMapEntries`
 - Support entries extraction from Dexx HashMap
+- Support entries extraction from vlsi.CompactHashMap
 
 ### Changed
 - `ThreadStackFrames` is moved to `native` schema

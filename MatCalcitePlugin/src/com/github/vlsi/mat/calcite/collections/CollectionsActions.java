@@ -21,7 +21,8 @@ public class CollectionsActions {
 
     private static final MapExtractorInfo[] knownExtractors = new MapExtractorInfo[]
             {
-                    new MapExtractorInfo("com.github.andrewoma.dexx.collection.HashMap", new DexxHashMapCollectionExtractor())
+                    new MapExtractorInfo("com.github.andrewoma.dexx.collection.HashMap", new DexxHashMapCollectionExtractor()),
+                    new MapExtractorInfo("vlsi.utils.CompactHashMap", new CompactHashMapCollectionExtractor())
             };
 
     public static ExtractedMap extractMap(IObject object) throws SnapshotException {
