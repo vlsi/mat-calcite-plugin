@@ -1,6 +1,6 @@
 ## [Unreleased]
 ### Added
-- New functions: `asMap`, `getMapEntries`
+- New functions: `asMap`, `getMapEntries`, `asMultiSet`
 - Support entries extraction from Dexx HashMap
 - Support entries extraction from vlsi.CompactHashMap
 
