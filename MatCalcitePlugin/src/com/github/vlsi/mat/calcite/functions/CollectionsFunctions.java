@@ -93,6 +93,7 @@ public class CollectionsFunctions extends HeapFunctionsBase {
         }
     }
 
+    @SuppressWarnings("unused")
     public static List asMultiSet(Object r) {
         HeapReference ref = ensureHeapReference(r);
         if (ref == null) {
