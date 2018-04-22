@@ -36,6 +36,17 @@ public class HeapFunctions extends HeapFunctionsBase {
         return r.toString();
     }
 
+    @SuppressWarnings("unused")
+    public static String getStringContent(Object r, int limit) {
+        try {
+            HeapReference ref = ensureHeapReference(r);
+            return ref == null ? "" : PrettyPrinter.objectAsString(ref.getIObject(), limit);
+        } catch (SnapshotException e) {
+            throw new RuntimeException("Unable to represent as string", e);
+        }
+    }
+
+    @SuppressWarnings("unused")
     public static String introspect(Object r) {
         if (r instanceof HeapReference) {
             return "HeapReference: " + toString(r);
