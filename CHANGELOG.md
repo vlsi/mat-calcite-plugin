@@ -3,6 +3,7 @@
 - New functions: `asMap`, `getMapEntries`, `asMultiSet`, `getStringContent`
 - Support entries extraction from Dexx HashMap
 - Support entries extraction from vlsi.CompactHashMap
+- Commandline mode
 
 ### Changed
 - `ThreadStackFrames` is moved to `native` schema

@@ -188,6 +188,13 @@ Running
 It is not yet clear how to run the plugin via maven.
 To launch via Eclipse, just open Eclipse project, double-click `plugin.xml`, then click `Launch an Eclipse application`.
 
+Commandline mode
+----------------
+
+You can process a single SQL via command line as follows
+
+    ./MemoryAnalyzer -application MatCalcitePlugin.execute <heap-dump.file> <query.file> <result.file>
+
 Roadmap
 -------
 
