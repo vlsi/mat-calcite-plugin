@@ -6,6 +6,7 @@ import org.apache.calcite.jdbc.CalciteConnection;
 import org.apache.calcite.jdbc.CalciteMetaImpl;
 import org.apache.calcite.sql.advise.SqlAdvisor;
 import org.apache.calcite.sql.validate.SqlMoniker;
+import org.apache.calcite.sql.validate.SqlMonikerType;
 import org.apache.calcite.util.Util;
 import org.eclipse.jface.text.ITextViewer;
 import org.eclipse.jface.text.contentassist.*;
@@ -21,6 +22,8 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 public class CalciteContentAssistantProcessor implements IContentAssistProcessor {
@@ -45,11 +48,10 @@ public class CalciteContentAssistantProcessor implements IContentAssistProcessor
 
         try (Connection con = CalciteDataSource.getConnection(snapshot)) {
             CalciteConnection ccon = con.unwrap(CalciteConnection.class);
-            String defaultSchema = ccon.getSchema();
             if (false) {
                 // This is an official API
                 System.out.println("advisor: ");
-                try (PreparedStatement ps = con.prepareStatement("select * from table(getHints(?, ?)) as t(id, names, type)")) {
+                try (PreparedStatement ps = con.prepareStatement("select id, names, type from table(getHints(?, ?)) as t")) {
                     ps.setString(1, sql);
                     ps.setInt(2, offset);
                     int cnt = 0;
@@ -80,15 +82,37 @@ public class CalciteContentAssistantProcessor implements IContentAssistProcessor
                 hints.add(hint);
             }
 
+            Collections.sort(hints, new Comparator<SqlMoniker>() {
+                private int order(SqlMonikerType type) {
+                    switch (type){
+                        case CATALOG: return 0;
+                        case SCHEMA: return 1;
+                        case TABLE: return 2;
+                        case VIEW: return 3;
+                        case COLUMN: return 4;
+                        case FUNCTION: return 5;
+                        case KEYWORD: return 6;
+                        case REPOSITORY: return 7;
+                        default:
+                            return 10;
+                    }
+                }
+
+                @Override
+                public int compare(SqlMoniker o1, SqlMoniker o2) {
+                    int a = order(o1.getType());
+                    int b = order(o2.getType());
+                    if (a != b) {
+                        return a < b ? -1 : 1;
+                    }
+                    return o1.id().compareTo(o2.id());
+                }
+            });
+
             ICompletionProposal[] res = new ICompletionProposal[hints.size()];
-            System.out.println();
             for (int i = 0; i < hints.size(); i++) {
                 SqlMoniker hint = hints.get(i);
-                List<String> qualifiedNames = hint.getFullyQualifiedNames();
-                if (defaultSchema.equals(qualifiedNames.get(0))) {
-                    qualifiedNames = Util.skip(qualifiedNames);
-                }
-                String hintStr = Util.sepList(qualifiedNames, ".");
+                String hintStr = advisor.getReplacement(hint, replacement);
                 res[i] = new CompletionProposal(hintStr, offset - replacement.length(),
                         replacement.length(), hintStr.length(),
                         null, hintStr + ", " + hint.getType().name(), null, "");

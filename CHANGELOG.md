@@ -1,5 +1,8 @@
 ## [Unreleased]
 
+### Fixed
+- Autocomplete is improved in lots of cases
+
 ## [1.3.0] - 2017-09-14
 ### Added
 - "class" tables can be accessed without quotes (e.g. `java.lang.HashMap`). Technically speaking, Java package maps to SQL schema. (Alexey Makhmutov)
