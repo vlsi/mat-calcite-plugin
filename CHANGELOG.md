@@ -1,4 +1,6 @@
 ## [Unreleased]
+
+## [1.4.0] - 2018-09-08
 ### Added
 - New functions: `asMap`, `getMapEntries`, `asMultiSet`, `getStringContent`
 - Support entries extraction from Dexx HashMap
