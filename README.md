@@ -130,22 +130,54 @@ Heap schema
     getField     | obtains value of field with specified name for referenced object
     getStringContent | pretty prints object representation
 
- The following table functions are supported
+ The following table functions are supported:
 
-    getValues(ref)             | returns all values of a Java collection
     getRetainedSet(ref)        | returns the set of retained objects
     getOutboundReferences(ref) | returns outbound references (name, this) pairs
     getInboundReferences(ref)  | returns inbound references (this)
-    asMap(ref)                 | converts Java Map to SQL MAP, so it can be used like asMap(ref)['key']
+    getValues(ref)             | returns all values of a Java collection
     getMapEntries(ref)         | unnests Map as (key, value) tuples
-    asMultiSet(ref)            | unnests Collection (or array) to set rows
 
- `CROSS APPLY` and `OUTER APPLY` might be used to call table functions:
-
+ These functions can be called in a following way:
 ```sql
-select u.this, refs.name, refs.this reference
-  from java.net.URL u
- cross apply table(getOutboundReferences(u.this)) refs
+select
+ u.this, refs.name, refs.this reference
+from 
+ java.net.URL u,
+ lateral table(getOutboundReferences(u.this)) refs
+```
+ Another example:
+```sql
+select
+ p.this, vals.key, vals."value"
+from 
+ java.util.Properties p,
+ lateral table(getMapEntries(p.this)) vals
+```
+
+ The following collection functions are also supported:
+
+    asMap(ref)                 | converts Java Map to SQL MAP, so it can be used like asMap(ref)['key']
+    asMultiSet(ref)            | converts Java Collection to SQL MULTISET type
+
+ These functions can be called in a following way:
+```sql
+select
+ p.this
+from 
+ java.util.Properties p
+where
+ asMap(p.this)['java.vm.version'] is not null
+```
+
+ Another example:
+```sql
+select 
+ fpc.this,
+ fp.fp_ref
+from 
+ java.io.FilePermissionCollection fpc,
+ unnest(asMultiSet(fpc.perms)) fp(fp_ref)
 ```
 
 Requirements
