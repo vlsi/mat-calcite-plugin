@@ -175,6 +175,15 @@ from
 
     asMap(ref)                 | converts Java Map to SQL MAP, so it can be used like asMap(ref)['key']
     asMultiSet(ref)            | converts Java Collection to SQL MULTISET type
+    asArray(ref)               | converts Java references array to SQL ARRAY type
+    asByteArray(ref)           | converts Java bytes array (bytes[]) to SQL ARRAY type
+    asShortArray(ref)          | converts Java shorts array (short[]) to SQL ARRAY type
+    asIntArray(ref)            | converts Java ints array (int[]) to SQL ARRAY type
+    asLongArray(ref)           | converts Java longs array (long[]) to SQL ARRAY type
+    asBooleanArray(ref)        | converts Java boolean array (boolean[]) to SQL ARRAY type
+    asCharArray(ref)           | converts Java chars array (char[]) to SQL ARRAY type
+    asFloatArray(ref)          | converts Java floats array (float[]) to SQL ARRAY type
+    asDoubleArray(ref)         | converts Java doubles array (double[]) to SQL ARRAY type
 
  These functions can be called in a following way:
 ```sql
@@ -194,6 +203,16 @@ select
 from 
  java.io.FilePermissionCollection fpc,
  unnest(asMultiSet(fpc.perms)) fp(fp_ref)
+```
+
+ Note, that SQL arrays are indexed starting with '1', so following example shows how to get first element of long[] arrays:
+```sql
+select 
+ asLongArray(all_long_arrays.this)[1] first_element
+from 
+ "long[]" all_long_arrays
+where 
+ length(all_long_arrays.this) > 0
 ```
 
 Requirements
