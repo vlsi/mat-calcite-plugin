@@ -148,9 +148,9 @@
                             <appArgLine>-application org.eclipse.ant.core.antRunner -debug -logfile target/eclipse-ant.log -buildfile packaging-p2composite.ant p2.composite.add -Dsite.label="${site.label}" -Dproject.build.directory=${project.build.directory}  -DqualifiedVersion=${qualifiedVersion} -DunqualifiedVersion=${unqualifiedVersion} -Dchild.repository.path.prefix="${child.repository.path.prefix}"</appArgLine>
                             <repositories>
                                 <repository>
-                                    <id>mars</id>
+                                    <id>photon</id>
                                     <layout>p2</layout>
-                                    <url>http://download.eclipse.org/releases/mars</url>
+                                    <url>http://download.eclipse.org/releases/photon</url>
                                 </repository>
                             </repositories>
                             <dependencies>

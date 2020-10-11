@@ -1,5 +1,9 @@
 ## [Unreleased]
 
+### Changed
+- Eclipse Memory Analyzer 1.8.0 or higher is required
+- Java 1.8 or higher is required
+
 ## [1.4.0] - 2018-09-08
 ### Added
 - New functions: `asMap`, `getMapEntries`, `asMultiSet`, `getStringContent`
