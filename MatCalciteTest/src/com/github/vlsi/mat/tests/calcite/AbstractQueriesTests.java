@@ -82,7 +82,7 @@ public abstract class AbstractQueriesTests {
       ResultSetMetaData md = rs.getMetaData();
       for (int j = 0; rs.next() && j < limit; j++) {
         for (int i = 1; i <= md.getColumnCount(); i++) {
-          System.out.println(md.getColumnName(i) + ": " + String.valueOf(rs.getObject(i)));
+          System.out.println(md.getColumnName(i) + ": " + rs.getObject(i));
         }
         System.out.println();
       }

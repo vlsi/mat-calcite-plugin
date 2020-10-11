@@ -11,7 +11,7 @@ public class ISnapshotMethods {
     try {
       return snapshot.getHeapSize(id);
     } catch (SnapshotException e) {
-      throw new IllegalArgumentException("Unable to get shallow size of object " + id + " in heap " + String.valueOf(snapshot), e);
+      throw new IllegalArgumentException("Unable to get shallow size of object " + id + " in heap " + snapshot, e);
     }
   }
 
@@ -19,7 +19,7 @@ public class ISnapshotMethods {
     try {
       return snapshot.getRetainedHeapSize(id);
     } catch (SnapshotException e) {
-      throw new IllegalArgumentException("Unable to get retained size of object " + id + " in heap " + String.valueOf(snapshot), e);
+      throw new IllegalArgumentException("Unable to get retained size of object " + id + " in heap " + snapshot, e);
     }
   }
 
@@ -27,7 +27,7 @@ public class ISnapshotMethods {
     try {
       return snapshot.getObject(id);
     } catch (SnapshotException e) {
-      throw new IllegalArgumentException("Unable to get object " + id + " in heap " + String.valueOf(snapshot), e);
+      throw new IllegalArgumentException("Unable to get object " + id + " in heap " + snapshot, e);
     }
   }
 

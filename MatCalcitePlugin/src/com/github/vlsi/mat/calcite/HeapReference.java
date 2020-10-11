@@ -68,7 +68,7 @@ public class HeapReference implements Comparable<HeapReference>, Map {
       return null;
     }
     if (key instanceof Number && getIObject() instanceof IArray) {
-      return HeapFunctions.getField(this, "[" + String.valueOf(key) + "]");
+      return HeapFunctions.getField(this, "[" + key + "]");
     }
     String fieldName = String.valueOf(key);
     if (fieldName.charAt(0) == '@') {
