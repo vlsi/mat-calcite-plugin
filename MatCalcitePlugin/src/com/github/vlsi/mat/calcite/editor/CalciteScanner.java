@@ -29,7 +29,7 @@ public class CalciteScanner extends RuleBasedScanner {
     }
   }
 
-  public class CalciteWordDetector implements IWordDetector {
+  public static class CalciteWordDetector implements IWordDetector {
     @Override
     public boolean isWordStart(char c) {
       return Character.isJavaIdentifierStart(c);
