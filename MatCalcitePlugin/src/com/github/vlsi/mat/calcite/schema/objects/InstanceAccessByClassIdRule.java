@@ -4,7 +4,6 @@ import com.github.vlsi.mat.calcite.SnapshotHolder;
 import com.github.vlsi.mat.calcite.rex.ExecutionRexBuilderContext;
 import com.github.vlsi.mat.calcite.rex.RexBuilderContext;
 
-import com.google.common.base.Function;
 import org.apache.calcite.plan.RelOptRuleCall;
 import org.apache.calcite.plan.RelOptSchema;
 import org.apache.calcite.plan.RelOptTable;
@@ -15,6 +14,7 @@ import org.apache.calcite.tools.RelBuilder;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Function;
 
 public class InstanceAccessByClassIdRule extends RelRule<InstanceAccessByClassIdRule.Config> {
   public static final InstanceAccessByClassIdRule INSTANCE = Config.DEFAULT.toRule();

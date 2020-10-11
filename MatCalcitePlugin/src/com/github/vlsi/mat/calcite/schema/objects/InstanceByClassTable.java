@@ -2,7 +2,6 @@ package com.github.vlsi.mat.calcite.schema.objects;
 
 import com.github.vlsi.mat.calcite.rex.RexBuilderContext;
 
-import com.google.common.base.Function;
 import com.google.common.collect.ImmutableList;
 import org.apache.calcite.plan.RelOptTable;
 import org.apache.calcite.rel.RelNode;
@@ -19,6 +18,7 @@ import org.eclipse.mat.snapshot.ISnapshot;
 
 import java.util.List;
 import java.util.concurrent.ExecutionException;
+import java.util.function.Function;
 
 public class InstanceByClassTable extends AbstractTable implements TranslatableTable {
   public final ISnapshot snapshot;

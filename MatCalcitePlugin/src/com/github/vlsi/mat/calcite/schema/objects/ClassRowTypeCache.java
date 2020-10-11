@@ -2,7 +2,6 @@ package com.github.vlsi.mat.calcite.schema.objects;
 
 import com.github.vlsi.mat.calcite.rex.RexBuilderContext;
 
-import com.google.common.base.Function;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
@@ -22,6 +21,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
+import java.util.function.Function;
 
 import static com.github.vlsi.mat.calcite.schema.objects.SnapshotRexExpressions.getClassLoader;
 import static com.github.vlsi.mat.calcite.schema.objects.SnapshotRexExpressions.getClassName;

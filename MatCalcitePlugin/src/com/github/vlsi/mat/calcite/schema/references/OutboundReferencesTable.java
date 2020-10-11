@@ -2,8 +2,6 @@ package com.github.vlsi.mat.calcite.schema.references;
 
 import com.github.vlsi.mat.calcite.HeapReference;
 
-import com.google.common.base.Function;
-import com.google.common.collect.FluentIterable;
 import com.google.common.collect.ImmutableList;
 import org.apache.calcite.adapter.java.AbstractQueryableTable;
 import org.apache.calcite.linq4j.Enumerator;
@@ -18,12 +16,11 @@ import org.apache.calcite.schema.Statistics;
 import org.apache.calcite.schema.impl.AbstractTableQueryable;
 import org.apache.calcite.sql.type.SqlTypeName;
 import org.apache.calcite.util.ImmutableBitSet;
+import org.apache.calcite.util.Util;
 import org.eclipse.mat.SnapshotException;
 import org.eclipse.mat.snapshot.model.NamedReference;
 
 import java.util.List;
-
-import javax.annotation.Nullable;
 
 public class OutboundReferencesTable extends AbstractQueryableTable {
   private final static List<ImmutableBitSet> NON_UNIQUE_KEYS_STATISTICS = ImmutableList.of(ImmutableBitSet.of());
@@ -40,20 +37,14 @@ public class OutboundReferencesTable extends AbstractQueryableTable {
     return new AbstractTableQueryable<Object[]>(queryProvider, schemaPlus, this, tableName) {
       @Override
       public Enumerator<Object[]> enumerator() {
-        FluentIterable<Object[]> it = FluentIterable
-            .from(references)
-            .transform(new Function<NamedReference, Object[]>() {
-              @Nullable
-              @Override
-              public Object[] apply(@Nullable NamedReference namedReference) {
-                HeapReference ref = null;
-                try {
-                  ref = HeapReference.valueOf(namedReference.getObject());
-                } catch (SnapshotException e) {
-                  e.printStackTrace();
-                }
-                return new Object[]{namedReference.getName(), ref};
+        List<Object[]> it = Util.transform(references, namedReference -> {
+              HeapReference ref = null;
+              try {
+                ref = HeapReference.valueOf(namedReference.getObject());
+              } catch (SnapshotException e) {
+                e.printStackTrace();
               }
+              return new Object[]{namedReference.getName(), ref};
             });
 
         return Linq4j.iterableEnumerator(it);

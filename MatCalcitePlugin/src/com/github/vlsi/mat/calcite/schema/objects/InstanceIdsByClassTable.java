@@ -1,6 +1,5 @@
 package com.github.vlsi.mat.calcite.schema.objects;
 
-import com.google.common.base.Function;
 import com.google.common.collect.FluentIterable;
 import com.google.common.collect.ImmutableList;
 import com.google.common.primitives.Ints;
@@ -47,16 +46,12 @@ public class InstanceIdsByClassTable extends AbstractQueryableTable {
         FluentIterable<Integer> it = FluentIterable
             .from(classesList.getClasses())
             .transformAndConcat(
-                new Function<IClass, Iterable<Integer>>() {
-                  @Override
-                  public Iterable<Integer> apply(IClass input) {
-                    try {
-                      return Ints.asList(input
-                          .getObjectIds());
-                    } catch (SnapshotException e) {
-                      e.printStackTrace();
-                      return Collections.emptyList();
-                    }
+                input -> {
+                  try {
+                    return Ints.asList(input.getObjectIds());
+                  } catch (SnapshotException e) {
+                    e.printStackTrace();
+                    return Collections.emptyList();
                   }
                 });
 
