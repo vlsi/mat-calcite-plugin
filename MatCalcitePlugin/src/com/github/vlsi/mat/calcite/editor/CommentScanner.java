@@ -23,6 +23,6 @@ public class CommentScanner extends RuleBasedScanner {
     rules.add(new EndOfLineRule("//", commentToken));
     rules.add(new MultiLineRule("/*", "*/", commentToken));
 
-    setRules(rules.toArray(new IRule[rules.size()]));
+    setRules(rules.toArray(new IRule[0]));
   }
 }

@@ -74,7 +74,7 @@ public class SnapshotThreadStacksTable extends AbstractTable implements Scannabl
           }
         }
       }
-      return threadStacks.toArray(new IThreadStack[threadStacks.size()]);
+      return threadStacks.toArray(new IThreadStack[0]);
     } catch (SnapshotException e) {
       throw new RuntimeException(e);
     }

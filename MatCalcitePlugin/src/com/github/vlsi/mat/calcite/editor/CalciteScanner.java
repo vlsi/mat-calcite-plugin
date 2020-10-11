@@ -81,6 +81,6 @@ public class CalciteScanner extends RuleBasedScanner {
     rules.add(keywordRule);
     rules.add(functionRule);
 
-    setRules(rules.toArray(new IRule[rules.size()]));
+    setRules(rules.toArray(new IRule[0]));
   }
 }

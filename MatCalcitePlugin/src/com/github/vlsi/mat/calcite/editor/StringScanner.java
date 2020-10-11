@@ -21,6 +21,6 @@ public class StringScanner extends RuleBasedScanner {
     rules.add(new SingleLineRule("'", "'", stringToken));
     rules.add(new SingleLineRule("\"", "\"", stringToken));
 
-    setRules(rules.toArray(new IRule[rules.size()]));
+    setRules(rules.toArray(new IRule[0]));
   }
 }
