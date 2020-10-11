@@ -41,7 +41,7 @@ public class InstanceAccessByClassIdRule extends RelRule<InstanceAccessByClassId
     InstanceByClassTableScan scan = call.rel(0);
     RelOptTable table = scan.getTable();
     RelOptSchema schema = table.getRelOptSchema();
-    List<String> indexName = new ArrayList<String>(table.getQualifiedName());
+    List<String> indexName = new ArrayList<>(table.getQualifiedName());
     indexName.set(indexName.size() - 1, "$ids$:" + indexName.get(indexName.size() - 1));
     RelBuilder relBuilder = call.builder();
     relBuilder.push(
@@ -56,7 +56,7 @@ public class InstanceAccessByClassIdRule extends RelRule<InstanceAccessByClassId
         scan.getCluster(), snapshotId, relBuilder.field(0));
 
     List<Function<RexBuilderContext, RexNode>> resolvers = instanceByClassTable.getResolvers();
-    List<RexNode> exprs = new ArrayList<RexNode>(resolvers.size());
+    List<RexNode> exprs = new ArrayList<>(resolvers.size());
     for (Function<RexBuilderContext, RexNode> resolver : resolvers) {
       exprs.add(resolver.apply(rexContext));
     }

@@ -44,14 +44,14 @@ public abstract class AbstractQueriesTests {
   }
 
   protected List<String> executeToCSV(String sql) throws SQLException {
-    List<String> res = new ArrayList<String>();
+    List<String> res = new ArrayList<>();
     System.out.println("sql = " + sql);
     try (Connection con = CalciteDataSource.getConnection(getSnapshot())) {
       PreparedStatement ps = con.prepareStatement(sql);
       ResultSet rs = ps.executeQuery();
       ResultSetMetaData md = rs.getMetaData();
       Joiner joiner = Joiner.on('|');
-      List<String> row = new ArrayList<String>();
+      List<String> row = new ArrayList<>();
       final int columnCount = md.getColumnCount();
       for (int i = 1; i <= columnCount; i++) {
         row.add(md.getColumnName(i));

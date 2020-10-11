@@ -15,7 +15,7 @@ import java.util.List;
 
 public class CommentScanner extends RuleBasedScanner {
   public CommentScanner() {
-    List<IRule> rules = new ArrayList<IRule>();
+    List<IRule> rules = new ArrayList<>();
 
     Token commentToken = new Token(new TextAttribute(new Color(
         Display.getCurrent(), new RGB(63, 127, 95))));

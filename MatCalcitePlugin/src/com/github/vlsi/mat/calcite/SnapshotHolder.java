@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 public class SnapshotHolder {
-  private static final List<Reference<ISnapshot>> SNAPSHOTS = new CopyOnWriteArrayList<Reference<ISnapshot>>();
+  private static final List<Reference<ISnapshot>> SNAPSHOTS = new CopyOnWriteArrayList<>();
 
   public static ISnapshot get(int index) {
     return SNAPSHOTS.get(index).get();

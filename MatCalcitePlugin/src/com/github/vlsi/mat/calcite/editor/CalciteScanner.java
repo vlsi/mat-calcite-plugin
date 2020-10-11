@@ -42,7 +42,7 @@ public class CalciteScanner extends RuleBasedScanner {
   }
 
   public CalciteScanner() {
-    List<IRule> rules = new ArrayList<IRule>();
+    List<IRule> rules = new ArrayList<>();
 
     Token other = new Token(CalcitePartitionScanner.OTHER);
     Token keywordToken = new Token(new TextAttribute(new Color(

@@ -14,7 +14,7 @@ import java.util.List;
 
 public class StringScanner extends RuleBasedScanner {
   public StringScanner() {
-    List<IRule> rules = new ArrayList<IRule>();
+    List<IRule> rules = new ArrayList<>();
 
     Token stringToken = new Token(new TextAttribute(new Color(
         Display.getCurrent(), new RGB(42, 0, 255))));

@@ -88,9 +88,9 @@ public class ClassRowTypeCache {
     @Override
     public Pair<RelDataType, List<Function<RexBuilderContext, RexNode>>> load(
         IClassesList classesList) throws Exception {
-      List<Function<RexBuilderContext, RexNode>> resolvers = new ArrayList<Function<RexBuilderContext, RexNode>>();
-      List<String> names = new ArrayList<String>();
-      List<RelDataType> types = new ArrayList<RelDataType>();
+      List<Function<RexBuilderContext, RexNode>> resolvers = new ArrayList<>();
+      List<String> names = new ArrayList<>();
+      List<RelDataType> types = new ArrayList<>();
 
       names.add("this");
       RelDataType anyNull = typeFactory.createSqlType(SqlTypeName.ANY);
