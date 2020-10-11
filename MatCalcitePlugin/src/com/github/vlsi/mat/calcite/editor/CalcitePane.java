@@ -79,13 +79,10 @@ public class CalcitePane extends CompositeHeapEditorPane {
     // No sure why the background is gray otherwise.
     queryString.setBackground(queryString.getBackground());
     queryString.setFont(JFaceResources.getFont(JFaceResources.TEXT_FONT));
-    queryString.addTraverseListener(new TraverseListener() {
-      @Override
-      public void keyTraversed(TraverseEvent e) {
-        if (e.detail == SWT.TRAVERSE_RETURN && (e.stateMask & SWT.MOD1) != 0) {
-          executeQueryAction.run();
-          e.detail = SWT.TRAVERSE_NONE;
-        }
+    queryString.addTraverseListener(e -> {
+      if (e.detail == SWT.TRAVERSE_RETURN && (e.stateMask & SWT.MOD1) != 0) {
+        executeQueryAction.run();
+        e.detail = SWT.TRAVERSE_NONE;
       }
     });
     queryString.addKeyListener(new KeyAdapter() {

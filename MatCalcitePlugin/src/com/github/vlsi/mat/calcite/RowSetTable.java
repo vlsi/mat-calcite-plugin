@@ -103,12 +103,7 @@ public class RowSetTable implements IResultTable {
     if (!(ref instanceof HeapReference)) {
       return null;
     }
-    return new IContextObject() {
-      @Override
-      public int getObjectId() {
-        return ((HeapReference) ref).getIObject().getObjectId();
-      }
-    };
+    return () -> ((HeapReference) ref).getIObject().getObjectId();
   }
 
   @Override

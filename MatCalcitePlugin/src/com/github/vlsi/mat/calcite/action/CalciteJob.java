@@ -41,32 +41,24 @@ public class CalciteJob extends AbstractPaneJob {
       argumentSet.setArgumentValue("sql", sql);//$NON-NLS-1$
       final QueryResult result = argumentSet
           .execute(new ProgressMonitorWrapper(monitor));
-      calcitePane.getQueryString().getDisplay().asyncExec(new Runnable() {
-        @Override
-        public void run() {
-          calcitePane.initQueryResult(result, state);
-        }
-      });
+      calcitePane.getQueryString().getDisplay().asyncExec(() -> calcitePane.initQueryResult(result, state));
     } catch (final Throwable e) {
-      calcitePane.getQueryString().getDisplay().asyncExec(new Runnable() {
-        @Override
-        public void run() {
-          String keyError = calcitePane.highlightError(e);
+      calcitePane.getQueryString().getDisplay().asyncExec(() -> {
+        String keyError = calcitePane.highlightError(e);
 
-          StringWriter sw = new StringWriter();
-          if (keyError != null) {
-            sw.append(keyError).append("\n");
-          }
-          if (sql != null) {
-            sw.append(sql).append('\n');
-          }
-          e.printStackTrace(new PrintWriter(sw));
-          String exceptionText = sw.toString();
-
-          TextResult tr = new TextResult(exceptionText, false);
-          QueryResult result = new QueryResult(descriptor, "calcite", tr);
-          calcitePane.initQueryResult(result, state);
+        StringWriter sw = new StringWriter();
+        if (keyError != null) {
+          sw.append(keyError).append("\n");
         }
+        if (sql != null) {
+          sw.append(sql).append('\n');
+        }
+        e.printStackTrace(new PrintWriter(sw));
+        String exceptionText = sw.toString();
+
+        TextResult tr = new TextResult(exceptionText, false);
+        QueryResult result = new QueryResult(descriptor, "calcite", tr);
+        calcitePane.initQueryResult(result, state);
       });
       e.printStackTrace();
     }
