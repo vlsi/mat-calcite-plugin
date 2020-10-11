@@ -159,7 +159,7 @@ public class ClassRowTypeCache {
                 Function<RexBuilderContext, RexNode> columnCalc;
                 switch (fieldName) {
                     case SpecialFields.CLASS:
-                        // This is Obejct#getClass
+                        // This is Object#getClass
                         // For java.lang.Class it returns "java.lang.Class"
                         columnCalc = (RexBuilderContext context) ->
                                 getClassOf(context, context.getIObjectId());
