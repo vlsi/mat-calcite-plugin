@@ -86,7 +86,7 @@ public class CollectionsFunctions extends HeapFunctionsBase {
       if (extractedMap == null) {
         return Collections.emptyMap();
       } else {
-        Map result = new HashMap();
+        Map<String, Object> result = new HashMap<>();
         for (Map.Entry<IObject, IObject> entry : extractedMap) {
           result.put(
               toString(entry.getKey()),

@@ -18,7 +18,6 @@ import org.apache.calcite.schema.impl.AbstractTableQueryable;
 import org.apache.calcite.util.ImmutableBitSet;
 import org.eclipse.mat.SnapshotException;
 import org.eclipse.mat.snapshot.ISnapshot;
-import org.eclipse.mat.snapshot.model.IClass;
 
 import java.util.Collections;
 import java.util.List;
