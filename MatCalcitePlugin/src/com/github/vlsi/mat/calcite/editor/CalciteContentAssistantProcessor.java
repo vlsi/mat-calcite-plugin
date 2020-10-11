@@ -28,7 +28,6 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
@@ -88,7 +87,7 @@ public class CalciteContentAssistantProcessor implements IContentAssistProcessor
         hints.add(hint);
       }
 
-      Collections.sort(hints, new Comparator<SqlMoniker>() {
+      hints.sort(new Comparator<SqlMoniker>() {
         private int order(SqlMonikerType type) {
           switch (type) {
           case CATALOG:
