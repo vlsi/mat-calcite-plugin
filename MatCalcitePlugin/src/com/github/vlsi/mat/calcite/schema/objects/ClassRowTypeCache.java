@@ -122,7 +122,6 @@ public class ClassRowTypeCache {
           entry.setValue(new Field(fieldName, ExtraTypes.ANY));
         }
       }
-      ;
 
       List<Field> fieldsInOrder = fields == null ? Collections.<Field>emptyList() : new ArrayList<>(fields.values());
       Collections.reverse(fieldsInOrder);

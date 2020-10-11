@@ -90,7 +90,6 @@ public class CalciteDataSource {
         throw new SQLException("Janino compiler is not initialized: CompilerFactoryFactory.getDefaultCompilerFactory" +
             "() == null");
       }
-      ;
     } catch (Exception e) {
       throw new SQLException("Unable to load Janino compiler", e);
     } finally {
