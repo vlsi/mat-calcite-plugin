@@ -156,8 +156,8 @@ public class CalcitePane extends CompositeHeapEditorPane {
 		IDocument doc = new Document();
 		doc.set("-- explain plan for -- or F10\n"
 				+ "-- Tables:\n"
-				+ "--   java.lang.BigInteger list of all BigIntegers\n"
-				+ "--   instanceof.java.lang.BigInteger BigIntegers and all subclasses\n"
+				+ "--   java.math.BigInteger list of all BigIntegers\n"
+				+ "--   instanceof.java.math.BigInteger BigIntegers and all subclasses\n"
 				+ "--   instanceof.java.lang.\"HashMap$Entry\" Entry and all subclasses\n"
 				+ "-- Virtual columns:\n"
 				+ "--   this['@shallow'] -- returns shallow heap size\n"
