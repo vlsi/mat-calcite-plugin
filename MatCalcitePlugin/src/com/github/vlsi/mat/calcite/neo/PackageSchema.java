@@ -33,7 +33,7 @@ public class PackageSchema extends AbstractSchema {
   private final Map<String, Table> classes = new HashMap<>();
 
   private PackageSchema() {
-    this(ImmutableMultimap.<String, Function>of());
+    this(ImmutableMultimap.of());
   }
 
   private PackageSchema(Multimap<String, Function> functions) {
@@ -63,7 +63,7 @@ public class PackageSchema extends AbstractSchema {
 
   @Override
   protected Map<String, Schema> getSubSchemaMap() {
-    return ImmutableMap.<String, Schema>copyOf(subPackages);
+    return ImmutableMap.copyOf(subPackages);
   }
 
   @Override

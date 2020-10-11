@@ -74,11 +74,10 @@ public abstract class AbstractQueriesTests {
   protected void execute(String sql, int limit) throws SQLException {
     System.out.println("sql = " + sql);
 
-    try (Connection con = CalciteDataSource.getConnection(getSnapshot())) {
-      PreparedStatement ps = null;
-      ResultSet rs = null;
-      ps = con.prepareStatement(sql);
-      rs = ps.executeQuery();
+    try (Connection con = CalciteDataSource.getConnection(getSnapshot());
+         PreparedStatement ps = con.prepareStatement(sql);
+         ResultSet rs = ps.executeQuery();
+    ) {
       ResultSetMetaData md = rs.getMetaData();
       for (int j = 0; rs.next() && j < limit; j++) {
         for (int i = 1; i <= md.getColumnCount(); i++) {

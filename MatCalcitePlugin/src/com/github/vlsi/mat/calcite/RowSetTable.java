@@ -92,7 +92,7 @@ public class RowSetTable implements IResultTable {
   }
 
   private static IContextObject getContext(final Object row, final int columnPosition) {
-    if (row == null || !(row instanceof Object[])) {
+    if (!(row instanceof Object[])) {
       return null;
     }
     final Object[] data = (Object[]) row;

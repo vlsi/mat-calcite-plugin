@@ -123,7 +123,7 @@ public class ClassRowTypeCache {
         }
       }
 
-      List<Field> fieldsInOrder = fields == null ? Collections.<Field>emptyList() : new ArrayList<>(fields.values());
+      List<Field> fieldsInOrder = fields == null ? Collections.emptyList() : new ArrayList<>(fields.values());
       Collections.reverse(fieldsInOrder);
 
       for (Field field : fieldsInOrder) {
@@ -155,8 +155,7 @@ public class ClassRowTypeCache {
           dataType = typeFactory.createJavaType(long.class);
           break;
         case IObject.Type.OBJECT:
-          dataType = anyNull;
-          break;
+          // fall-through
         case ExtraTypes.ANY:
           dataType = anyNull;
           break;
