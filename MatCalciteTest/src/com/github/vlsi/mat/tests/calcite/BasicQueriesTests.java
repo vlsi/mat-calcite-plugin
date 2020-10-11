@@ -116,6 +116,46 @@ public class BasicQueriesTests extends SampleHeapDumpTests {
     }
 
     @Test
+    public void selectClass() throws SQLException {
+        returnsInOrder("select name, \"@super\", \"@classLoader\" from java.lang.Class order by toString(name) limit 10",
+                "name|@super|@classLoader",
+                "boolean[]|class java.lang.Object @ 0x7bfe3fde8|<system class loader>",
+                "byte[]|class java.lang.Object @ 0x7bfe3fde8|<system class loader>",
+                "byte[][]|class java.lang.Object @ 0x7bfe3fde8|<system class loader>",
+                "char[]|class java.lang.Object @ 0x7bfe3fde8|<system class loader>",
+                "com.google.common.base.Function|class java.lang.Object @ 0x7bfe3fde8|org.codehaus.plexus.classworlds.realm.ClassRealm @ 0x7bfe97510",
+                "com.google.common.base.Joiner|class java.lang.Object @ 0x7bfe3fde8|org.codehaus.plexus.classworlds.realm.ClassRealm @ 0x7bfe97510",
+                "com.google.common.base.Joiner$1|class com.google.common.base.Joiner @ 0x7bfeec1e8|org.codehaus.plexus.classworlds.realm.ClassRealm @ 0x7bfe97510",
+                "com.google.common.base.Joiner$2|class com.google.common.base.Joiner @ 0x7bfeec1e8|org.codehaus.plexus.classworlds.realm.ClassRealm @ 0x7bfe97510",
+                "com.google.common.base.Preconditions|class java.lang.Object @ 0x7bfe3fde8|org.codehaus.plexus.classworlds.realm.ClassRealm @ 0x7bfe97510",
+                "com.google.common.collect.AbstractIndexedListIterator|class com.google.common.collect.UnmodifiableListIterator @ 0x7bfee9e10|org.codehaus.plexus.classworlds.realm.ClassRealm @ 0x7bfe97510");
+    }
+
+    @Test
+    public void selectClassFields() throws SQLException {
+        returnsInOrder("select this['@className'] className" +
+                        ", this['@class']['@className'] class_className" +
+                        ", this['@class']['name'] class_name" +
+                        ", this['@class']['@super'] class_super" +
+                        ", this['@class']['@classLoader'] class_classLoader" +
+                        " from java.util.HashMap order by this limit 1",
+                "className|class_className|class_name|class_super|class_classLoader",
+                "java.util.HashMap|java.lang.Class|java.util.HashMap|class java.util.AbstractMap @ 0x7bfe6ed10|<system class loader>");
+    }
+
+    @Test
+    public void groupByClassLoader() throws SQLException {
+        returnsInOrder("select \"@classLoader\", count(*) classes" +
+                        " from java.lang.Class group by \"@classLoader\" order by 2 desc",
+                "@classLoader|classes",
+                        "<system class loader>|748",
+                        "org.codehaus.plexus.classworlds.realm.ClassRealm @ 0x7bfe97510|217",
+                        "sun.misc.Launcher$AppClassLoader @ 0x7bfe391f0|16",
+                        "null|9",
+                        "sun.misc.Launcher$ExtClassLoader @ 0x7bfe394f0|4");
+    }
+
+    @Test
     public void selectShallow() throws SQLException {
         returnsInOrder("select sum(cast(hm.this['@shallow'] as bigint)) sum_shallow from java.util.HashMap hm",
                        "sum_shallow",

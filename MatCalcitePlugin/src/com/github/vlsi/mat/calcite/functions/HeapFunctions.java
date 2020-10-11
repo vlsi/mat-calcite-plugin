@@ -2,6 +2,7 @@ package com.github.vlsi.mat.calcite.functions;
 
 import com.github.vlsi.mat.calcite.HeapReference;
 import com.github.vlsi.mat.calcite.collections.CollectionsActions;
+import com.github.vlsi.mat.calcite.schema.objects.SpecialFields;
 import org.eclipse.mat.SnapshotException;
 import org.eclipse.mat.inspections.collectionextract.CollectionExtractionUtils;
 import org.eclipse.mat.inspections.collectionextract.ICollectionExtractor;
@@ -141,8 +142,28 @@ public class HeapFunctions extends HeapFunctionsBase {
         if (ref == null) {
             return null;
         }
-
-        return resolveReference(IObjectMethods.resolveSimpleValue(ref.getIObject(), fieldName));
+        IObject iObject = ref.getIObject();
+        if (fieldName.charAt(0) == '@') {
+            if ("@shallow".equalsIgnoreCase(fieldName)) {
+                return HeapFunctions.shallowSize(ref);
+            }
+            if ("@retained".equalsIgnoreCase(fieldName)) {
+                return HeapFunctions.retainedSize(ref);
+            }
+            if (SpecialFields.CLASS_NAME.equalsIgnoreCase(fieldName)) {
+                return IClassMethods.getClassName(iObject.getClazz());
+            }
+            if (iObject instanceof IClass) {
+                if (SpecialFields.CLASS_LOADER.equalsIgnoreCase(fieldName)) {
+                    return resolveReference(IClassMethods.getClassLoader(iObject));
+                } else if (SpecialFields.SUPER.equalsIgnoreCase(fieldName)) {
+                    return resolveReference(IClassMethods.getSuper(iObject));
+                }
+            } else if (SpecialFields.CLASS.equalsIgnoreCase(fieldName)) {
+                return resolveReference(iObject.getClazz());
+            }
+        }
+        return resolveReference(IObjectMethods.resolveSimpleValue(iObject, fieldName));
     }
 
     @SuppressWarnings("unused")

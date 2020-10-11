@@ -116,6 +116,26 @@ Heap schema
 
     this         | reference to current object
 
+ Fields are available as MAP.get call:
+
+    select path -- retrieve field as usual
+         , this['path'] -- retrieve field via MAP get
+         , this['@className']
+         , this['@class']['@classLoader'] -- nested calls work as well
+      from java.net.URL
+
+ The following virtual properties are available via MAP.get:
+
+    @shallow     | shallow heap size of referenced object
+    @retained    | retained heap size for referenced object
+    @class       | the same as `getClass()` in Java
+    @className   | class name (the same as `getClass().getName()` in Java)
+
+ The following virtual properties are available for `Class` instances via MAP.get:
+
+    @super       | super class
+    @classLoader | returns `ClassLoader` for a given class
+
  The following functions can be used to work with column which represents reference:
 
     getId        | internal object identifier for referenced object

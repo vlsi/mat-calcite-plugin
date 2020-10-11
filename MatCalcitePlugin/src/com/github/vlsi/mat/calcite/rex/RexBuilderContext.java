@@ -1,6 +1,7 @@
 package com.github.vlsi.mat.calcite.rex;
 
 import com.github.vlsi.mat.calcite.functions.ISnapshotMethods;
+import com.github.vlsi.mat.calcite.schema.objects.HeapOperatorTable;
 import com.google.common.collect.ImmutableList;
 import org.apache.calcite.plan.RelOptCluster;
 import org.apache.calcite.rel.type.RelDataTypeFactory;
@@ -37,6 +38,10 @@ public abstract class RexBuilderContext {
     public abstract RexNode getSnapshot();
 
     public abstract RexNode getIObjectId();
+
+    public RexNode toHeapReference(RexNode node) {
+        return getBuilder().makeCall(HeapOperatorTable.TO_HEAP_REFERENCE, node);
+    }
 
     public RexNode getIObject() {
         if (object == null) {

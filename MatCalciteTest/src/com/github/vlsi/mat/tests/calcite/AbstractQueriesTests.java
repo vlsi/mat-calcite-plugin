@@ -34,8 +34,8 @@ public abstract class AbstractQueriesTests {
         } catch (SQLException e) {
             e.printStackTrace(); // tycho-surefire-plugin forces trimStackTrace=true
         }
-        System.out.println("Arrays.toString(expected) = " + Arrays.toString(expected));
-        System.out.println("Arrays.toString(actuals) = " + Arrays.toString(actuals));
+        System.out.println("Arrays.toString(expected) = " + String.join("\n", expected));
+        System.out.println("Arrays.toString(actuals) = " + String.join("\n", actuals));
         Assert.assertArrayEquals(sql, nnl(expected), nnl(actuals));
     }
 

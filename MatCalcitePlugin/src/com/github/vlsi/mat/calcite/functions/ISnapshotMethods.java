@@ -3,8 +3,10 @@ package com.github.vlsi.mat.calcite.functions;
 import com.github.vlsi.mat.calcite.HeapReference;
 import org.eclipse.mat.SnapshotException;
 import org.eclipse.mat.snapshot.ISnapshot;
+import org.eclipse.mat.snapshot.model.IClass;
 import org.eclipse.mat.snapshot.model.IObject;
 
+@SuppressWarnings("unused")
 public class ISnapshotMethods {
     public static long getShallowSize(ISnapshot snapshot, int id) {
         try {
@@ -30,7 +32,11 @@ public class ISnapshotMethods {
         }
     }
 
-    public static HeapReference toReference(IObject iObject) {
-        return new HeapReference(iObject);
+    public static IClass getClassOf(ISnapshot snapshot, int id) {
+        try {
+            return snapshot.getClassOf(id);
+        } catch (SnapshotException e) {
+            throw new IllegalArgumentException("Unable to get class of " + id + " in heap " + snapshot, e);
+        }
     }
 }

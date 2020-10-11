@@ -1,35 +1,22 @@
 package com.github.vlsi.mat.calcite.schema.objects;
 
-import com.github.vlsi.mat.calcite.HeapReference;
-import com.github.vlsi.mat.calcite.functions.IObjectMethods;
-import com.github.vlsi.mat.calcite.functions.ISnapshotMethods;
 import com.github.vlsi.mat.calcite.rex.RexBuilderContext;
 import com.google.common.base.Function;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
-import com.google.common.collect.ImmutableList;
-import org.apache.calcite.plan.RelOptCluster;
 import org.apache.calcite.rel.type.RelDataType;
 import org.apache.calcite.rel.type.RelDataTypeFactory;
-import org.apache.calcite.rex.RexBuilder;
 import org.apache.calcite.rex.RexNode;
-import org.apache.calcite.schema.impl.ScalarFunctionImpl;
-import org.apache.calcite.sql.SqlFunction;
-import org.apache.calcite.sql.SqlIdentifier;
-import org.apache.calcite.sql.SqlKind;
-import org.apache.calcite.sql.parser.SqlParserPos;
-import org.apache.calcite.sql.type.OperandTypes;
-import org.apache.calcite.sql.type.ReturnTypes;
-import org.apache.calcite.sql.type.SqlTypeFamily;
 import org.apache.calcite.sql.type.SqlTypeName;
-import org.apache.calcite.sql.validate.SqlUserDefinedFunction;
 import org.apache.calcite.util.Pair;
 import org.eclipse.mat.snapshot.model.FieldDescriptor;
 import org.eclipse.mat.snapshot.model.IClass;
 import org.eclipse.mat.snapshot.model.IObject;
 
 import java.util.*;
+
+import static com.github.vlsi.mat.calcite.schema.objects.SnapshotRexExpressions.*;
 
 public class ClassRowTypeCache {
 
@@ -41,22 +28,23 @@ public class ClassRowTypeCache {
                 public LoadingCache<IClassesList, Pair<RelDataType, List<Function<RexBuilderContext, RexNode>>>> load(
                         final RelDataTypeFactory typeFactory) throws Exception {
                     return CacheBuilder.newBuilder().weakKeys()
-							.build(new ClassRowTypeResolver(typeFactory));
-				}
-			});
+                            .build(new ClassRowTypeResolver(typeFactory));
+                }
+            });
 
-    private static interface ExtraTypes extends IObject.Type {
+    private interface ExtraTypes extends IObject.Type {
         int ANY = -1;
+        int CHARACTER = -2;
     }
 
-	private static final class ClassRowTypeResolver
-	extends
+    private static final class ClassRowTypeResolver
+            extends
             CacheLoader<IClassesList, Pair<RelDataType, List<Function<RexBuilderContext, RexNode>>>> {
         private final RelDataTypeFactory typeFactory;
 
-		private ClassRowTypeResolver(RelDataTypeFactory typeFactory) {
-			this.typeFactory = typeFactory;
-		}
+        private ClassRowTypeResolver(RelDataTypeFactory typeFactory) {
+            this.typeFactory = typeFactory;
+        }
 
         private LinkedHashMap<String, Field> getAllInstanceFields(IClass clazz) {
             // In case base class and subclass have a field with the same name, we just use the one from a subclass
@@ -72,21 +60,29 @@ public class ClassRowTypeCache {
                         seenFields.put(fd.getName(), new Field(fd));
                     }
                 }
+                if (IClass.JAVA_LANG_CLASS.equals(i.getName())) {
+                    seenFields.put(SpecialFields.CLASS_LOADER, new Field(SpecialFields.CLASS_LOADER, IObject.Type.OBJECT));
+                    seenFields.put(SpecialFields.SUPER, new Field(SpecialFields.SUPER, IObject.Type.OBJECT));
+                    seenFields.put(SpecialFields.CLASS_NAME, new Field(SpecialFields.CLASS_NAME, ExtraTypes.CHARACTER));
+                    // Hide the default "Class.name" field as it might be null
+                    seenFields.remove("name");
+                }
             }
+            seenFields.put(SpecialFields.CLASS, new Field(SpecialFields.CLASS, IObject.Type.OBJECT));
             return seenFields;
         }
 
-		@Override
-		public Pair<RelDataType, List<Function<RexBuilderContext, RexNode>>> load(
+        @Override
+        public Pair<RelDataType, List<Function<RexBuilderContext, RexNode>>> load(
                 IClassesList classesList) throws Exception {
             List<Function<RexBuilderContext, RexNode>> resolvers = new ArrayList<Function<RexBuilderContext, RexNode>>();
             List<String> names = new ArrayList<String>();
-			List<RelDataType> types = new ArrayList<RelDataType>();
+            List<RelDataType> types = new ArrayList<RelDataType>();
 
-			names.add("this");
+            names.add("this");
             RelDataType anyNull = typeFactory.createSqlType(SqlTypeName.ANY);
             types.add(anyNull);
-            resolvers.add(ThisComputer.INSTANCE);
+            resolvers.add(SnapshotRexExpressions::computeThis);
 
             // In case multiple classes have a field with different datatype, we just make field type "ANY"
 
@@ -119,7 +115,6 @@ public class ClassRowTypeCache {
             Collections.reverse(fieldsInOrder);
 
             for (Field field : fieldsInOrder) {
-                names.add(field.getName());
                 int type = field.getType();
                 RelDataType dataType;
                 switch (type) {
@@ -153,118 +148,63 @@ public class ClassRowTypeCache {
                     case ExtraTypes.ANY:
                         dataType = anyNull;
                         break;
+                    case ExtraTypes.CHARACTER:
+                        // fall-through
                     default:
                         dataType = typeFactory.createJavaType(String.class);
                         break;
                 }
                 types.add(dataType);
-                if (type == IObject.Type.OBJECT)
-                    resolvers.add(new ReferencePropertyComputer(field.getName()));
-                else
-                    resolvers.add(new SimplePropertyComputer(field.getName(), type, dataType));
+                String fieldName = field.getName();
+                Function<RexBuilderContext, RexNode> columnCalc;
+                switch (fieldName) {
+                    case SpecialFields.CLASS:
+                        // This is Obejct#getClass
+                        // For java.lang.Class it returns "java.lang.Class"
+                        columnCalc = (RexBuilderContext context) ->
+                                getClassOf(context, context.getIObjectId());
+                        break;
+                    case SpecialFields.SUPER:
+                        // This property is available only for classes
+                        // It is assumed that getIObject would return IClass
+                        columnCalc = (RexBuilderContext context) ->
+                                getSuper(context, context.getIObject());
+                        break;
+                    case SpecialFields.CLASS_LOADER:
+                        // This property is available only for classes
+                        // It is assumed that getIObject would return IClass
+                        columnCalc = (RexBuilderContext context) ->
+                                getClassLoader(context, context.getIObject());
+                        break;
+                    case SpecialFields.CLASS_NAME:
+                        // This property is available only for classes
+                        // It is assumed that getIObject would return IClass
+                        columnCalc = (RexBuilderContext context) ->
+                                getClassName(context, context.getIObject());
+                        fieldName = "name";
+                        break;
+                    default:
+                        String resolvedField = fieldName;
+                        columnCalc = (RexBuilderContext context) ->
+                                resolveField(context, resolvedField);
+                }
+                if (type == IObject.Type.OBJECT) {
+                    // Wrap object fields with HeapReference
+                    Function<RexBuilderContext, RexNode> prev = columnCalc;
+                    columnCalc = (RexBuilderContext context) ->
+                            context.toHeapReference(prev.apply(context));
+                } else if (dataType != anyNull){
+                    Function<RexBuilderContext, RexNode> prev = columnCalc;
+                    columnCalc = (RexBuilderContext context) ->
+                            context.getBuilder().makeCast(dataType, prev.apply(context));
+                }
+                names.add(fieldName);
+                resolvers.add(columnCalc);
             }
 
             return Pair.of(
                     typeFactory.createStructType(types, names),
-					resolvers);
-		}
-	}
-
-	static class ThisComputer implements Function<RexBuilderContext, RexNode> {
-		public static final ThisComputer INSTANCE = new ThisComputer();
-
-		public RexNode apply(RexBuilderContext context) {
-			RelOptCluster cluster = context.getCluster();
-			RelDataTypeFactory typeFactory = cluster.getTypeFactory();
-			final SqlFunction UDF =
-					new SqlUserDefinedFunction(
-							new SqlIdentifier("TO_REFERENCE", SqlParserPos.ZERO),
-                            SqlKind.OTHER_FUNCTION,
-							ReturnTypes.explicit(typeFactory.createJavaType(HeapReference.class)),
-							null,
-							OperandTypes.operandMetadata(
-							        ImmutableList.of(SqlTypeFamily.ANY),
-                                    tf -> ImmutableList.of(tf.createTypeWithNullability(tf.createJavaType(IObject.class), false)),
-                                    i -> "iobject",
-                                    i -> false),
-							ScalarFunctionImpl.create(ISnapshotMethods.class, "toReference")
-					);
-			return context.getBuilder().makeCall(UDF, context.getIObject());
-		}
-	}
-
-	static class SimplePropertyComputer implements Function<RexBuilderContext, RexNode> {
-		private final String name;
-		private final int type;
-		private final RelDataType dataType;
-
-		public SimplePropertyComputer(String name, int type, RelDataType dataType) {
-			this.name = name;
-			this.type = type;
-			this.dataType = dataType;
-		}
-
-		@Override
-		public RexNode apply(RexBuilderContext context) {
-			RelOptCluster cluster = context.getCluster();
-			RelDataTypeFactory typeFactory = cluster.getTypeFactory();
-			final SqlFunction UDF =
-					new SqlUserDefinedFunction(
-							new SqlIdentifier("RESOLVE_SIMPLE", SqlParserPos.ZERO),
-							SqlKind.OTHER_FUNCTION,
-							ReturnTypes.explicit(typeFactory.createJavaType(Object.class)),
-							null,
-                            OperandTypes.operandMetadata(
-                                    ImmutableList.of(SqlTypeFamily.ANY, SqlTypeFamily.CHARACTER),
-                                    tf -> ImmutableList.of(
-                                            tf.createTypeWithNullability(tf.createJavaType(IObject.class), false),
-                                            tf.createJavaType(String.class)),
-                                    i -> i == 0 ? "iobject" : "fieldName",
-                                    i -> false),
-							ScalarFunctionImpl.create(IObjectMethods.class, "resolveSimpleValue"));
-			RexBuilder b = context.getBuilder();
-			RexNode rexNode = b.makeCall(UDF, context.getIObject(), b.makeLiteral(name));
-			return b.makeCast(dataType, rexNode);
-		}
-
-		@Override
-		public String toString() {
-			return "Property{field=" + name + "}";
-		}
-	}
-
-	static class ReferencePropertyComputer implements Function<RexBuilderContext, RexNode> {
-		private final String name;
-
-		public ReferencePropertyComputer(String name) {
-			this.name = name;
-		}
-
-		@Override
-		public RexNode apply(RexBuilderContext context) {
-			RelOptCluster cluster = context.getCluster();
-			RelDataTypeFactory typeFactory = cluster.getTypeFactory();
-			final SqlFunction UDF =
-					new SqlUserDefinedFunction(
-							new SqlIdentifier("RESOLVE_REFERENCE", SqlParserPos.ZERO),
-							SqlKind.OTHER_FUNCTION,
-							ReturnTypes.explicit(typeFactory.createJavaType(HeapReference.class)),
-							null,
-                            OperandTypes.operandMetadata(
-                                    ImmutableList.of(SqlTypeFamily.ANY, SqlTypeFamily.CHARACTER),
-                                    tf -> ImmutableList.of(
-                                            tf.createTypeWithNullability(tf.createJavaType(IObject.class), false),
-                                            tf.createJavaType(String.class)),
-                                    i -> i == 0 ? "iobject" : "fieldName",
-                                    i -> false),
-							ScalarFunctionImpl.create(IObjectMethods.class, "resolveReferenceValue"));
-			RexBuilder b = context.getBuilder();
-			return b.makeCall(UDF, context.getIObject(), b.makeLiteral(name));
-		}
-
-		@Override
-		public String toString() {
-			return "Property{field=" + name + "}";
-		}
-	}
+                    resolvers);
+        }
+    }
 }

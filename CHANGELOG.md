@@ -1,10 +1,19 @@
 ## [Unreleased]
 
+### Added
+- Extra property for all objects: `@class` (references to `java.lang.Class`)
+- Extra property for all objects: `@className` (returns the name of the class)
+- Extra property for Class objects: `@classLoader` (references to `java.lang.ClassLoader`)
+- Extra property for Class objects: `@super` (references to `java.lang.Class`)
+
 ### Changed
 - Eclipse Memory Analyzer 1.8.0 or higher is required
 - Java 1.8 or higher is required
 - Update Apache Calcite to 1.26.0 (see https://calcite.apache.org/news/2020/10/06/release-1.26.0/)
 - Update Guava to 29.0-jre
+
+### Fixed
+- `name` for `IClass` return class name rather than the value of `Class.name` field (OpenJDK uses the field as a cache, so it might be null)
 
 ## [1.4.0] - 2018-09-08
 ### Added
