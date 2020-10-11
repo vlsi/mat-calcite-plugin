@@ -1,8 +1,5 @@
 package com.github.vlsi.mat.calcite.editor;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.eclipse.jface.text.TextAttribute;
 import org.eclipse.jface.text.rules.EndOfLineRule;
 import org.eclipse.jface.text.rules.IRule;
@@ -13,16 +10,19 @@ import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.widgets.Display;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class CommentScanner extends RuleBasedScanner {
-	public CommentScanner() {
-		List<IRule> rules = new ArrayList<IRule>();
+  public CommentScanner() {
+    List<IRule> rules = new ArrayList<IRule>();
 
-		Token commentToken = new Token(new TextAttribute(new Color(
-				Display.getCurrent(), new RGB(63, 127, 95))));
-		rules.add(new EndOfLineRule("--", commentToken));
-		rules.add(new EndOfLineRule("//", commentToken));
-		rules.add(new MultiLineRule("/*", "*/", commentToken));
+    Token commentToken = new Token(new TextAttribute(new Color(
+        Display.getCurrent(), new RGB(63, 127, 95))));
+    rules.add(new EndOfLineRule("--", commentToken));
+    rules.add(new EndOfLineRule("//", commentToken));
+    rules.add(new MultiLineRule("/*", "*/", commentToken));
 
-		setRules(rules.toArray(new IRule[rules.size()]));
-	}
+    setRules(rules.toArray(new IRule[rules.size()]));
+  }
 }

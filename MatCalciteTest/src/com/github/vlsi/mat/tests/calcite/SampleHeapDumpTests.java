@@ -8,20 +8,20 @@ import org.junit.BeforeClass;
 import java.io.File;
 
 public abstract class SampleHeapDumpTests extends AbstractQueriesTests {
-    protected static ISnapshot snapshot;
+  protected static ISnapshot snapshot;
 
-    @BeforeClass
-    public static void openSnapshot() throws SnapshotException {
-        snapshot = openSnapshot(new File("dumps", "mvn1m_jdk18.hprof"));
-    }
+  @BeforeClass
+  public static void openSnapshot() throws SnapshotException {
+    snapshot = openSnapshot(new File("dumps", "mvn1m_jdk18.hprof"));
+  }
 
-    @AfterClass
-    public static void closeSnapshot() {
-        closeSnapshot(snapshot);
-        snapshot = null;
-    }
+  @AfterClass
+  public static void closeSnapshot() {
+    closeSnapshot(snapshot);
+    snapshot = null;
+  }
 
-    protected ISnapshot getSnapshot() {
-        return snapshot;
-    }
+  protected ISnapshot getSnapshot() {
+    return snapshot;
+  }
 }

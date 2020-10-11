@@ -10,19 +10,19 @@ import org.eclipse.ui.plugin.AbstractUIPlugin;
 
 public class OpenCalciteAction extends Action {
 
-	public OpenCalciteAction() {
-		super("SQL", AbstractUIPlugin.imageDescriptorFromPlugin("MatCalcitePlugin", "resources/icons/plugin.png"));
-	}
+  public OpenCalciteAction() {
+    super("SQL", AbstractUIPlugin.imageDescriptorFromPlugin("MatCalcitePlugin", "resources/icons/plugin.png"));
+  }
 
-	@Override
-	public void run() {
-		IWorkbenchPage page = PlatformUI.getWorkbench()
-				.getActiveWorkbenchWindow().getActivePage();
-		IEditorPart part = page == null ? null : page.getActiveEditor();
+  @Override
+  public void run() {
+    IWorkbenchPage page = PlatformUI.getWorkbench()
+        .getActiveWorkbenchWindow().getActivePage();
+    IEditorPart part = page == null ? null : page.getActiveEditor();
 
-		if (part instanceof MultiPaneEditor) {
-			((MultiPaneEditor) part).addNewPage("CALCITE", null);//$NON-NLS-1$
-		}
-	}
+    if (part instanceof MultiPaneEditor) {
+      ((MultiPaneEditor) part).addNewPage("CALCITE", null);//$NON-NLS-1$
+    }
+  }
 
 }

@@ -24,59 +24,58 @@ import org.eclipse.mat.snapshot.model.IClass;
 import java.util.Collections;
 import java.util.List;
 
-public class InstanceIdsByClassTable extends AbstractQueryableTable
-{
-    private final ISnapshot snapshot;
-    private final IClassesList classesList;
+public class InstanceIdsByClassTable extends AbstractQueryableTable {
+  private final ISnapshot snapshot;
+  private final IClassesList classesList;
 
-    public InstanceIdsByClassTable(IClassesList classesList) {
-        super(Object[].class);
-        this.classesList = classesList;
-        this.snapshot = classesList.snapshot;
-    }
+  public InstanceIdsByClassTable(IClassesList classesList) {
+    super(Object[].class);
+    this.classesList = classesList;
+    this.snapshot = classesList.snapshot;
+  }
 
-    @Override
-    public Schema.TableType getJdbcTableType() {
-        return Schema.TableType.SYSTEM_TABLE;
-    }
+  @Override
+  public Schema.TableType getJdbcTableType() {
+    return Schema.TableType.SYSTEM_TABLE;
+  }
 
-    @Override
-    public Queryable<Integer> asQueryable(QueryProvider queryProvider, SchemaPlus schemaPlus, String tableName) {
-        return new AbstractTableQueryable<Integer>(queryProvider, schemaPlus, this, tableName) {
-            @Override
-            public Enumerator<Integer> enumerator() {
-                FluentIterable<Integer> it = FluentIterable
-                        .from(classesList.getClasses())
-                        .transformAndConcat(
-                                new Function<IClass, Iterable<Integer>>() {
-                                    @Override
-                                    public Iterable<Integer> apply(IClass input) {
-                                        try {
-                                            return Ints.asList(input
-                                                    .getObjectIds());
-                                        } catch (SnapshotException e) {
-                                            e.printStackTrace();
-                                            return Collections.emptyList();
-                                        }
-                                    }
-                                });
+  @Override
+  public Queryable<Integer> asQueryable(QueryProvider queryProvider, SchemaPlus schemaPlus, String tableName) {
+    return new AbstractTableQueryable<Integer>(queryProvider, schemaPlus, this, tableName) {
+      @Override
+      public Enumerator<Integer> enumerator() {
+        FluentIterable<Integer> it = FluentIterable
+            .from(classesList.getClasses())
+            .transformAndConcat(
+                new Function<IClass, Iterable<Integer>>() {
+                  @Override
+                  public Iterable<Integer> apply(IClass input) {
+                    try {
+                      return Ints.asList(input
+                          .getObjectIds());
+                    } catch (SnapshotException e) {
+                      e.printStackTrace();
+                      return Collections.emptyList();
+                    }
+                  }
+                });
 
-                return Linq4j.iterableEnumerator(it);
-            }
-        };
-    }
+        return Linq4j.iterableEnumerator(it);
+      }
+    };
+  }
 
-    @Override
-    public Statistic getStatistic() {
-        List<ImmutableBitSet> uniqueKeys = ImmutableList.of(ImmutableBitSet.of(0));
-        return Statistics.of(classesList.getTotalObjects(), uniqueKeys);
-    }
+  @Override
+  public Statistic getStatistic() {
+    List<ImmutableBitSet> uniqueKeys = ImmutableList.of(ImmutableBitSet.of(0));
+    return Statistics.of(classesList.getTotalObjects(), uniqueKeys);
+  }
 
-    @Override
-    public RelDataType getRowType(RelDataTypeFactory typeFactory) {
-        return typeFactory.createStructType(
-                Collections.singletonList(typeFactory.createJavaType(int.class)),
-                Collections.singletonList("@ID")
-        );
-    }
+  @Override
+  public RelDataType getRowType(RelDataTypeFactory typeFactory) {
+    return typeFactory.createStructType(
+        Collections.singletonList(typeFactory.createJavaType(int.class)),
+        Collections.singletonList("@ID")
+    );
+  }
 }
