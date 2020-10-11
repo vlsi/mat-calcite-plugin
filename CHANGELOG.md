@@ -4,6 +4,7 @@
 - Eclipse Memory Analyzer 1.8.0 or higher is required
 - Java 1.8 or higher is required
 - Update Apache Calcite to 1.26.0 (see https://calcite.apache.org/news/2020/10/06/release-1.26.0/)
+- Update Guava to 29.0-jre
 
 ## [1.4.0] - 2018-09-08
 ### Added
