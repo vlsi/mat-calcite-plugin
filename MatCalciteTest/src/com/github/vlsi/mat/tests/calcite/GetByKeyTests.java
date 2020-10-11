@@ -1,5 +1,6 @@
 package com.github.vlsi.mat.tests.calcite;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.sql.SQLException;
@@ -20,7 +21,8 @@ public class GetByKeyTests extends SampleHeapDumpTests {
         "7");
   }
 
-  //@Test
+  @Test
+  @Ignore
   public void testConcurrentHashMap() throws SQLException {
     returnsInOrder("select getByKey(m.this, 'MST')['ID'] c from java.util.concurrent.ConcurrentHashMap m where " +
             "getByKey(m.this, 'MST') is not null",
