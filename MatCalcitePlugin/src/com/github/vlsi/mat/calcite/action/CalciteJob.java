@@ -19,9 +19,9 @@ import java.io.StringWriter;
 
 public class CalciteJob extends AbstractPaneJob {
 
-  private String sql;
-  private CalcitePane calcitePane;
-  private PaneState state;
+  private final String sql;
+  private final CalcitePane calcitePane;
+  private final PaneState state;
 
   public CalciteJob(String sql, CalcitePane pane, PaneState state) {
     super(sql, pane);

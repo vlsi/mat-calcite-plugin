@@ -28,7 +28,7 @@ import java.lang.reflect.Method;
 import java.util.List;
 
 public class SnapshotFunctions {
-  private ISnapshot snapshot;
+  private final ISnapshot snapshot;
 
   public SnapshotFunctions(int snapshotId) {
     snapshot = SnapshotHolder.get(snapshotId);
@@ -70,8 +70,8 @@ public class SnapshotFunctions {
   }
 
   private static class SnapshotFunction implements ScalarFunction, ImplementableFunction, NotNullImplementor {
-    private ISnapshot snapshot;
-    private Method functionMethod;
+    private final ISnapshot snapshot;
+    private final Method functionMethod;
 
     public SnapshotFunction(ISnapshot snapshot, Method functionMethod) {
       this.snapshot = snapshot;

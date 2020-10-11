@@ -13,9 +13,9 @@ public class ExecuteQueryAction extends Action {
   public static final Pattern STARTS_WITH_EXPLAIN_PLAN = Pattern.compile("^\\s*explain\\s+plan\\s+for",
       Pattern.CASE_INSENSITIVE);
 
-  private boolean doExplain;
-  private CalcitePane pane;
-  private PaneState state;
+  private final boolean doExplain;
+  private final CalcitePane pane;
+  private final PaneState state;
 
   public ExecuteQueryAction(CalcitePane pane, PaneState state, boolean doExplain) {
     super(null);

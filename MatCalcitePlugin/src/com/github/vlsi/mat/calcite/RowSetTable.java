@@ -15,7 +15,7 @@ import javax.sql.rowset.CachedRowSet;
 public class RowSetTable implements IResultTable {
 
   private final ResultMetaData metaData;
-  private CachedRowSet rowSet;
+  private final CachedRowSet rowSet;
   Column[] columns;
   int idColumnPosition = -1;
 

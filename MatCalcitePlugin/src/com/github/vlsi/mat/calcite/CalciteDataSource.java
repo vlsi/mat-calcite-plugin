@@ -21,7 +21,7 @@ import java.util.concurrent.ExecutionException;
 
 public class CalciteDataSource {
 
-  private static LoadingCache<ISnapshot, Schema> SCHEMA_CACHE = CacheBuilder
+  private static final LoadingCache<ISnapshot, Schema> SCHEMA_CACHE = CacheBuilder
       .newBuilder()
       .weakKeys().build(new CacheLoader<ISnapshot, Schema>() {
         @Override

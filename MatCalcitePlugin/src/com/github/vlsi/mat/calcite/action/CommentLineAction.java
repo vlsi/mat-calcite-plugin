@@ -5,7 +5,7 @@ import org.eclipse.swt.custom.ST;
 import org.eclipse.swt.custom.StyledText;
 
 public class CommentLineAction extends Action {
-  private StyledText text;
+  private final StyledText text;
 
   public CommentLineAction(StyledText text) {
     this.text = text;
