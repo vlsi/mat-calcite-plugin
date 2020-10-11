@@ -206,7 +206,7 @@ public class TableFunctions {
 
         @Override
         public RelDataType getRowType(RelDataTypeFactory relDataTypeFactory) {
-            RelDataTypeFactory.FieldInfoBuilder builder = relDataTypeFactory.builder();
+            RelDataTypeFactory.Builder builder = relDataTypeFactory.builder();
             for (String columnName : columnNames) {
                 builder.add(columnName, relDataTypeFactory.createSqlType(SqlTypeName.ANY));
             }

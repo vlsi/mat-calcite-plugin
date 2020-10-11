@@ -17,9 +17,11 @@ import org.apache.calcite.rex.RexNode;
 import org.apache.calcite.schema.impl.ScalarFunctionImpl;
 import org.apache.calcite.sql.SqlFunction;
 import org.apache.calcite.sql.SqlIdentifier;
+import org.apache.calcite.sql.SqlKind;
 import org.apache.calcite.sql.parser.SqlParserPos;
 import org.apache.calcite.sql.type.OperandTypes;
 import org.apache.calcite.sql.type.ReturnTypes;
+import org.apache.calcite.sql.type.SqlTypeFamily;
 import org.apache.calcite.sql.type.SqlTypeName;
 import org.apache.calcite.sql.validate.SqlUserDefinedFunction;
 import org.apache.calcite.util.Pair;
@@ -177,10 +179,14 @@ public class ClassRowTypeCache {
 			final SqlFunction UDF =
 					new SqlUserDefinedFunction(
 							new SqlIdentifier("TO_REFERENCE", SqlParserPos.ZERO),
+                            SqlKind.OTHER_FUNCTION,
 							ReturnTypes.explicit(typeFactory.createJavaType(HeapReference.class)),
 							null,
-							OperandTypes.ANY,
-							ImmutableList.of(typeFactory.createTypeWithNullability(typeFactory.createJavaType(IObject.class), false)),
+							OperandTypes.operandMetadata(
+							        ImmutableList.of(SqlTypeFamily.ANY),
+                                    tf -> ImmutableList.of(tf.createTypeWithNullability(tf.createJavaType(IObject.class), false)),
+                                    i -> "iobject",
+                                    i -> false),
 							ScalarFunctionImpl.create(ISnapshotMethods.class, "toReference")
 					);
 			return context.getBuilder().makeCall(UDF, context.getIObject());
@@ -205,11 +211,16 @@ public class ClassRowTypeCache {
 			final SqlFunction UDF =
 					new SqlUserDefinedFunction(
 							new SqlIdentifier("RESOLVE_SIMPLE", SqlParserPos.ZERO),
+							SqlKind.OTHER_FUNCTION,
 							ReturnTypes.explicit(typeFactory.createJavaType(Object.class)),
 							null,
-							OperandTypes.ANY_ANY,
-							ImmutableList.of(typeFactory.createTypeWithNullability(typeFactory.createJavaType(IObject.class), false),
-									typeFactory.createJavaType(int.class)),
+                            OperandTypes.operandMetadata(
+                                    ImmutableList.of(SqlTypeFamily.ANY, SqlTypeFamily.CHARACTER),
+                                    tf -> ImmutableList.of(
+                                            tf.createTypeWithNullability(tf.createJavaType(IObject.class), false),
+                                            tf.createJavaType(String.class)),
+                                    i -> i == 0 ? "iobject" : "fieldName",
+                                    i -> false),
 							ScalarFunctionImpl.create(IObjectMethods.class, "resolveSimpleValue"));
 			RexBuilder b = context.getBuilder();
 			RexNode rexNode = b.makeCall(UDF, context.getIObject(), b.makeLiteral(name));
@@ -236,11 +247,16 @@ public class ClassRowTypeCache {
 			final SqlFunction UDF =
 					new SqlUserDefinedFunction(
 							new SqlIdentifier("RESOLVE_REFERENCE", SqlParserPos.ZERO),
+							SqlKind.OTHER_FUNCTION,
 							ReturnTypes.explicit(typeFactory.createJavaType(HeapReference.class)),
 							null,
-							OperandTypes.ANY_ANY,
-							ImmutableList.of(typeFactory.createTypeWithNullability(typeFactory.createJavaType(IObject.class), false),
-									typeFactory.createJavaType(String.class)),
+                            OperandTypes.operandMetadata(
+                                    ImmutableList.of(SqlTypeFamily.ANY, SqlTypeFamily.CHARACTER),
+                                    tf -> ImmutableList.of(
+                                            tf.createTypeWithNullability(tf.createJavaType(IObject.class), false),
+                                            tf.createJavaType(String.class)),
+                                    i -> i == 0 ? "iobject" : "fieldName",
+                                    i -> false),
 							ScalarFunctionImpl.create(IObjectMethods.class, "resolveReferenceValue"));
 			RexBuilder b = context.getBuilder();
 			return b.makeCall(UDF, context.getIObject(), b.makeLiteral(name));

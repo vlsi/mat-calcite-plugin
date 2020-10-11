@@ -42,7 +42,7 @@ public class SnapshotThreadStacksTable extends AbstractTable implements Scannabl
 
     @Override
     public RelDataType getRowType(RelDataTypeFactory typeFactory) {
-        RelDataTypeFactory.FieldInfoBuilder builder = typeFactory.builder();
+        RelDataTypeFactory.Builder builder = typeFactory.builder();
         RelDataType anyType = typeFactory.createSqlType(SqlTypeName.ANY);
         builder.add("thread", anyType);
         builder.add("depth", typeFactory.createJavaType(int.class));

@@ -96,7 +96,7 @@ public class PackageSchema extends AbstractSchema {
         try {
             // Create functions for schema
             ImmutableMultimap.Builder<String, Function> builder = ImmutableMultimap.builder();
-            builder.putAll(ScalarFunctionImpl.createAll(HeapFunctions.class));
+            builder.putAll(ScalarFunctionImpl.functions(HeapFunctions.class));
             builder.putAll(CollectionsFunctions.createAll());
             builder.putAll(TableFunctions.createAll());
             builder.putAll(SnapshotFunctions.createAll(snapshot));

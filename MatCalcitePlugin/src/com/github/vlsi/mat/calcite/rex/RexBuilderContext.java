@@ -9,9 +9,11 @@ import org.apache.calcite.rex.RexNode;
 import org.apache.calcite.schema.impl.ScalarFunctionImpl;
 import org.apache.calcite.sql.SqlFunction;
 import org.apache.calcite.sql.SqlIdentifier;
+import org.apache.calcite.sql.SqlKind;
 import org.apache.calcite.sql.parser.SqlParserPos;
 import org.apache.calcite.sql.type.OperandTypes;
 import org.apache.calcite.sql.type.ReturnTypes;
+import org.apache.calcite.sql.type.SqlTypeFamily;
 import org.apache.calcite.sql.validate.SqlUserDefinedFunction;
 import org.eclipse.mat.snapshot.ISnapshot;
 import org.eclipse.mat.snapshot.model.IObject;
@@ -43,11 +45,16 @@ public abstract class RexBuilderContext {
             final SqlFunction GET_IOBJECT =
                     new SqlUserDefinedFunction(
                             new SqlIdentifier("GET_IOBJECT", SqlParserPos.ZERO),
+                            SqlKind.OTHER_FUNCTION,
                             ReturnTypes.explicit(typeFactory.createTypeWithNullability(typeFactory.createJavaType(IObject.class), false)),
                             null,
-                            OperandTypes.ANY_ANY,
-                            ImmutableList.of(typeFactory.createTypeWithNullability(typeFactory.createJavaType(ISnapshot.class), false),
-                                    typeFactory.createJavaType(int.class)),
+                            OperandTypes.operandMetadata(
+                                    ImmutableList.of(SqlTypeFamily.ANY, SqlTypeFamily.NUMERIC),
+                                    tf -> ImmutableList.of(
+                                            typeFactory.createTypeWithNullability(typeFactory.createJavaType(ISnapshot.class), false),
+                                            typeFactory.createJavaType(int.class)),
+                                    i -> i == 0 ? "snapshotId" : "objectId",
+                                    i -> false),
                             ScalarFunctionImpl.create(ISnapshotMethods.class, "getIObject"));
             object = b.makeCall(GET_IOBJECT, getSnapshot(), getIObjectId());
         }
