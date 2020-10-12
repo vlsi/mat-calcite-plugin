@@ -33,8 +33,6 @@ To install Calcite SQL plugin, perform the following:
 1. Accept License
 1. Click `Finish` and restart MAT
 
-The following update site can be used to get development builds: https://dl.bintray.com/vlsi/eclipse-test/updates/
-
 Early access versions
 ---------------------
 
