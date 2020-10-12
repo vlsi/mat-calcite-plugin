@@ -1,5 +1,6 @@
 ## [Unreleased]
 
+## [1.5.0] - 2020-10-12
 ### Added
 - Extra property for all objects: `@class` (references to `java.lang.Class`)
 - Extra property for all objects: `@className` (returns the name of the class)
