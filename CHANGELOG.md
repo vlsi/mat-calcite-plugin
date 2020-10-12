@@ -14,6 +14,7 @@
 
 ### Fixed
 - `name` for `IClass` return class name rather than the value of `Class.name` field (OpenJDK uses the field as a cache, so it might be null)
+- Declare reference columns as nullable, so the engine does not optimize `count(name)` into `count(*)`
 
 ## [1.4.0] - 2018-09-08
 ### Added

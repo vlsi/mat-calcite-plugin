@@ -93,8 +93,9 @@ public class ClassRowTypeCache {
       List<RelDataType> types = new ArrayList<>();
 
       names.add("this");
-      RelDataType anyNull = typeFactory.createSqlType(SqlTypeName.ANY);
-      types.add(anyNull);
+      RelDataType any = typeFactory.createSqlType(SqlTypeName.ANY);
+      RelDataType anyNull = typeFactory.createTypeWithNullability(any, true);
+      types.add(any);
       resolvers.add(SnapshotRexExpressions::computeThis);
 
       // In case multiple classes have a field with different datatype, we just make field type "ANY"
@@ -160,7 +161,9 @@ public class ClassRowTypeCache {
           dataType = anyNull;
           break;
         case ExtraTypes.CHARACTER:
-          // fall-through
+          dataType = typeFactory.createTypeWithNullability(
+              typeFactory.createSqlType(SqlTypeName.VARCHAR), true);
+          break;
         default:
           dataType = typeFactory.createJavaType(String.class);
           break;

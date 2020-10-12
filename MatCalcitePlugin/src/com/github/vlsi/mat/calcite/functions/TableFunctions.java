@@ -208,8 +208,10 @@ public class TableFunctions {
     @Override
     public RelDataType getRowType(RelDataTypeFactory relDataTypeFactory) {
       RelDataTypeFactory.Builder builder = relDataTypeFactory.builder();
+      RelDataType anyNull = relDataTypeFactory.createTypeWithNullability(
+          relDataTypeFactory.createSqlType(SqlTypeName.ANY), true);
       for (String columnName : columnNames) {
-        builder.add(columnName, relDataTypeFactory.createSqlType(SqlTypeName.ANY));
+        builder.add(columnName, anyNull);
       }
       return builder.build();
     }

@@ -171,6 +171,33 @@ public class BasicQueriesTests extends SampleHeapDumpTests {
   }
 
   @Test
+  public void joinClassClass() throws SQLException {
+    returnsInOrder("select count(a.name) ca, count(b.name) cb\n" +
+            "  from java.lang.Class a\n" +
+            "  left join java.lang.Class b\n" +
+            "  on (a.this = b.this)",
+        "ca|cb",
+        "985|985");
+  }
+
+  @Test
+  public void joinClassClassLoader() throws SQLException {
+    returnsInOrder("select count(c.name) c, count(cl.this) cl\n" +
+            "  from java.lang.Class c\n" +
+            "  left join instanceof.java.lang.ClassLoader cl\n" +
+            "  on (c.\"@classLoader\" = cl.this)",
+        "c|cl",
+        "985|985");
+  }
+
+  @Test
+  public void countClass() throws SQLException {
+    returnsInOrder("select count(this['@super']) a, count(\"@super\") b, count(enumConstantDirectory) c from java.lang.Class",
+        "a|b|c",
+        "984|984|0");
+  }
+
+  @Test
   public void selectShallow() throws SQLException {
     returnsInOrder("select sum(cast(hm.this['@shallow'] as bigint)) sum_shallow from java.util.HashMap hm",
         "sum_shallow",
