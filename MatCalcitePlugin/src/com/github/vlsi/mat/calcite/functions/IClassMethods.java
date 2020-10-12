@@ -5,15 +5,15 @@ import org.eclipse.mat.snapshot.model.IClass;
 import org.eclipse.mat.snapshot.model.IObject;
 
 @SuppressWarnings("unused")
-public interface IClassMethods {
-  static IClass getSuper(IObject clazz) {
+public abstract class IClassMethods {
+  public static IClass getSuper(IObject clazz) {
     if (clazz instanceof IClass) {
       return ((IClass) clazz).getSuperClass();
     }
     return null;
   }
 
-  static IObject getClassLoader(IObject clazz) {
+  public static IObject getClassLoader(IObject clazz) {
     if (!(clazz instanceof IClass)) {
       return null;
     }
@@ -26,7 +26,7 @@ public interface IClassMethods {
     }
   }
 
-  static String getClassName(IObject clazz) {
+  public static String getClassName(IObject clazz) {
     if (clazz instanceof IClass) {
       return ((IClass) clazz).getName();
     }
