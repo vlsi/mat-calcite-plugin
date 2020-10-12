@@ -31,7 +31,7 @@ script:
 deploy:
   provider: releases
   api_key:
-    secure: "Pj2LGYrSWmIoaCHNsiYIr563AyEZPZWPsSb2gD52bNTUOKegKNXLopKlpFBTVYen1U0mc/6zweIWaGVIjZdG3/vDydBp/fcBEogNIARND0ICPKZ4d78a2nhq3mdC6nnTUnvrkl6s2vwq9YunobePM5U97qRWIWREKHGrjDPN9xU="
+    secure: WJGtlMnyktPazmcaBUM+ZlUAIJOJgqB/xVcDCEtuiFQb76mwyZsYxXw8seKlPcoJUmzo0QQPZxY0hPJTVe89EqwzXJz2tHap0PRITe/Hx9IexTWXP2BbqUlF6ewYmHzpEJ11P2eBRM4agBAh5y6w+S0O9GT3Zaw15rqbd2fG2MU=
   file_glob: true
   file: "MatCalciteRepository/target/MatCalciteRepository-*.zip"
   skip_cleanup: true
