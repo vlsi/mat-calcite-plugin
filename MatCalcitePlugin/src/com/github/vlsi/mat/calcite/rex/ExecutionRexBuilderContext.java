@@ -25,6 +25,21 @@ public class ExecutionRexBuilderContext extends RexBuilderContext {
 
   private RexNode snapshot;
 
+  private static final SqlFunction GET_SNAPSHOT =
+      new SqlUserDefinedFunction(
+          new SqlIdentifier("GET_SNAPSHOT", SqlParserPos.ZERO),
+          SqlKind.OTHER_FUNCTION,
+          ReturnTypes.explicit(tf -> tf.createTypeWithNullability(tf.createJavaType(ISnapshot.class),
+              false)),
+          null,
+          OperandTypes.operandMetadata(
+              ImmutableList.of(SqlTypeFamily.NUMERIC),
+              tf -> ImmutableList.of(
+                  tf.createJavaType(int.class)),
+              i -> "snapshotId",
+              i -> false),
+          ScalarFunctionImpl.create(SnapshotHolder.class, "get"));
+
   public ExecutionRexBuilderContext(RelOptCluster cluster, int snapshotId, RexNode objectId) {
     super(cluster);
     this.snapshotId = snapshotId;
@@ -36,21 +51,7 @@ public class ExecutionRexBuilderContext extends RexBuilderContext {
     if (snapshot == null) {
       RelDataTypeFactory typeFactory = getCluster().getTypeFactory();
       RexBuilder b = getBuilder();
-      final SqlFunction UDF =
-          new SqlUserDefinedFunction(
-              new SqlIdentifier("GET_SNAPSHOT", SqlParserPos.ZERO),
-              SqlKind.OTHER_FUNCTION,
-              ReturnTypes.explicit(typeFactory.createTypeWithNullability(typeFactory.createJavaType(ISnapshot.class),
-                  false)),
-              null,
-              OperandTypes.operandMetadata(
-                  ImmutableList.of(SqlTypeFamily.NUMERIC),
-                  tf -> ImmutableList.of(
-                      tf.createJavaType(Integer.class)),
-                  i -> "snapshotId",
-                  i -> false),
-              ScalarFunctionImpl.create(SnapshotHolder.class, "get"));
-      snapshot = b.makeCall(UDF, b.makeLiteral(snapshotId, typeFactory.createSqlType(SqlTypeName.INTEGER), false));
+      snapshot = b.makeCall(GET_SNAPSHOT, b.makeLiteral(snapshotId, typeFactory.createSqlType(SqlTypeName.INTEGER), false));
     }
     return snapshot;
   }
