@@ -43,6 +43,12 @@ To install Calcite SQL plugin, perform the following:
 
 The following update site can be used to get development builds: https://dl.bintray.com/vlsi/eclipse-test/updates/
 
+Early access versions
+---------------------
+
+Development builds are pushed to https://dl.bintray.com/vlsi/eclipse-test/updates/ repository,
+so you can preview the upcoming version right after the commit lands to the default branch.
+
 Sample
 ------
 
