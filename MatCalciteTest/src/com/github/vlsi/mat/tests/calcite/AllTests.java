@@ -7,7 +7,8 @@ import org.junit.runners.Suite;
 @Suite.SuiteClasses({
     BasicQueriesTests.class,
     GetByKeyTests.class,
-    TableFunctionsTests.class
+    TableFunctionsTests.class,
+    CollectionsFunctionsTests.class
 })
 public class AllTests {
 }

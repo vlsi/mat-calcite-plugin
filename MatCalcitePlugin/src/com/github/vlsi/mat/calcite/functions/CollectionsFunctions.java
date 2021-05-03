@@ -72,9 +72,9 @@ public class CollectionsFunctions extends HeapFunctionsBase {
   }
 
   public static class ArrayFunction extends BaseImplementableFunction {
-    private final Class elementType;
+    private final Class<?> elementType;
 
-    ArrayFunction(Method method, Class elementType) {
+    ArrayFunction(Method method, Class<?> elementType) {
       super(method);
       this.elementType = elementType;
     }
@@ -102,7 +102,7 @@ public class CollectionsFunctions extends HeapFunctionsBase {
   }
 
   @SuppressWarnings("unused")
-  public static Map asMap(Object r) {
+  public static Map<String, Object> asMap(Object r) {
     HeapReference ref = ensureHeapReference(r);
     if (ref == null) {
       return null;
@@ -115,9 +115,8 @@ public class CollectionsFunctions extends HeapFunctionsBase {
       } else {
         Map<String, Object> result = new HashMap<>();
         for (Map.Entry<IObject, IObject> entry : extractedMap) {
-          result.put(
-              toString(entry.getKey()),
-              resolveReference(entry.getValue())
+          result.put(toString(entry.getKey()),
+                     resolveReference(entry.getValue())
                     );
         }
         return result;
@@ -128,7 +127,7 @@ public class CollectionsFunctions extends HeapFunctionsBase {
   }
 
   @SuppressWarnings("unused")
-  public static List asMultiSet(Object r) {
+  public static List<HeapReference> asMultiSet(Object r) {
     HeapReference ref = ensureHeapReference(r);
     if (ref == null) {
       return null;
@@ -151,7 +150,7 @@ public class CollectionsFunctions extends HeapFunctionsBase {
   }
 
   @SuppressWarnings("unused")
-  public static List asArray(Object r) {
+  public static List<?> asArray(Object r) {
     HeapReference ref = ensureHeapReference(r);
     if (ref == null) {
       return null;
