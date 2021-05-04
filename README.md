@@ -214,6 +214,17 @@ from
 where 
  length(all_long_arrays.this) > 0
 ```
+ 
+ Array index could be extracted into the table by using the 'unnest ... with ordinality' clause:
+```sql
+select
+    c.this,
+    cs.index,
+    cs.val
+from
+    java.util.GregorianCalendar c,
+    unnest(asIntArray(c.stamp)) with ordinality cs(val, index)
+```
 
 Requirements
 ------------
