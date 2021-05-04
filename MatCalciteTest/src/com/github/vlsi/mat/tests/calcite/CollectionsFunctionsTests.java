@@ -58,11 +58,13 @@ public class CollectionsFunctionsTests extends SampleHeapDumpTests {
   }
 
   // asShortArray
-  // Test dump has no short[] objects
-//  @Test
-//  public void testAsShortArray() throws SQLException {
-//
-//  }
+
+  @Test
+  public void testAsShortArray() throws SQLException {
+    // Test dump has no short[] objects, so we just check that function could be invoked
+    returnsInOrder("select cardinality(asShortArray(o.this)) m from java.lang.Object o limit 1",
+                   "m", "0");
+  }
 
   // asIntArray
 
@@ -99,17 +101,21 @@ public class CollectionsFunctionsTests extends SampleHeapDumpTests {
   }
 
   // asFloatArray
-  // Test dump has no float[] objects
-//  @Test
-//  public void testAsFloatArray() throws SQLException {
-//
-//  }
+
+  @Test
+  public void testAsFloatArray() throws SQLException {
+    // Test dump has no float[] objects, so we just check that function could be invoked
+    returnsInOrder("select cardinality(asFloatArray(o.this)) m from java.lang.Object o limit 1",
+                   "m", "0");
+  }
 
   // asDoubleArray
-  // Test dump has no double[] objects
-//  @Test
-//  public void testAsDoubleArray() throws SQLException {
-//
-//  }
+
+  @Test
+  public void testAsDoubleArray() throws SQLException {
+    // Test dump has no double[] objects, so we just check that function could be invoked
+    returnsInOrder("select cardinality(asDoubleArray(o.this)) m from java.lang.Object o limit 1",
+                   "m", "0");
+  }
 
 }
