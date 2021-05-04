@@ -18,7 +18,11 @@ import org.eclipse.mat.SnapshotException;
 import org.eclipse.mat.inspections.collectionextract.CollectionExtractionUtils;
 import org.eclipse.mat.inspections.collectionextract.ExtractedCollection;
 import org.eclipse.mat.inspections.collectionextract.ExtractedMap;
+import org.eclipse.mat.snapshot.ISnapshot;
+import org.eclipse.mat.snapshot.model.IArray;
 import org.eclipse.mat.snapshot.model.IObject;
+import org.eclipse.mat.snapshot.model.IObjectArray;
+import org.eclipse.mat.snapshot.model.IPrimitiveArray;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -30,7 +34,7 @@ import java.util.Map;
 public class CollectionsFunctions extends HeapFunctionsBase {
 
   public abstract static class BaseImplementableFunction extends ReflectiveFunctionBase implements ScalarFunction,
-      ImplementableFunction {
+                                                                                                   ImplementableFunction {
     final CallImplementor implementor;
 
     BaseImplementableFunction(Method method) {
@@ -52,7 +56,7 @@ public class CollectionsFunctions extends HeapFunctionsBase {
     @Override
     public RelDataType getReturnType(RelDataTypeFactory relDataTypeFactory) {
       return relDataTypeFactory.createMapType(relDataTypeFactory.createJavaType(String.class),
-          relDataTypeFactory.createJavaType(HeapReference.class));
+                                              relDataTypeFactory.createJavaType(HeapReference.class));
     }
   }
 
@@ -67,15 +71,38 @@ public class CollectionsFunctions extends HeapFunctionsBase {
     }
   }
 
+  public static class ArrayFunction extends BaseImplementableFunction {
+    private final Class<?> elementType;
+
+    ArrayFunction(Method method, Class<?> elementType) {
+      super(method);
+      this.elementType = elementType;
+    }
+
+    @Override
+    public RelDataType getReturnType(RelDataTypeFactory relDataTypeFactory) {
+      return relDataTypeFactory.createArrayType(relDataTypeFactory.createJavaType(elementType), -1);
+    }
+  }
+
   public static Multimap<String, ScalarFunction> createAll() {
     ImmutableMultimap.Builder<String, ScalarFunction> builder = ImmutableMultimap.builder();
     builder.put("asMap", new MapFunction(findMethod(CollectionsFunctions.class, "asMap")));
     builder.put("asMultiSet", new MultiSetFunction(findMethod(CollectionsFunctions.class, "asMultiSet")));
+    builder.put("asArray", new ArrayFunction(findMethod(CollectionsFunctions.class, "asArray"), HeapReference.class));
+    builder.put("asByteArray", new ArrayFunction(findMethod(CollectionsFunctions.class, "asArray"), Byte.class));
+    builder.put("asShortArray", new ArrayFunction(findMethod(CollectionsFunctions.class, "asArray"), Short.class));
+    builder.put("asIntArray", new ArrayFunction(findMethod(CollectionsFunctions.class, "asArray"), Integer.class));
+    builder.put("asLongArray", new ArrayFunction(findMethod(CollectionsFunctions.class, "asArray"), Long.class));
+    builder.put("asBooleanArray", new ArrayFunction(findMethod(CollectionsFunctions.class, "asArray"), Boolean.class));
+    builder.put("asCharArray", new ArrayFunction(findMethod(CollectionsFunctions.class, "asArray"), Character.class));
+    builder.put("asFloatArray", new ArrayFunction(findMethod(CollectionsFunctions.class, "asArray"), Float.class));
+    builder.put("asDoubleArray", new ArrayFunction(findMethod(CollectionsFunctions.class, "asArray"), Double.class));
     return builder.build();
   }
 
   @SuppressWarnings("unused")
-  public static Map asMap(Object r) {
+  public static Map<String, Object> asMap(Object r) {
     HeapReference ref = ensureHeapReference(r);
     if (ref == null) {
       return null;
@@ -88,10 +115,9 @@ public class CollectionsFunctions extends HeapFunctionsBase {
       } else {
         Map<String, Object> result = new HashMap<>();
         for (Map.Entry<IObject, IObject> entry : extractedMap) {
-          result.put(
-              toString(entry.getKey()),
-              resolveReference(entry.getValue())
-          );
+          result.put(toString(entry.getKey()),
+                     resolveReference(entry.getValue())
+                    );
         }
         return result;
       }
@@ -101,7 +127,7 @@ public class CollectionsFunctions extends HeapFunctionsBase {
   }
 
   @SuppressWarnings("unused")
-  public static List asMultiSet(Object r) {
+  public static List<HeapReference> asMultiSet(Object r) {
     HeapReference ref = ensureHeapReference(r);
     if (ref == null) {
       return null;
@@ -121,6 +147,45 @@ public class CollectionsFunctions extends HeapFunctionsBase {
     } catch (SnapshotException e) {
       throw new RuntimeException("Unable to extract collection from " + r, e);
     }
+  }
 
+  @SuppressWarnings("unused")
+  public static List<?> asArray(Object r) {
+    HeapReference ref = ensureHeapReference(r);
+    if (ref == null) {
+      return null;
+    }
+
+    IObject iObject = ref.getIObject();
+    if (!(iObject instanceof IArray)) {
+      return null;
+    }
+
+    try {
+      if (iObject instanceof IPrimitiveArray) {
+        IPrimitiveArray arrayObject = (IPrimitiveArray) iObject;
+        int length = arrayObject.getLength();
+        List<Object> result = new ArrayList<>(length);
+        for (int i = 0; i < length; i++) {
+          result.add(arrayObject.getValueAt(i));
+        }
+        return result;
+      } else {
+        IObjectArray arrayObject = (IObjectArray) iObject;
+        ISnapshot snapshot = arrayObject.getSnapshot();
+        int length = arrayObject.getLength();
+        List<HeapReference> result = new ArrayList<>(length);
+        for (long objectAddress : arrayObject.getReferenceArray()) {
+          if (objectAddress != 0) {
+            result.add(HeapReference.valueOf(snapshot.getObject(snapshot.mapAddressToId(objectAddress))));
+          } else {
+            result.add(null);
+          }
+        }
+        return result;
+      }
+    } catch (SnapshotException e) {
+      throw new RuntimeException("Unable to extract references from array " + r, e);
+    }
   }
 }

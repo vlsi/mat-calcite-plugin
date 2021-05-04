@@ -232,21 +232,7 @@ public class BasicQueriesTests extends SampleHeapDumpTests {
         "114976");
   }
 
-  @Test
-  public void selectOutboundReferences() throws SQLException {
-    returnsInOrder("select sum(retainedSize(og.this)) retained_size, count(og.name) cnt_name from java.util.HashMap " +
-            "hm, lateral (select * from table(getOutboundReferences(hm.this))) as og(name, this)",
-        "retained_size|cnt_name",
-        "113712|155");
-  }
 
-  @Test
-  public void selectOutboundReferencesCrossApply() throws SQLException {
-    returnsInOrder("select sum(retainedSize(og.this)) retained_size, count(og.name) cnt_name from java.util.HashMap " +
-            "hm cross apply table(getOutboundReferences(hm.this)) as og(name, this)",
-        "retained_size|cnt_name",
-        "113712|155");
-  }
 
   @Test
   public void testReadme() throws SQLException {
@@ -273,12 +259,5 @@ public class BasicQueriesTests extends SampleHeapDumpTests {
         "   from java.lang.String s\n" +
         "   join java.net.URL u\n" +
         "     on s.this = u.path", 10);
-  }
-
-  @Test
-  public void testAsMap() throws SQLException {
-    returnsInOrder("select getField(asMap(m.this)['org.codehaus.plexus.classworlds'],'pkgName') pkgName from java" +
-            ".util.HashMap m where m.size = 4",
-        "pkgName", "org.codehaus.plexus.classworlds");
   }
 }
