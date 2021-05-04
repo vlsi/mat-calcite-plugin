@@ -216,6 +216,10 @@ public class BasicQueriesTests extends SampleHeapDumpTests {
     returnsInOrder("select count(this['table.[0]']) count_first_entry from java.util.HashMap",
         "count_first_entry",
         "71");
+    // This is actually incorrect, as IObject.resolveValue handle null values in array as reference to first Object on
+    // heap (i.e. System ClassLoader). The previous test (@selectThisMapField) handles null values correctly (as we
+    // do it directly in our code), so the correct result should be 18, but as we testing Mat syntax here (handled by
+    // Mat itself), so we just accept its behavior.
   }
 
   @Test
@@ -232,7 +236,19 @@ public class BasicQueriesTests extends SampleHeapDumpTests {
         "114976");
   }
 
+  @Test
+  public void testGetField() throws SQLException {
+    returnsInOrder("select getField(lm.this, 'initializationDone') a, getField(lm.rootLogger, 'levelValue') b, getField(lm.this, 'listenerMap')['size'] c from java.util.logging.LogManager lm",
+                   "a|b|c",
+                   "true|800|0");
+  }
 
+  @Test
+  public void testGetStaticField() throws SQLException {
+    returnsInOrder("select c.name, getStaticField(c.this, 'serialVersionUID') serialVersionUID from java.lang.Class c where c.name = 'java.util.HashMap'",
+                   "name|serialVersionUID",
+                   "java.util.HashMap|362498820763181265");
+  }
 
   @Test
   public void testReadme() throws SQLException {

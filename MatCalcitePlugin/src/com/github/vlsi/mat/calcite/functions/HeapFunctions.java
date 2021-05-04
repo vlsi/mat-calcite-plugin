@@ -205,6 +205,30 @@ public class HeapFunctions extends HeapFunctionsBase {
   }
 
   @SuppressWarnings("unused")
+  public static Object getStaticField(Object r, String name) {
+    HeapReference ref = ensureHeapReference(r);
+    if (ref == null) {
+      return null;
+    }
+
+    IObject iObject = ref.getIObject();
+    if (iObject instanceof IClass) {
+      IClass iClass = (IClass) iObject;
+      for (Field field : iClass.getStaticFields()) {
+        if (field.getName().equals(name)) {
+          Object value = field.getValue();
+          if (value instanceof IObject) {
+            return new HeapReference((IObject) value);
+          } else {
+            return value;
+          }
+        }
+      }
+    }
+    return null;
+  }
+
+  @SuppressWarnings("unused")
   public static long getAddress(Object r) {
     HeapReference ref = ensureHeapReference(r);
     if (ref == null) {
