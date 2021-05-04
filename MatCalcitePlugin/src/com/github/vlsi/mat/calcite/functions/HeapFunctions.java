@@ -8,10 +8,7 @@ import org.eclipse.mat.SnapshotException;
 import org.eclipse.mat.inspections.collectionextract.CollectionExtractionUtils;
 import org.eclipse.mat.inspections.collectionextract.ICollectionExtractor;
 import org.eclipse.mat.snapshot.ISnapshot;
-import org.eclipse.mat.snapshot.model.IArray;
-import org.eclipse.mat.snapshot.model.IClass;
-import org.eclipse.mat.snapshot.model.IObject;
-import org.eclipse.mat.snapshot.model.PrettyPrinter;
+import org.eclipse.mat.snapshot.model.*;
 
 import java.util.Map;
 
@@ -167,6 +164,41 @@ public class HeapFunctions extends HeapFunctionsBase {
         }
       } else if (SpecialFields.CLASS.equalsIgnoreCase(fieldName)) {
         return resolveReference(iObject.getClazz());
+      }
+    } else if (iObject instanceof IArray
+               && fieldName.length() > 2
+               && fieldName.charAt(0) == '['
+               && fieldName.charAt(fieldName.length() - 1) == ']') {
+      try {
+        // Field name is '[<number>]' and target object is array.
+        // Initially such calls were routed to IObject.resolveValue, which accepts field names as '[<index>]' for arrays.
+        // However, this have two problems:
+        // 1. This doesn't work with primitive arrays (they always return null)
+        // 2. This doesn't correct work with <null> values - MAT code doesn't handle 0 address properly in this case
+        // So, now we handle this case directly in our code
+        int index = Integer.parseInt(fieldName.substring(1, fieldName.length() - 1));
+        int length = ((IArray) iObject).getLength();
+        if (index >= 0 && index < length) {
+          if (iObject instanceof IPrimitiveArray) {
+            return ((IPrimitiveArray) iObject).getValueAt(index);
+          } else if (iObject instanceof IObjectArray) {
+            long objectAddress = ((IObjectArray) iObject).getReferenceArray()[index];
+            if (objectAddress != 0) {
+              ISnapshot snapshot = iObject.getSnapshot();
+              try {
+                return resolveReference(snapshot.getObject(snapshot.mapAddressToId(objectAddress)));
+              } catch (SnapshotException e) {
+                return null;
+              }
+            } else {
+              return null;
+            }
+          }
+        } else {
+          return null;
+        }
+      } catch (NumberFormatException e) {
+        // fall down
       }
     }
     return resolveReference(IObjectMethods.resolveSimpleValue(iObject, fieldName));

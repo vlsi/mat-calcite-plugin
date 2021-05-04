@@ -208,7 +208,7 @@ public class BasicQueriesTests extends SampleHeapDumpTests {
   public void selectThisMapField() throws SQLException {
     returnsInOrder("select count(this['table'][0]) count_first_entry from java.util.HashMap",
         "count_first_entry",
-        "71");
+        "18");
   }
 
   @Test
