@@ -144,6 +144,7 @@ Heap schema
     getSize      | size of referenced collection, map or count of non-null elements in array
     getByKey     | extracts value for given string representation of key for referenced map
     getField     | obtains value of field with specified name for referenced object
+    getStaticField   | obtains value of static field with specified name for referenced class
     getStringContent | pretty prints object representation
 
  The following table functions are supported:
