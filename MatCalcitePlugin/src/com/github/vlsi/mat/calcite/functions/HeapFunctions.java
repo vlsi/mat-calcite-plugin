@@ -174,7 +174,7 @@ public class HeapFunctions extends HeapFunctionsBase {
         // Initially such calls were routed to IObject.resolveValue, which accepts field names as '[<index>]' for arrays.
         // However, this have two problems:
         // 1. This doesn't work with primitive arrays (they always return null)
-        // 2. This doesn't correct work with <null> values - MAT code doesn't handle 0 address properly in this case
+        // 2. This doesn't correctly work with <null> values - MAT code doesn't handle 0 address properly in this case
         // So, now we handle this case directly in our code
         int index = Integer.parseInt(fieldName.substring(1, fieldName.length() - 1));
         int length = ((IArray) iObject).getLength();
@@ -182,17 +182,7 @@ public class HeapFunctions extends HeapFunctionsBase {
           if (iObject instanceof IPrimitiveArray) {
             return ((IPrimitiveArray) iObject).getValueAt(index);
           } else if (iObject instanceof IObjectArray) {
-            long objectAddress = ((IObjectArray) iObject).getReferenceArray()[index];
-            if (objectAddress != 0) {
-              ISnapshot snapshot = iObject.getSnapshot();
-              try {
-                return resolveReference(snapshot.getObject(snapshot.mapAddressToId(objectAddress)));
-              } catch (SnapshotException e) {
-                return null;
-              }
-            } else {
-              return null;
-            }
+            return resolveReference(iObject.getSnapshot(), ((IObjectArray) iObject).getReferenceArray()[index]);
           }
         } else {
           return null;
@@ -256,7 +246,6 @@ public class HeapFunctions extends HeapFunctionsBase {
     } catch (SnapshotException e) {
       throw new RuntimeException("Cannot obtain immediate dominator object for " + r, e);
     }
-
   }
 
 }

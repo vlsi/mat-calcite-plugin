@@ -20,7 +20,6 @@ import org.apache.calcite.schema.FunctionParameter;
 import org.apache.calcite.schema.ImplementableFunction;
 import org.apache.calcite.schema.ScalarFunction;
 import org.apache.calcite.schema.impl.ReflectiveFunctionBase;
-import org.eclipse.mat.SnapshotException;
 import org.eclipse.mat.snapshot.ISnapshot;
 
 import java.lang.reflect.Constructor;
@@ -36,11 +35,7 @@ public class SnapshotFunctions {
 
   @SuppressWarnings("unused")
   public HeapReference getReference(String address) {
-    try {
-      return HeapReference.valueOf(snapshot.getObject(snapshot.mapAddressToId(Long.decode(address))));
-    } catch (SnapshotException e) {
-      throw new RuntimeException("Cannot get object by address '" + address + "'", e);
-    }
+    return HeapFunctionsBase.resolveReference(snapshot, Long.decode(address));
   }
 
   public static Multimap<String, Function> createAll(ISnapshot snapshot) {
@@ -49,11 +44,11 @@ public class SnapshotFunctions {
     return builder.build();
   }
 
-  private static Function getFunction(ISnapshot snapshot, String name, Class... argumentClasses) {
+  private static Function getFunction(ISnapshot snapshot, String name, Class<?> ... argumentClasses) {
     return new SnapshotFunction(snapshot, getMethod(SnapshotFunctions.class, name, argumentClasses));
   }
 
-  private static Method getMethod(Class<?> cls, String name, Class... argumentClasses) {
+  private static Method getMethod(Class<?> cls, String name, Class<?> ... argumentClasses) {
     try {
       return cls.getMethod(name, argumentClasses);
     } catch (NoSuchMethodException e) {
@@ -61,7 +56,7 @@ public class SnapshotFunctions {
     }
   }
 
-  private static <T> Constructor<T> getConstructor(Class<T> cls, Class... argumentClasses) {
+  private static <T> Constructor<T> getConstructor(Class<T> cls, Class<?> ... argumentClasses) {
     try {
       return cls.getConstructor(argumentClasses);
     } catch (NoSuchMethodException e) {

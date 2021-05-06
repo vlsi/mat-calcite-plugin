@@ -161,31 +161,23 @@ public class CollectionsFunctions extends HeapFunctionsBase {
       return null;
     }
 
-    try {
-      if (iObject instanceof IPrimitiveArray) {
-        IPrimitiveArray arrayObject = (IPrimitiveArray) iObject;
-        int length = arrayObject.getLength();
-        List<Object> result = new ArrayList<>(length);
-        for (int i = 0; i < length; i++) {
-          result.add(arrayObject.getValueAt(i));
-        }
-        return result;
-      } else {
-        IObjectArray arrayObject = (IObjectArray) iObject;
-        ISnapshot snapshot = arrayObject.getSnapshot();
-        int length = arrayObject.getLength();
-        List<HeapReference> result = new ArrayList<>(length);
-        for (long objectAddress : arrayObject.getReferenceArray()) {
-          if (objectAddress != 0) {
-            result.add(HeapReference.valueOf(snapshot.getObject(snapshot.mapAddressToId(objectAddress))));
-          } else {
-            result.add(null);
-          }
-        }
-        return result;
+    if (iObject instanceof IPrimitiveArray) {
+      IPrimitiveArray arrayObject = (IPrimitiveArray) iObject;
+      int length = arrayObject.getLength();
+      List<Object> result = new ArrayList<>(length);
+      for (int i = 0; i < length; i++) {
+        result.add(arrayObject.getValueAt(i));
       }
-    } catch (SnapshotException e) {
-      throw new RuntimeException("Unable to extract references from array " + r, e);
+      return result;
+    } else {
+      IObjectArray arrayObject = (IObjectArray) iObject;
+      ISnapshot snapshot = arrayObject.getSnapshot();
+      int length = arrayObject.getLength();
+      List<HeapReference> result = new ArrayList<>(length);
+      for (long objectAddress : arrayObject.getReferenceArray()) {
+        result.add(resolveReference(snapshot, objectAddress));
+      }
+      return result;
     }
   }
 }
