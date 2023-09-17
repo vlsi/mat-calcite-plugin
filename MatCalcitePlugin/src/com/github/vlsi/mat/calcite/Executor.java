@@ -1,5 +1,6 @@
 package com.github.vlsi.mat.calcite;
 
+import sqlline.MCPSqlLine;
 import com.google.common.base.Joiner;
 import com.google.common.escape.Escaper;
 import com.google.common.escape.Escapers;
@@ -15,12 +16,15 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
+import java.io.IOException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.util.ArrayList;
 import java.util.List;
+
+import static org.jline.terminal.TerminalBuilder.PROP_JANSI;
 
 public class Executor implements IApplication {
 
@@ -29,8 +33,23 @@ public class Executor implements IApplication {
     String[] args = (String[]) context.getArguments().get("application.args");
     char delimiter = ',';
 
-    if (args.length < 3) {
+    if (args.length == 0 || (args.length < 3 && !"sqlline".equalsIgnoreCase(args[0]))) {
       System.out.println("java com.github.vlsi.mat.calcite.Executor <heap-dump> <query> <result>");
+      System.out.println("java com.github.vlsi.mat.calcite.Executor sqlline");
+      return IApplication.EXIT_OK;
+    }
+
+    if ("sqlline".equalsIgnoreCase(args[0])) {
+      try {
+        System.setProperty(PROP_JANSI, Boolean.TRUE.toString());
+        MCPSqlLine sqlLine = new MCPSqlLine();
+        String[] sqllineArgs = new String[args.length - 1];
+        System.arraycopy(args, 1, sqllineArgs, 0, args.length - 1);
+        sqlLine.begin(sqllineArgs, null, false);
+      } catch (IOException e) {
+        e.printStackTrace();
+        return IApplication.EXIT_OK;
+      }
       return IApplication.EXIT_OK;
     }
 
@@ -56,7 +75,6 @@ public class Executor implements IApplication {
       e.printStackTrace();
       return IApplication.EXIT_OK;
     }
-
 
     try (Connection con = CalciteDataSource.getConnection(openSnapshot(heapFile));
          BufferedWriter w = new BufferedWriter(new FileWriter(resultsFile))) {
