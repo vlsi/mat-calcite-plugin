@@ -3,12 +3,9 @@ package com.github.vlsi.mat.calcite.schema.objects;
 import com.github.vlsi.mat.calcite.SnapshotHolder;
 import com.github.vlsi.mat.calcite.rex.ExecutionRexBuilderContext;
 import com.github.vlsi.mat.calcite.rex.RexBuilderContext;
+import com.github.vlsi.mat.calcite.rules.DefaultRuleConfig;
 
-import org.apache.calcite.plan.RelOptRuleCall;
-import org.apache.calcite.plan.RelOptSchema;
-import org.apache.calcite.plan.RelOptTable;
-import org.apache.calcite.plan.RelRule;
-import org.apache.calcite.plan.ViewExpanders;
+import org.apache.calcite.plan.*;
 import org.apache.calcite.rex.RexNode;
 import org.apache.calcite.tools.RelBuilder;
 
@@ -16,23 +13,18 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
 
-public class InstanceAccessByClassIdRule extends RelRule<InstanceAccessByClassIdRule.Config> {
-  public static final InstanceAccessByClassIdRule INSTANCE = Config.DEFAULT.toRule();
+public class InstanceAccessByClassIdRule extends RelRule<RelRule.Config> {
+  public static final InstanceAccessByClassIdRule INSTANCE =
+      new InstanceAccessByClassIdRule(
+          DefaultRuleConfig.EMPTY
+              .withOperandSupplier(
+                  b0 ->
+                      b0.operand(InstanceByClassTableScan.class)
+                          .anyInputs()
+              )
+      );
 
-  public interface Config extends RelRule.Config {
-    InstanceAccessByClassIdRule.Config DEFAULT = EMPTY
-        .withOperandSupplier(b0 ->
-            b0.operand(InstanceByClassTableScan.class)
-                .anyInputs())
-        .as(Config.class);
-
-    @Override
-    default InstanceAccessByClassIdRule toRule() {
-      return new InstanceAccessByClassIdRule(this);
-    }
-  }
-
-  public InstanceAccessByClassIdRule(InstanceAccessByClassIdRule.Config config) {
+  public InstanceAccessByClassIdRule(RelRule.Config config) {
     super(config);
   }
 
