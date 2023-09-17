@@ -1,0 +1,48 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - '**'
+  pull_request:
+    branches:
+      - '**'
+
+concurrency:
+  # On master/release, we don't want any jobs cancelled so the sha is used to name the group
+  # On PR branches, we cancel the job if new commits are pushed
+  # More info: https://stackoverflow.com/a/68422069/253468
+  group: ${{ (github.ref == 'refs/heads/master' || github.ref == 'refs/heads/release' ) && format('ci-main-{0}', github.sha) || format('ci-main-{0}', github.ref) }}
+  cancel-in-progress: true
+
+jobs:
+  build-test:
+    strategy:
+      matrix:
+        java: [ 8 ]
+        os: [ ubuntu-latest, windows-latest ]
+    name: 'Test, ${{ matrix.os }}, java ${{ matrix.java }}'
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: Checkout sources
+        uses: actions/checkout@v3
+      - name: Cache local Maven repository
+        uses: actions/cache@v3
+        with:
+          path: ~/.m2/repository
+          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            ${{ runner.os }}-maven-
+      - name: 'Set up JDK ${{ matrix.java }}'
+        uses: actions/setup-java@v3
+        with:
+          distribution: zulu
+          java-version: ${{ matrix.java }}
+      - name: Build MatCalciteDependencies
+        run: |
+          cd MatCalciteDependencies
+          mvn --color=always -B install
+      - name: Test
+        run: |
+          mvn --color=always -B verify
+
