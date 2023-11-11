@@ -41,8 +41,8 @@ jobs:
       - name: Build MatCalciteDependencies
         run: |
           cd MatCalciteDependencies
-          mvn --color=always -B install
+          ../mvnw --color=always -B install
       - name: Test
         run: |
-          mvn --color=always -B verify
+          ./mvnw --color=always -B verify
 
