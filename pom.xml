@@ -78,6 +78,21 @@
                 <groupId>org.eclipse.tycho</groupId>
                 <artifactId>tycho-packaging-plugin</artifactId>
                 <version>${tycho-version}</version>
+                <executions>
+                    <execution>
+                        <id>validate-pom</id>
+                        <phase>verify</phase>
+                        <goals>
+                            <goal>verify-osgi-pom</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <archive>
+                        <addMavenDescriptor>true</addMavenDescriptor>
+                    </archive>
+                    <mapP2Dependencies>true</mapP2Dependencies>
+                </configuration>
             </plugin>
             <plugin>
                 <groupId>org.eclipse.tycho</groupId>
@@ -102,7 +117,7 @@
                 <artifactId>target-platform-configuration</artifactId>
                 <version>${tycho-version}</version>
                 <configuration>
-                    <!--<pomDependencies>consider</pomDependencies>-->
+                    <pomDependencies>wrapAsBundle</pomDependencies>
                     <executionEnvironment>JavaSE-17</executionEnvironment>
                     <target>
                         <artifact>

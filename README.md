@@ -240,25 +240,13 @@ Eclipse plugin cannot depend on jars from maven repository.
 It has to be a OSGi bundle, however Calcite is easier to reach via maven.
 So we use two-phase approach: bundle the dependencies in a single jar, then use this jar in eclipse project.
 
-1. Build dependencies.jar
+1. Build the plugin
 
     ```
-    cd MatCalciteDependencies
-    mvn install
+    ./mvnw install # from the top-level folder
     ```
 
-    This will create a jar with all the dependencies in `dependencies/target` folder.
-    You do not need to touch/move/copy the jar.
-
-2. Build the plugin
-
-    ```
-    mvn install # from the top-level folder
-    ```
-
-    Note: this will copy `MatCalciteDependencies` to `MatCalcitePlugin/MatCalcitePlugin/target/dependency` so Eclipse can find it.
-
-    The final repository (aka "update site") with the plugin will be created in `eclipse-repository/target/eclipse-repository-1.0.0-SNAPSHOT.zip`
+    The final repository (aka "update site") with the plugin will be created in `MatCalciteRepository/target/MatCalciteRepository-....zip`
 
 
 Running

@@ -60,6 +60,9 @@
                 <version>${tycho-version}</version>
                 <configuration>
                     <finalName>${project.artifactId}-${qualifiedVersion}</finalName>
+                    <includeAllDependencies>true</includeAllDependencies>
+                    <filterProvided>true</filterProvided>
+                    <addPomRepositoryReferences>true</addPomRepositoryReferences>
                 </configuration>
             </plugin>
         </plugins>

@@ -38,10 +38,6 @@ jobs:
         with:
           distribution: zulu
           java-version: ${{ matrix.java }}
-      - name: Build MatCalciteDependencies
-        run: |
-          cd MatCalciteDependencies
-          ../mvnw --color=always -B install
       - name: Test
         run: |
           ./mvnw --color=always -B verify
