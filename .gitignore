@@ -3,6 +3,7 @@ target/
 coverage-report/
 dependency-reduced-pom.xml
 /source/revision.txt
+.m2
 
 #IDE projects
 .idea/
