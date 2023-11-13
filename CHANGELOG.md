@@ -1,5 +1,13 @@
 ## [Unreleased]
 
+### Changed
+- Eclipse Memory Analyzer 1.14.0 or higher is required
+- Java 17 is required
+- Update Apache Calcite to 1.36.0 (see https://calcite.apache.org/news/2023/11/10/release-1.36.0/)
+- Update Guava to 32.1.3-jre
+- Update net.minidev:accessors-smart to 2.5.0
+- Update net.minidev:json-smart to 2.5.0
+
 ## [1.5.0] - 2020-10-12
 ### Added
 - Extra property for all objects: `@class` (references to `java.lang.Class`)

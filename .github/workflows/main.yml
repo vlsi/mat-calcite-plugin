@@ -19,7 +19,7 @@ jobs:
   build-test:
     strategy:
       matrix:
-        java: [ 8 ]
+        java: [ 17 ]
         os: [ ubuntu-latest, windows-latest ]
     name: 'Test, ${{ matrix.os }}, java ${{ matrix.java }}'
     runs-on: ${{ matrix.os }}
