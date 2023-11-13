@@ -9,6 +9,7 @@ import org.apache.calcite.jdbc.CalciteConnection;
 import org.apache.calcite.schema.Schema;
 import org.apache.calcite.schema.SchemaPlus;
 import org.codehaus.commons.compiler.CompilerFactoryFactory;
+import org.codehaus.janino.CompilerFactory;
 import org.eclipse.mat.snapshot.ISnapshot;
 
 import java.sql.Connection;
@@ -82,18 +83,13 @@ public class CalciteDataSource {
       return;
     }
     initCompilerDone = true;
-    Thread currentThread = Thread.currentThread();
-    ClassLoader cl = currentThread.getContextClassLoader();
     try {
-      currentThread.setContextClassLoader(CompilerFactoryFactory.class.getClassLoader());
-      if (CompilerFactoryFactory.getDefaultCompilerFactory() == null) {
+      if (CompilerFactoryFactory.getDefaultCompilerFactory(CompilerFactory.class.getClassLoader()) == null) {
         throw new SQLException("Janino compiler is not initialized: CompilerFactoryFactory.getDefaultCompilerFactory" +
             "() == null");
       }
     } catch (Exception e) {
       throw new SQLException("Unable to load Janino compiler", e);
-    } finally {
-      currentThread.setContextClassLoader(cl);
     }
   }
 
