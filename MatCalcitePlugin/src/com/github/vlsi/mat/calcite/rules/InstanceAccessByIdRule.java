@@ -4,23 +4,18 @@ import org.apache.calcite.plan.RelOptRuleCall;
 import org.apache.calcite.plan.RelRule;
 import org.apache.calcite.rel.core.Correlate;
 
-public class InstanceAccessByIdRule extends RelRule<InstanceAccessByIdRule.Config> {
-  public static final InstanceAccessByIdRule INSTANCE = Config.DEFAULT.toRule();
+public class InstanceAccessByIdRule extends RelRule<RelRule.Config> {
+  public static final InstanceAccessByIdRule INSTANCE =
+      new InstanceAccessByIdRule(
+          DefaultRuleConfig.EMPTY
+              .withOperandSupplier(
+                  b0 ->
+                      b0.operand(Correlate.class)
+                          .anyInputs()
+              )
+      );
 
-  public interface Config extends RelRule.Config {
-    InstanceAccessByIdRule.Config DEFAULT = EMPTY
-        .withOperandSupplier(b0 ->
-            b0.operand(Correlate.class)
-                .anyInputs())
-        .as(InstanceAccessByIdRule.Config.class);
-
-    @Override
-    default InstanceAccessByIdRule toRule() {
-      return new InstanceAccessByIdRule(this);
-    }
-  }
-
-  public InstanceAccessByIdRule(Config config) {
+  public InstanceAccessByIdRule(RelRule.Config config) {
     super(config);
   }
 

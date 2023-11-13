@@ -10,12 +10,11 @@
     <name>MAT Calcite plugin parent</name>
 
     <properties>
-        <tycho-version>1.3.0</tycho-version>
-        <tycho-extras-version>${tycho-version}</tycho-extras-version>
-        <eclipse-repository>http://download.eclipse.org/releases/photon</eclipse-repository>
+        <tycho-version>4.0.3</tycho-version>
+        <eclipse-repository>https://download.eclipse.org/releases/2023-09</eclipse-repository>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <maven.compiler.source>1.8</maven.compiler.source>
-        <maven.compiler.target>1.8</maven.compiler.target>
+        <maven.compiler.source>17</maven.compiler.source>
+        <maven.compiler.target>17</maven.compiler.target>
     </properties>
 
     <modules>
@@ -53,18 +52,10 @@
                             <goal>plugin-source</goal>
                         </goals>
                     </execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <groupId>org.eclipse.tycho.extras</groupId>
-                <artifactId>tycho-source-feature-plugin</artifactId>
-                <version>${tycho-extras-version}</version>
-                <executions>
                     <execution>
-                        <id>source-feature</id>
-                        <phase>package</phase>
+                        <id>feature-source</id>
                         <goals>
-                            <goal>source-feature</goal>
+                            <goal>feature-source</goal>
                         </goals>
                     </execution>
                 </executions>
@@ -112,6 +103,7 @@
                 <version>${tycho-version}</version>
                 <configuration>
                     <!--<pomDependencies>consider</pomDependencies>-->
+                    <executionEnvironment>JavaSE-17</executionEnvironment>
                     <target>
                         <artifact>
                             <groupId>com.github.vlsi.mat.calcite</groupId>
