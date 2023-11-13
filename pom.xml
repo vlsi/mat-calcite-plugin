@@ -11,7 +11,6 @@
 
     <properties>
         <tycho-version>4.0.3</tycho-version>
-        <tycho-extras-version>2.7.5</tycho-extras-version>
         <eclipse-repository>https://download.eclipse.org/releases/2023-09</eclipse-repository>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.source>17</maven.compiler.source>
@@ -53,22 +52,14 @@
                             <goal>plugin-source</goal>
                         </goals>
                     </execution>
+                    <execution>
+                        <id>feature-source</id>
+                        <goals>
+                            <goal>feature-source</goal>
+                        </goals>
+                    </execution>
                 </executions>
             </plugin>
-<!--            <plugin>-->
-<!--                <groupId>org.eclipse.tycho.extras</groupId>-->
-<!--                <artifactId>tycho-source-feature-plugin</artifactId>-->
-<!--                <version>${tycho-extras-version}</version>-->
-<!--                <executions>-->
-<!--                    <execution>-->
-<!--                        <id>source-feature</id>-->
-<!--                        <phase>package</phase>-->
-<!--                        <goals>-->
-<!--                            <goal>source-feature</goal>-->
-<!--                        </goals>-->
-<!--                    </execution>-->
-<!--                </executions>-->
-<!--            </plugin>-->
             <plugin>
                 <groupId>org.eclipse.tycho</groupId>
                 <artifactId>tycho-p2-plugin</artifactId>
@@ -87,6 +78,21 @@
                 <groupId>org.eclipse.tycho</groupId>
                 <artifactId>tycho-packaging-plugin</artifactId>
                 <version>${tycho-version}</version>
+                <executions>
+                    <execution>
+                        <id>validate-pom</id>
+                        <phase>verify</phase>
+                        <goals>
+                            <goal>verify-osgi-pom</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <archive>
+                        <addMavenDescriptor>true</addMavenDescriptor>
+                    </archive>
+                    <mapP2Dependencies>true</mapP2Dependencies>
+                </configuration>
             </plugin>
             <plugin>
                 <groupId>org.eclipse.tycho</groupId>
@@ -111,7 +117,8 @@
                 <artifactId>target-platform-configuration</artifactId>
                 <version>${tycho-version}</version>
                 <configuration>
-                    <!--<pomDependencies>consider</pomDependencies>-->
+                    <pomDependencies>wrapAsBundle</pomDependencies>
+                    <executionEnvironment>JavaSE-17</executionEnvironment>
                     <target>
                         <artifact>
                             <groupId>com.github.vlsi.mat.calcite</groupId>
