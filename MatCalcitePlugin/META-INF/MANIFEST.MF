@@ -7,7 +7,19 @@ Bundle-Vendor: Vladimir Sitnikov
 Bundle-RequiredExecutionEnvironment: JavaSE-17
 Require-Bundle: org.eclipse.mat.api;bundle-version="1.14.0",
  org.eclipse.mat.ui;bundle-version="1.14.0",
- com.fasterxml.jackson.core.jackson-annotations,
+ org.eclipse.ui;bundle-version="3.6.0",
+ org.eclipse.core.runtime;bundle-version="3.7.0",
+ org.eclipse.jface.text;bundle-version="3.7.2",
+ org.eclipse.core.resources;bundle-version="3.7.101"
+Export-Package: com.github.vlsi.mat.calcite
+Import-Package: com.google.common.cache,
+ org.apache.calcite.schema,
+ org.apache.calcite.jdbc
+Old-Require-Bundle: com.fasterxml.jackson.core.jackson-annotations,
+ com.github.vlsi.mat.calcite.org.apache.calcite.calcite-core,
+ com.github.vlsi.mat.calcite.org.apache.calcite.calcite-linq4j,
+ com.github.vlsi.mat.calcite.org.apache.calcite.avatica.avatica-core,
+ com.github.vlsi.mat.calcite.org.apache.calcite.avatica.avatica-metrics,
  com.fasterxml.jackson.core.jackson-core,
  com.fasterxml.jackson.core.jackson-databind,
  com.fasterxml.jackson.dataformat.jackson-dataformat-yaml,
@@ -30,10 +42,6 @@ Require-Bundle: org.eclipse.mat.api;bundle-version="1.14.0",
  com.github.vlsi.mat.calcite.net.hydromatic.aggdesigner-algorithm,
  net.minidev.accessors-smart,
  net.minidev.json-smart,
- com.github.vlsi.mat.calcite.org.apache.calcite.avatica.avatica-core,
- com.github.vlsi.mat.calcite.org.apache.calcite.avatica.avatica-metrics,
- com.github.vlsi.mat.calcite.org.apache.calcite.calcite-core,
- com.github.vlsi.mat.calcite.org.apache.calcite.calcite-linq4j,
  org.apache.commons.commons-dbcp2;resolution:=optional,
  org.apache.commons.lang3,
  org.apache.commons.math3,
@@ -52,9 +60,4 @@ Require-Bundle: org.eclipse.mat.api;bundle-version="1.14.0",
  org.objectweb.asm,
  org.apache.geronimo.specs.geronimo-jta_1.1_spec,
  slf4j.api,
- org.yaml.snakeyaml,
- org.eclipse.ui;bundle-version="3.6.0",
- org.eclipse.core.runtime;bundle-version="3.7.0",
- org.eclipse.jface.text;bundle-version="3.7.2",
- org.eclipse.core.resources;bundle-version="3.7.101"
-Export-Package: com.github.vlsi.mat.calcite
+ org.yaml.snakeyaml
