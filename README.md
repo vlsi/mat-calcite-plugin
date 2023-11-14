@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/vlsi/mat-calcite-plugin.svg?branch=master)](https://travis-ci.org/vlsi/mat-calcite-plugin)
+[![Build Status](https://github.com/vlsi/mat-calcite-plugin/actions/workflows/main.yml/badge.svg?branch=main)](https://github.com/vlsi/mat-calcite-plugin/actions/workflows/main.yml)
 
 MAT Calcite plugin
 ==================
