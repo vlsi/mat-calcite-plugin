@@ -16,15 +16,17 @@ See [Calcite SQL reference](https://calcite.apache.org/docs/reference.html)
 Installation
 ------------
 
-Requirements: Java 1.8+, Eclipse Memory Analyzer 1.8.0+
+Requirements: Java 17+, Eclipse Memory Analyzer 0.14.0+
 
-TL;DR: use the following update repository to install the latest released version: https://dl.bintray.com/vlsi/eclipse/updates/
+There are two update channels:
+ * https://vlsi.github.io/mat-calcite-plugin-update-site/stable (stable releases)
+ * https://vlsi.github.io/mat-calcite-plugin-update-site/ea (early access, per-commit releases)
 
 To install Calcite SQL plugin, perform the following:
 1. Open `Help`, `Install New Software...`
 1. Click `Add`, it will open a `Add Repository` window
-1. Type `Calcite SQL plugin site` to the `Name` field
-1. Type `https://dl.bintray.com/vlsi/eclipse/updates/` to the `Location` field
+1. Type `Calcite SQL plugin stable releases` to the `Name` field
+1. Type `https://vlsi.github.io/mat-calcite-plugin-update-site/stable/` to the `Location` field
 1. Click `Ok`
 1. All the checkboxes can be left by default (`Show only latest version`, `Group items by category`, ...)
 1. Check `SQL for Memory Analyzer` category
@@ -36,7 +38,7 @@ To install Calcite SQL plugin, perform the following:
 Early access versions
 ---------------------
 
-Development builds are pushed to https://dl.bintray.com/vlsi/eclipse-test/updates/ repository,
+Development builds are pushed to https://vlsi.github.io/mat-calcite-plugin-update-site/ea/ repository,
 so you can preview the upcoming version right after the commit lands to the default branch.
 
 Sample

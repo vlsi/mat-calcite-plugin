@@ -1,0 +1,39 @@
+name: Publish update site
+description: Publishes the updated update-site
+inputs:
+  update_site_token:
+    required: true
+    description: GitHub token for publishing
+runs:
+  using: "composite"
+  steps:
+    - name: Checkout update site
+      uses: actions/checkout@v4
+      with:
+        repository: vlsi/mat-calcite-plugin-update-site
+        path: MatCalciteRepository/target/mat-calcite-plugin-update-site
+        token: ${{ inputs.update_site_token }}
+    - name: Publish
+      shell: bash
+      run: |
+        PLUGIN_VERSION=$(./mvnw help:evaluate -q -DforceStdout -D"expression=project.version")
+        cd MatCalciteRepository/target
+        # git clone https://github.com/vlsi/mat-calcite-plugin-update-site.git
+        git config --global user.name "${GITHUB_ACTOR}"
+        git config --global user.email "${GITHUB_ACTOR}@users.noreply.github.com"
+        if [ -z ${i##*-SNAPSHOT} ]; then
+          REPO=ea
+        else
+          REPO=stable
+        fi
+        DIR=mat-calcite-plugin-update-site/$REPO
+        rm -rf $DIR
+        # Copy "repository" recursively as "ea" or "stable" folder
+        cp -R repository $DIR
+        cd mat-calcite-plugin-update-site
+        # Restore the deleted readme, so the browser can display it
+        git checkout $REPO/README.md
+        git add -A
+        git commit -m "Update site for ${PLUGIN_VERSION}, ${{ github.server_url }}/${{ github.repository }}/commit/${{ github.sha }}"
+        git push
+
