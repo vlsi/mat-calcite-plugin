@@ -27,6 +27,8 @@ jobs:
       - name: Update version to stable
         shell: bash
         run: |
+          git config --global user.name "${GITHUB_ACTOR}"
+          git config --global user.email "${GITHUB_ACTOR}@users.noreply.github.com"
           ./mvnw tycho-versions:set-version -DnewVersion=$RELEASE_VERSION
           git add -u
           git commit -m "Prepare for release v$RELEASE_VERSION"
