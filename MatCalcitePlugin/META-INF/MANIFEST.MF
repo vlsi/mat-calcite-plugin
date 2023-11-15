@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: MatCalcitePlugin
 Bundle-SymbolicName: MatCalcitePlugin;singleton:=true
-Bundle-Version: 1.7.0.qualifier
+Bundle-Version: 1.6.1
 Bundle-Vendor: Vladimir Sitnikov
 Bundle-RequiredExecutionEnvironment: JavaSE-17
 Require-Bundle: org.eclipse.mat.api;bundle-version="1.13.0",
