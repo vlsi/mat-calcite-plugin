@@ -1,0 +1,27 @@
+name: Build plugin
+description: Builds the plugin
+inputs:
+  java_version:
+    required: true
+    description: Java version for building the plugin
+runs:
+  using: "composite"
+  steps:
+    - name: 'Set up JDK ${{ inputs.java_version }}'
+      uses: actions/setup-java@v3
+      with:
+        distribution: zulu
+        java-version: ${{ inputs.java_version }}
+    - name: Test
+      shell: bash
+      run: |
+        ./mvnw --color=always -B verify
+    - uses: actions/upload-artifact@v3
+      name: Attach generated update site as zip
+      if: runner.os == 'Linux'
+      with:
+        name: mat-calcite-plugin-update-site
+        # actions/upload-artifact always creates .zip, so we specify directory here to prevent double zip archiving
+        path: MatCalciteRepository/target/repository/*
+        # Default retention is 90 days, and we publish the archives to the update site anyway
+        retention-days: 4

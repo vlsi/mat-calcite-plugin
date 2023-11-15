@@ -1,0 +1,60 @@
+name: Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      release_version:
+        description: 'Release version'
+        required: true
+      next_version:
+        description: 'Next version to set after release (without -SNAPSHOT)'
+        required: true
+
+jobs:
+  release-job:
+    permissions:
+      # For creating releases
+      contents: write
+    env:
+      RELEASE_VERSION: ${{ inputs.release_version }}
+      NEXT_VERSION: ${{ inputs.next_version }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout sources
+        uses: actions/checkout@v4
+      - name: Cache dependencies
+        uses: ./.github/actions/cache
+      - name: Update version to stable
+        shell: bash
+        run: |
+          ./mvnw tycho-versions:set-version -DnewVersion=$RELEASE_VERSION
+          git add -u
+          git commit -m "Prepare for release v$RELEASE_VERSION"
+          git tag v$RELEASE_VERSION
+      - name: Build
+        uses: ./.github/actions/build
+        with:
+          java_version: ${{ matrix.java }}
+      - name: Publish release
+        uses: softprops/action-gh-release@de2c0eb89ae2a093876385947365aca7b0e5f844 # v1
+        with:
+          tag_name: v${{ inputs.next_version }}
+          generate_release_notes: true
+          draft: true
+          files: |
+            MatCalciteRepository/target/MatCalciteRepository*.zip
+      - name: Publish Eclipse update site
+        if: github.repository == 'vlsi/mat-calcite-plugin'
+        uses: ./.github/actions/publish-update-site
+        with:
+          update_site_token:
+            ${{ secrets.UPDATE_SITE_TOKEN }}
+      - name: Prepare for next development iteration
+        shell: bash
+        run: |
+          ./mvnw tycho-versions:set-version -DnewVersion=$NEXT_VERSION-SNAPSHOT
+          git add -u
+          git commit -m "Update version to $NEXT_VERSION-SNAPSHOT"
+          git push origin main v$RELEASE_VERSION
+
+
