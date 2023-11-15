@@ -22,8 +22,8 @@ jobs:
     steps:
       - name: Checkout sources
         uses: actions/checkout@v4
-      - name: Cache dependencies
-        uses: ./.github/actions/cache
+      - name: Setup Java
+        uses: ./.github/actions/setup_java
       - name: Update version to stable
         shell: bash
         run: |
@@ -33,8 +33,6 @@ jobs:
           git tag v$RELEASE_VERSION
       - name: Build
         uses: ./.github/actions/build
-        with:
-          java_version: ${{ matrix.java }}
       - name: Publish release
         uses: softprops/action-gh-release@de2c0eb89ae2a093876385947365aca7b0e5f844 # v1
         with:

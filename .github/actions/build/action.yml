@@ -1,17 +1,8 @@
 name: Build plugin
 description: Builds the plugin
-inputs:
-  java_version:
-    required: true
-    description: Java version for building the plugin
 runs:
   using: "composite"
   steps:
-    - name: 'Set up JDK ${{ inputs.java_version }}'
-      uses: actions/setup-java@v3
-      with:
-        distribution: zulu
-        java-version: ${{ inputs.java_version }}
     - name: Test
       shell: bash
       run: |

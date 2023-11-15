@@ -26,8 +26,10 @@ jobs:
     steps:
       - name: Checkout sources
         uses: actions/checkout@v4
-      - name: Cache dependencies
-        uses: ./.github/actions/cache
+      - name: Setup Java
+        uses: ./.github/actions/setup_java
+        with:
+          java_version: ${{ matrix.java }}
       - name: Build
         uses: ./.github/actions/build
         with:

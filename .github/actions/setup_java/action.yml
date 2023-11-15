@@ -1,0 +1,22 @@
+name: Caches Maven dependencies
+description: Caches Maven dependencies
+inputs:
+  java_version:
+    required: true
+    description: Java version for building the plugin
+    default: '17'
+runs:
+  using: "composite"
+  steps:
+    - name: 'Set up JDK ${{ inputs.java_version }}'
+      uses: actions/setup-java@v3
+      with:
+        distribution: zulu
+        java-version: ${{ inputs.java_version }}
+    - name: Cache local Maven repository
+      uses: actions/cache@v3
+      with:
+        path: ~/.m2/repository
+        key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+        restore-keys: |
+          ${{ runner.os }}-maven-
