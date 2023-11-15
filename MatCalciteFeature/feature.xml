@@ -2,7 +2,7 @@
 <feature
         id="MatCalciteFeature"
         label="Calcite plugin for MAT"
-        version="1.6.1"
+        version="1.7.0.qualifier"
         provider-name="Vladimir Sitnikov">
 
     <description>This plugin for Eclipse Memory Analyzer allows to query heap dump via SQL</description>
