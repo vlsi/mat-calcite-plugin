@@ -231,9 +231,9 @@ from
 
 Requirements
 ------------
-Java 1.8 as a build JDK. The code should still be Java 1.7 compatible.
-Memory Analyzer Tool 1.5 or higher
-
+Java 17 as a build JDK.
+The code can use all Java 17 features.
+Eclipse Memory Analyzer 0.14.0 or higher
 
 Building
 --------
