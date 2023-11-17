@@ -1,5 +1,14 @@
 ## [Unreleased]
 
+## [1.6.2] - 2023-11-17
+### Fixed
+- Fixed java.lang.IllegalArgumentException: Illegal group reference when explain plan has table names with dollars
+
+## [1.6.1] - 2023-11-15
+### Fixed
+- Fixed java.lang.NoClassDefFoundError: org/apache/calcite/runtime/CalciteContextException when SQL fails in MAT UI (regression since 1.6.0)
+
+## [1.6.0] - 2023-11-15
 ### Changed
 - Eclipse Memory Analyzer 1.14.0 or higher is required
 - Java 17 is required

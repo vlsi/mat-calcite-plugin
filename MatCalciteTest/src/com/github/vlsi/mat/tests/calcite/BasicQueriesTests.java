@@ -89,6 +89,11 @@ public class BasicQueriesTests extends SampleHeapDumpTests {
     execute("select toString(l.this) from java.lang.\"Object[]\" l", 1);
   }
 
+  @Test
+  public void explainClassWithDollar() throws SQLException {
+    execute("explain plan for select * from \"java.util.HashMap$Node\"", 1);
+  }
+
   //    @Test
   public void joinOptimization() throws SQLException {
     // Unfortunately, this is not yet optimized to snapshot.getObject(get_id(u.path))

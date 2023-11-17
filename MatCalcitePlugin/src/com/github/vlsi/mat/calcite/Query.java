@@ -67,7 +67,8 @@ public class Query implements IQuery {
           StringBuffer sb = new StringBuffer();
           while (ind.find()) {
             String className = ind.group(1).replace(", ", ".") + ind.group(2);
-            ind.appendReplacement(sb, "GetObjectIdsByClass (class=" + className + ")");
+            ind.appendReplacement(sb, "");
+            sb.append("GetObjectIdsByClass (class=").append(className).append(")");
           }
           ind.appendTail(sb);
           plan = sb.toString();
