@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: MatCalciteTest
 Bundle-SymbolicName: MatCalciteTest
-Bundle-Version: 1.7.0.qualifier
+Bundle-Version: 1.6.2
 Require-Bundle: org.junit,
  org.eclipse.core.runtime,
  org.eclipse.mat.api;bundle-version="1.8.0",
