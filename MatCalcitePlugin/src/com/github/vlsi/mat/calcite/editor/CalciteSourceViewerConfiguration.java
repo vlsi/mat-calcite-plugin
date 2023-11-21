@@ -41,7 +41,7 @@ public class CalciteSourceViewerConfiguration extends SourceViewerConfiguration 
   public IContentAssistant getContentAssistant(ISourceViewer sourceViewer) {
     IContentAssistProcessor proc = new CalciteContentAssistantProcessor();
     ContentAssistant assistant = new ContentAssistant();
-    assistant.enableAutoActivation(true);
+    assistant.enableAutoActivation(false);
     assistant.setAutoActivationDelay(500);
     assistant.setContentAssistProcessor(proc, IDocument.DEFAULT_CONTENT_TYPE);
     assistant.setContentAssistProcessor(proc, CalcitePartitionScanner.SQL_QUOTED_IDENTIFIER);
