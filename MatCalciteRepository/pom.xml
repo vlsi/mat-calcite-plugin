@@ -4,14 +4,14 @@
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>MatCalciteRepository</artifactId>
-    <version>1.6.3</version>
+    <version>1.6.4-SNAPSHOT</version>
     <packaging>eclipse-repository</packaging>
     <name>Calcite SQL update site</name>
 
     <parent>
         <groupId>com.github.vlsi.mat.calcite</groupId>
         <artifactId>parent</artifactId>
-        <version>1.6.3</version>
+        <version>1.6.4-SNAPSHOT</version>
     </parent>
 
     <dependencies>
