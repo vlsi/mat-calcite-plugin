@@ -5,7 +5,7 @@
 
     <groupId>com.github.vlsi.mat.calcite</groupId>
     <artifactId>parent</artifactId>
-    <version>1.6.3-SNAPSHOT</version>
+    <version>1.6.3</version>
     <packaging>pom</packaging>
     <name>MAT Calcite plugin parent</name>
 
