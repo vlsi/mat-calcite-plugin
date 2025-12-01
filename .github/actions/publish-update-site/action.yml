@@ -8,7 +8,7 @@ runs:
   using: "composite"
   steps:
     - name: Checkout update site
-      uses: actions/checkout@v5
+      uses: actions/checkout@v6
       with:
         repository: vlsi/mat-calcite-plugin-update-site
         path: MatCalciteRepository/target/mat-calcite-plugin-update-site
