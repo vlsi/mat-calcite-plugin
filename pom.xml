@@ -10,7 +10,7 @@
     <name>MAT Calcite plugin parent</name>
 
     <properties>
-        <tycho-version>4.0.13</tycho-version>
+        <tycho-version>5.0.1</tycho-version>
         <eclipse-repository>https://download.eclipse.org/releases/2022-12</eclipse-repository>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.source>17</maven.compiler.source>
