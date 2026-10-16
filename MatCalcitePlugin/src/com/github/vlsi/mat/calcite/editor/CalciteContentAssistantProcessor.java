@@ -148,7 +148,8 @@ public class CalciteContentAssistantProcessor implements IContentAssistProcessor
 
   @Override
   public char[] getContextInformationAutoActivationCharacters() {
-    return new char[]{' ', '(', '.'};
+    // No context information is provided (computeContextInformation returns nothing)
+    return null;
   }
 
   @Override

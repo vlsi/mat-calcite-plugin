@@ -1,6 +1,33 @@
 ## [Unreleased]
 ### Added
 - SQL function `getHexAddress(x)`: the object address as `0x...`, the form MAT command lines and labels use.
+- SQL date and time functions: `toDateTime(x[, zone])` shows heap date objects as e.g. `2026-10-01 11:11:11.224`
+  (java.util.Date, java.sql.Date/Time/Timestamp, Calendar, java.time Instant, LocalDate, LocalTime, LocalDateTime,
+  ZonedDateTime, OffsetDateTime, and numbers as epoch milliseconds). Also `toEpochMillis(x[, zone])`,
+  `millisToDateTime(long[, zone])`, `secondsToDateTime(long[, zone])` and `toDuration(x)`. Points in time default to
+  UTC, zoned values use their own zone, java.sql.Date/Time use the dumped JVM's zone; `'jvm'` selects that zone.
+- `instanceof."java.lang.ref.Reference"`: the instanceof schema takes a class's full name as one quoted
+  identifier, like the root schema does, so package parts that are SQL words (`ref`, `user`) need no quoting.
+- SQL editor: right-click menu with Run, Explain, Undo/Redo, Cut/Copy/Paste, Delete, Select All and
+  Toggle Comment.
+- SQL editor: "SQL Reference" toolbar button that opens tables, virtual columns and functions in a separate
+  tab, so the current result stays open. The editor now starts with a short hint and a sample query instead of the 30-line help comment.
+- SQL editor syntax colors are theme colors (Preferences > Appearance > Colors and Fonts > SQL (Calcite)
+  editor), with defaults for the dark theme.
+- SQL editor keys (F5 / Ctrl+Enter, F10, Ctrl+Space, Ctrl+/) are now workbench commands in their own key
+  binding context. MAT binds F5, Ctrl+Enter and Ctrl+Space to its OQL commands, and the workbench consumed
+  those keys before the SQL editor could see them.
+- SQL editor: schema browser beside the editor (toolbar toggle) listing classes by package, classes with
+  subclasses (instanceof), thread stacks and functions, with each class's columns and its this['@shallow'] /
+  this['@retained'] sizes. Double-click inserts the name at the cursor, quoted where SQL needs it; the filter box
+  lists matching tables.
+- "SQL > Open in SQL Editor" on the context menu of objects and classes in MAT's views (histogram, dominator
+  tree, object lists...). It adds a query for the selection to the last used SQL tab (a class row selects all
+  instances, objects are selected by address, one statement per class) and selects it without running it.
+- SQL editor: completion proposals pop up after typing '.' or '"', not only on Ctrl+Space.
+- SQL result rows show MAT's object icons (instance, class, array, class loader, GC root overlay).
+- Navigation history: re-opening a SQL result restores its query in the editor and runs it again, as the OQL
+  pane does.
 
 ### Changed
 - **BREAKING**: Eclipse Memory Analyzer 1.17.0 or higher is now required (previously 1.14.0).
@@ -13,6 +40,8 @@
   (`https://download.eclipse.org/mat/1.17.0/update-site/`) instead of an Eclipse simultaneous release,
   so the MAT API version matches the MAT users run. The URL names the release: `latest` would move to
   the next MAT release by itself.
+- SQL errors are shown without adding an entry to the navigation history, as the OQL pane does.
+- The SQL result area takes 4/5 of the pane height, as in the OQL pane.
 
 ### Fixed
 - `getDominator(x)` failed with "Object -1 not found" for objects dominated by the virtual root (e.g. shared
@@ -40,6 +69,45 @@
 - `testStackTraces` failed: MAT now renders a native frame with its source file,
   `(Object.java(Native Method))` instead of `(Native Method)`. That text comes from MAT unchanged, so the
   test ignores the source file part.
+- SQL editor: an error in a query run from a selection (F5 on selected text, which "Open in SQL Editor" sets up)
+  or from Explain was underlined at the wrong place: the position counted from the start of the editor and
+  ignored the `explain plan for` prefix. A position outside the text threw instead, and the error was not shown.
+- SQL editor: an error underline stayed after the query was fixed or another one ran; each run now clears it.
+- SQL editor: Cancel in the progress view did not stop a running query, and closing the tab left it running. Both
+  now stop the heap scan.
+- SQL editor: a query that finished after its tab was closed failed on the disposed editor. Closing the tab while
+  the editor had focus could leave its key bindings active and the Cut/Copy/Paste handlers pointing at it.
+- "Open in SQL Editor" on a class row of a partial histogram (Show Retained Set, a dominator tree grouped by class)
+  selected every instance of the class, not just the objects of the row.
+- "Open in SQL Editor" added the query to the active editor, which with several dumps open is not necessarily
+  the one the objects belong to; it now finds the editor of their dump.
+- Schema browser filter: it sorted every table name of the dump on each keystroke (four per class, slow on dumps
+  with 100,000 classes). The sorted names are now kept per schema, and the search runs when typing pauses.
+- `toDateTime(x)` returned the stale time of a `java.util.Date` changed with a deprecated setter (`setHours`...)
+  and of a `Calendar` changed with `set(...)` since its time was computed; it now returns null for them.
+- `toDuration(x)` overflowed beyond about 292 years: `Duration.ofSeconds(Long.MAX_VALUE)`, a common "forever",
+  showed as `-0s`.
+- Identifiers are quoted by Calcite's own reserved words, not only SQL-92's: the schema browser
+  wrote `java.lang.ref` unquoted, which does not parse (`REF` is reserved).
+- The SQL reference used `instanceof.java.util.Map` as its example, which is always empty: heap
+  dumps record superclasses but not interfaces. It now uses `java.util.AbstractMap` and says why.
+- Running a query could scroll the SQL editor when it was scrolled to the end: JFace's
+  ToolBarManager.relayout packs the toolbar's parent, which briefly lays the editor out taller, and StyledText
+  scrolls to fill the extra space. The editor now restores its scroll position after such a transient resize.
+- Line numbers of the SQL editor use the editor's colors, so they are readable in the dark theme.
+- Backspace, Delete and the arrow keys stopped working in the query editor after a table result was shown, while
+  letters still typed, until the window was deactivated and activated again. Cause: MAT shows table results with a
+  "Retrieving view elements..." user job whose progress dialog is opened and closed without ever getting focus. SWT
+  on GTK still records it as the active shell and, once it is disposed, has no active shell at all, so it drops every
+  key press that is not committed text. On Wayland the window gets no new focus-in event to repair that. The SQL
+  pane now re-activates the workbench window in that case (only if the window was never deactivated), which also
+  fixes MAT's own OQL pane.
+- The SQL pane leaked its title image and syntax colors. The title image now comes from the shared JFace image
+  registry (the navigation history keeps showing it after the tab is closed), and the colors from the theme
+  registry.
+- Undo and Redo keys (Ctrl+Z, Ctrl+Y) did not work in the SQL editor; the right-click menu's Cut and Copy could be
+  disabled while text was selected.
+- Removed debug output printed to stdout on every result table refresh and explain plan.
 
 ### Notes
 - Only the MAT units this plugin needs are listed in the target (api, report, ui, parser, hprof).
