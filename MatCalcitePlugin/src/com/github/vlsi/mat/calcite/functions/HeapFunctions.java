@@ -233,6 +233,19 @@ public class HeapFunctions extends HeapFunctionsBase {
     return Long.decode(value);
   }
 
+  /**
+   * Address of the referenced object as hex, e.g. 0x7bfeb5848: the form MAT uses for objects in command lines and
+   * labels.
+   */
+  @SuppressWarnings("unused")
+  public static String getHexAddress(Object r) {
+    HeapReference ref = ensureHeapReference(r);
+    if (ref == null) {
+      return null;
+    }
+    return "0x" + Long.toHexString(ref.getIObject().getObjectAddress());
+  }
+
   @SuppressWarnings("unused")
   public static Object getDominator(Object r) {
     HeapReference ref = ensureHeapReference(r);
@@ -242,7 +255,11 @@ public class HeapFunctions extends HeapFunctionsBase {
 
     try {
       ISnapshot snapshot = ref.getIObject().getSnapshot();
-      return HeapReference.valueOf(snapshot.getObject(snapshot.getImmediateDominatorId(ref.getIObject().getObjectId())));
+      int dominator = snapshot.getImmediateDominatorId(ref.getIObject().getObjectId());
+      if (dominator < 0) {
+        return null; // dominated by the virtual root, e.g. an object referenced from several GC roots
+      }
+      return HeapReference.valueOf(snapshot.getObject(dominator));
     } catch (SnapshotException e) {
       throw new RuntimeException("Cannot obtain immediate dominator object for " + r, e);
     }
