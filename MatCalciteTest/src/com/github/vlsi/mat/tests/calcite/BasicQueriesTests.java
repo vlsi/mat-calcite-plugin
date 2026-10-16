@@ -1,10 +1,38 @@
 package com.github.vlsi.mat.tests.calcite;
 
+import com.github.vlsi.mat.calcite.Query;
+import com.github.vlsi.mat.calcite.SqlIdentifiers;
+
+import org.eclipse.mat.util.VoidProgressListener;
+import org.junit.Assert;
 import org.junit.Test;
 
 import java.sql.SQLException;
+import java.util.concurrent.CancellationException;
 
 public class BasicQueriesTests extends SampleHeapDumpTests {
+  /** Cancel in MAT's progress view, or closing the SQL tab, stops a query that is scanning the heap. */
+  @Test
+  public void aCancelledProgressListenerStopsTheQuery() throws Exception {
+    Query query = new Query();
+    query.snapshot = getSnapshot();
+    query.sql = "select count(*) from \"java.lang.String\"";
+    VoidProgressListener listener = new VoidProgressListener();
+    listener.setCanceled(true);
+    try {
+      query.execute(listener);
+      Assert.fail("expected the cancelled query to stop");
+    } catch (Exception e) {
+      Throwable t = e;
+      while (t != null && !(t instanceof CancellationException)) {
+        t = t.getCause();
+      }
+      if (t == null) {
+        throw e;
+      }
+    }
+  }
+
 
   @Test
   public void testRegularClassName() throws SQLException {
@@ -49,6 +77,20 @@ public class BasicQueriesTests extends SampleHeapDumpTests {
   @Test
   public void testInstanceOfQuotedClassName() throws SQLException {
     execute("select * from \"instanceof.java.util.HashMap$Node\"", 1);
+  }
+
+  @Test
+  public void testInstanceOfFullClassName() throws SQLException {
+    execute("select * from instanceof.\"java.util.HashMap$Node\"", 1);
+  }
+
+  @Test
+  public void testInstanceOfReservedWordPackage() throws SQLException {
+    // REF is reserved in Calcite's parser, so the package part needs quotes; the full name form does not
+    execute("select count(*) from instanceof.java.lang.\"ref\".Reference", 1);
+    execute("select count(*) from instanceof.\"java.lang.ref.Reference\"", 1);
+    Assert.assertEquals("java.lang.\"ref\".Reference", SqlIdentifiers.quotePath("java.lang.ref.Reference"));
+    Assert.assertEquals("java.util.\"HashMap$Node\"", SqlIdentifiers.quotePath("java.util.HashMap$Node"));
   }
 
   @Test

@@ -27,28 +27,26 @@ public class ExecuteQueryAction extends Action {
         "/explain.png" : "resources/icons/run.png"));
   }
 
-  private String getSelectedQuery() {
+  @Override
+  public void run() {
     StyledText queryString = pane.getQueryString();
     String query = queryString.getSelectionText();
-
+    // Where the SQL that runs starts in the editor, so an error position can be shown at the right place
+    int offset = queryString.getSelection().x;
     if ("".equals(query)) //$NON-NLS-1$
     {
       query = queryString.getText();
+      offset = 0;
     }
-
     // Temporary workaround for https://issues.apache.org/jira/browse/CALCITE-459
     query = query + queryString.getLineDelimiter();
 
-    return query;
-  }
-
-  @Override
-  public void run() {
-    String query = getSelectedQuery();
     //TODO: actually check with this regexp doesn't work if there are comments in the beginning of the query
+    String prefix = "";
     if (doExplain && !STARTS_WITH_EXPLAIN_PLAN.matcher(query).find()) {
-      query = "explain plan for " + query;
+      prefix = "explain plan for ";
     }
-    new CalciteJob(query, pane, state).schedule();
+    pane.clearErrorHighlight();
+    new CalciteJob(prefix + query, pane, state, offset, prefix.length()).schedule();
   }
 }
