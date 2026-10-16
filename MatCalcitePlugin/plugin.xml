@@ -165,6 +165,15 @@
             sequence="M1+/">
       </key>
    </extension>
+   <!-- MCP server on stdio: MemoryAnalyzer -nosplash -application MatCalcitePlugin.mcp -->
+   <extension id="mcp" point="org.eclipse.core.runtime.applications">
+      <application
+              cardinality="singleton-global"
+              thread="any"
+              visible="true">
+         <run class="com.github.vlsi.mat.calcite.mcp.McpServerApplication" />
+      </application>
+   </extension>
    <extension id="execute" point="org.eclipse.core.runtime.applications">
       <application
               cardinality="singleton-global"
