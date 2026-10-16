@@ -76,9 +76,9 @@ public class InstanceIdsByClassTable extends AbstractQueryableTable {
   }
 
   /**
-   * Stops the scan when its query is cancelled ({@link QueryCancellation}), e.g. from MAT's progress view. Calcite
-   * checks its own cancel flag only between result rows, so without this an aggregation over a large class could not
-   * be stopped until it had read every object.
+   * Stops the scan when its query is cancelled ({@link QueryCancellation}), e.g. by the MCP server. Calcite checks
+   * its own cancel flag only between result rows, so without this an aggregation over a large class could not be
+   * stopped until it had read every object.
    */
   static final class CancellableEnumerator<T> implements Enumerator<T> {
     private final Enumerator<T> delegate;

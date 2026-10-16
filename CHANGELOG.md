@@ -28,6 +28,20 @@
 - SQL result rows show MAT's object icons (instance, class, array, class loader, GC root overlay).
 - Navigation history: re-opening a SQL result restores its query in the editor and runs it again, as the OQL
   pane does.
+- MCP server for AI assistants: `MemoryAnalyzer -nosplash -application MatCalcitePlugin.mcp` serves the Model
+  Context Protocol on stdio. Tools: open/list/close heap dumps, list and describe tables, run SQL (markdown
+  results, row limit), explain and the SQL reference. Dumps stay open between calls, and SQL errors carry their
+  position. No new dependencies: JSON-RPC uses json-smart, which was already bundled.
+- MCP server: the per-object actions of MAT's context menu as tools (`object_info`, `list_references`,
+  `retained_set`, `path_to_gc_roots`, `immediate_dominators`), plus `mat_query` for any MAT command. Results use
+  MAT's labels, including field names and GC root marks.
+- MCP server analyses: `heap_overview`, `histogram` (filter by class name, sort by objects, shallow or retained
+  heap; exact retained sizes for up to 20 classes), `leak_suspects` (class loader, accumulation point and the path from a GC
+  root to it; a group's biggest instances; a thread's stack frames with the locals that hold memory),
+  `compare_dumps` (growth between two dumps), `collection_contents` (paged map/list contents), `duplicate_strings`,
+  `wasteful_collections` (empty, under-filled and colliding collections) and `export_query` (CSV, no row limit).
+- MCP server: running calls can be cancelled (`notifications/cancelled` or the `cancel_query` tool) and stop after
+  `timeout_seconds`. The heap object scan checks for cancellation, so aggregations over large classes stop too.
 
 ### Changed
 - **BREAKING**: Eclipse Memory Analyzer 1.17.0 or higher is now required (previously 1.14.0).
@@ -87,10 +101,10 @@
   and of a `Calendar` changed with `set(...)` since its time was computed; it now returns null for them.
 - `toDuration(x)` overflowed beyond about 292 years: `Duration.ofSeconds(Long.MAX_VALUE)`, a common "forever",
   showed as `-0s`.
-- Identifiers are quoted by Calcite's own reserved words, not only SQL-92's: the schema browser
+- Identifiers are quoted by Calcite's own reserved words, not only SQL-92's: the schema browser and the MCP tools
   wrote `java.lang.ref` unquoted, which does not parse (`REF` is reserved).
-- The SQL reference used `instanceof.java.util.Map` as its example, which is always empty: heap
-  dumps record superclasses but not interfaces. It now uses `java.util.AbstractMap` and says why.
+- The SQL reference and MCP hints used `instanceof.java.util.Map` as their example, which is always empty: heap
+  dumps record superclasses but not interfaces. They now use `java.util.AbstractMap` and say why.
 - Running a query could scroll the SQL editor when it was scrolled to the end: JFace's
   ToolBarManager.relayout packs the toolbar's parent, which briefly lays the editor out taller, and StyledText
   scrolls to fill the extra space. The editor now restores its scroll position after such a transient resize.
@@ -108,6 +122,45 @@
 - Undo and Redo keys (Ctrl+Z, Ctrl+Y) did not work in the SQL editor; the right-click menu's Cut and Copy could be
   disabled while text was selected.
 - Removed debug output printed to stdout on every result table refresh and explain plan.
+- MCP server: a `histogram` filter that takes exponential time on a class name (e.g. `^(.+)+\1!`) could not be
+  stopped by the timeout or `cancel_query`; the match now checks for cancellation. `export_query` makes column
+  headers that a spreadsheet would run as formulas inert, as it already did for values.
+- MCP server: `mat_query` could write files through MAT commands such as `export_hprof -output <path>`, and
+  `export_query` wrote to any absolute path. Both matter because the assistant reads heap contents, which can hold
+  text written to steer it. `mat_query` now refuses commands that read or write files or run reports, and
+  `export_query` writes only `.csv` files inside the export directory (the dump's directory, or
+  `MAT_MCP_EXPORT_DIR`), through a temporary file so a failed export leaves an existing file intact. Text that a
+  spreadsheet would run as a formula is prefixed with `'`.
+- MCP server: cancelling no longer interrupts the worker thread. MAT reads index files through a `FileChannel`,
+  which an interrupt closes for good, breaking the dump until reopened; and an interrupt that arrived as one call
+  finished could fail the next one. Scans now check a flag that belongs to the call (`QueryCancellation`).
+- MCP `duplicate_strings` kept the text of every distinct string in memory, which ran a large dump's server out of
+  memory. It now counts values by a 64-bit hash and reads the text only for the values it shows.
+- MCP `wasteful_collections` counted 8 bytes per unused slot, the dump's identifier size; with compressed pointers
+  (MAT's `$useCompressedOops`, the default up to 32 GB heaps) a slot is 4 bytes, so waste was overstated about 2x.
+  It also kept every wasteful collection to list the 10 worst; it now keeps only those 10.
+- Closing a dump did not free its SQL schema: the schema cache has weak keys, but each schema refers to its
+  snapshot, so entries were never dropped. `close_heap_dump` and server shutdown now drop them.
+- MCP server: a `notifications/cancelled` for a call still waiting behind another was ignored, so after the user
+  interrupted, every queued call still ran in turn. Such calls are now skipped.
+- MCP `mat_query` also refuses commands that open another dump from a path (`delta_histogram -baseline <path>`):
+  opening writes index files beside any path and deletes MAT's older ones there. `compare_dumps` compares open
+  dumps.
+- SQL parse errors from the MCP server say to quote a table name whose parts are SQL words: `java.util.Date`
+  does not parse (`DATE` is reserved), `"java.util.Date"` does.
+- MCP `heap_overview` and `compare_dumps` sorted by the column labelled "Shallow Heap", which MAT's language packs
+  translate; without it they now sort by the first byte-size column instead of not at all. `leak_suspects` keeps
+  only the 5 biggest members of a group while scanning, instead of sorting all of them.
+- MCP `open_heap_dump` could not be stopped: `cancel_query` answered "Cancelled" while the open went on. It now
+  stops at MAT's next progress check, takes an optional `timeout_seconds` (no default limit, since building a
+  large dump's indexes takes long), and deletes the partial index files the stopped open created (only MAT's
+  index file names; note that MAT itself, when it indexes `app.hprof`, deletes `app.2.index`, the index of a
+  sibling dump `app.2.hprof`).
+  `describe_table` can be cancelled and takes `timeout_seconds` too.
+- MCP server: a request could be left unanswered for good, and the client hung, if an error escaped a tool call
+  (e.g. a class failing to load). Every request now gets an answer, with a JSON-RPC internal error if need be.
+- MCP `immediate_dominators` reports the true immediate dominators. MAT's query skips `java.*` dominators by
+  default, which made JDK-held objects all show `<ROOT>`; the new `skip` argument restores that view on request.
 
 ### Notes
 - Only the MAT units this plugin needs are listed in the target (api, report, ui, parser, hprof).

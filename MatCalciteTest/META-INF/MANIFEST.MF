@@ -10,4 +10,6 @@ Require-Bundle: org.junit,
  org.eclipse.mat.ui;bundle-version="1.17.0",
  org.eclipse.mat.hprof;bundle-version="1.17.0"
 Import-Package: com.github.vlsi.mat.calcite,
+ com.github.vlsi.mat.calcite.mcp,
+ net.minidev.json,
  com.google.common.base

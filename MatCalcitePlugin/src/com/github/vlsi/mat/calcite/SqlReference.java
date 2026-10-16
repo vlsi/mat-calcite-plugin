@@ -1,7 +1,7 @@
 package com.github.vlsi.mat.calcite;
 
 /**
- * Quick reference of the SQL dialect: shown by the SQL editor's "SQL Reference" tab.
+ * Quick reference of the SQL dialect: shown by the SQL editor's "SQL Reference" tab and returned by the MCP server.
  */
 public final class SqlReference {
   public static final String TEXT = "SQL (Calcite) quick reference\n"

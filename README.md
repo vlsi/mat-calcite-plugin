@@ -264,6 +264,71 @@ You can process a single SQL via command line as follows
 
     ./MemoryAnalyzer -application MatCalcitePlugin.execute <heap-dump.file> <query.file> <result.file>
 
+MCP server (AI assistants)
+--------------------------
+
+The plugin includes a [Model Context Protocol](https://modelcontextprotocol.io) server, so an AI assistant can
+query heap dumps with SQL. It runs headless on the stdio transport, using the MAT install the plugin is installed
+in:
+
+    ./MemoryAnalyzer -nosplash -application MatCalcitePlugin.mcp
+
+Register it with Claude Code, for example:
+
+    claude mcp add mat-sql -- /path/to/mat/MemoryAnalyzer -nosplash -application MatCalcitePlugin.mcp
+
+Tools (none changes a heap dump; `export_query` writes CSV files, and opening a dump writes MAT's index files beside
+it, see Security below):
+
+| Tool | Purpose |
+|---|---|
+| `open_heap_dump` | open a `.hprof` file and keep it open between calls |
+| `list_heap_dumps`, `close_heap_dump` | manage the open dumps |
+| `list_tables`, `describe_table` | find class tables and their columns |
+| `sql_query` | run a query, results as a markdown table (`max_rows`, default 100) |
+| `explain_sql` | show the execution plan |
+| `sql_reference` | the SQL dialect: tables, virtual columns, heap functions |
+| `object_info` | one object: class, sizes, GC root, immediate dominator, field values |
+| `list_references` | who references objects (`incoming`, their "parents") or what they reference (`outgoing`) |
+| `retained_set` | what objects keep alive, as a histogram |
+| `path_to_gc_roots` | why an object is alive: shortest paths from GC roots |
+| `immediate_dominators` | the objects that keep the given ones alive |
+| `mat_query` | any MAT command line, e.g. `find_leaks`, `top_consumers`, `dominator_tree`; commands that read or write files, open other dumps or run reports are refused |
+| `cancel_query` | stop the running call |
+| `heap_overview` | start here: heap and JVM details, biggest objects, classes using most memory |
+| `histogram` | objects, shallow and retained heap per class, filtered by a class-name regex and sorted by objects, shallow or retained heap |
+| `leak_suspects` | MAT's leak suspects as data: class loader, accumulation point and the path from a GC root to it; a group's biggest instances; a thread's stack frames with the locals that hold memory |
+| `compare_dumps` | totals and the classes that grew most between a baseline and a current dump |
+| `collection_contents` | entries of a map, or elements of a list/set/queue, with size, capacity, fill and collision ratio |
+| `duplicate_strings` | strings stored many times, the memory the copies waste, an example address each |
+| `wasteful_collections` | empty, under-filled and colliding collections, per class and the worst single ones |
+| `export_query` | run a query and write every row to a CSV file in the export directory |
+
+Results show objects as `class @ 0xaddress`, and the object tools take those addresses. For example, find the
+biggest maps with `sql_query`, then ask `path_to_gc_roots` why one is alive.
+
+Long calls stop after `timeout_seconds` (default 300; `open_heap_dump` has no default limit). They can also be cancelled while running, either with
+`cancel_query` or with the MCP `notifications/cancelled` that clients send when the user interrupts. Cancelling
+also reaches inside a running aggregation.
+
+Security: the assistant reads heap contents, and a heap can hold text that someone outside wrote (request bodies,
+messages, log lines), possibly to steer an assistant. So the server writes files in one place only:
+
+- `export_query` writes `.csv` files inside the export directory, which is the dump's directory unless the
+  environment variable `MAT_MCP_EXPORT_DIR` names another one. Text cells that a spreadsheet would run as a
+  formula get a leading `'`.
+- `mat_query` refuses MAT commands that read or write files, open other dumps or run reports (`export_hprof`,
+  `delta_histogram -baseline`, `create_report`, `default_report`); `compare_dumps` compares dumps that are open.
+
+Opening a dump still creates MAT's index files next to it.
+
+Notes:
+
+- The first open of a dump builds MAT's index files next to it, which can take minutes for a large dump. Later
+  opens reuse them.
+- Memory comes from the `-Xmx` setting in `MemoryAnalyzer.ini`, the same as for the MAT UI.
+- SQL errors are returned to the assistant with the line and column, so it can correct its query.
+
 Roadmap
 -------
 

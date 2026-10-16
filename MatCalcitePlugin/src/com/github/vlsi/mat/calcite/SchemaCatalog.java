@@ -11,7 +11,8 @@ import java.util.TreeSet;
 import java.util.WeakHashMap;
 
 /**
- * Finds the tables and functions of the heap schema ({@link CalciteDataSource#getHeapSchema}), for the schema browser.
+ * Finds the tables and functions of the heap schema ({@link CalciteDataSource#getHeapSchema}), for the schema browser
+ * and the MCP server.
  */
 public final class SchemaCatalog {
   /** Sub-schema of classes with their subclasses. */
