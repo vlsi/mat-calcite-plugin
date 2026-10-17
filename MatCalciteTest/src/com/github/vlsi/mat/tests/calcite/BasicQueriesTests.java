@@ -60,7 +60,11 @@ public class BasicQueriesTests extends SampleHeapDumpTests {
 
   @Test
   public void testStackTraces() throws SQLException {
-    returnsInOrder("select thread, depth, text from native.ThreadStackFrames order by 1, 2, 3 limit 2",
+    // Uses the stack-frame-tolerant variant: MAT's exact rendering of a native method's source location
+    // changed between MAT versions ("(Native Method)" vs "(Object.java(Native Method))"), and that text is
+    // produced by MAT, never by this plugin. See returnsInOrderIgnoringStackFrameSourceFile.
+    returnsInOrderIgnoringStackFrameSourceFile(
+        "select thread, depth, text from native.ThreadStackFrames order by 1, 2, 3 limit 2",
         "thread|depth|text",
         "Finalizer|0|at java.lang.Object.wait(J)V (Native Method)",
         "Finalizer|1|at java.lang.ref.ReferenceQueue.remove(J)Ljava/lang/ref/Reference; (ReferenceQueue.java:142)");
@@ -164,6 +168,19 @@ public class BasicQueriesTests extends SampleHeapDumpTests {
   }
 
   @Test
+  public void orderByThisSortsByAddress() throws SQLException {
+    // ORDER BY this used to keep the scan order whichever direction was asked
+    returnsInOrder("select getHexAddress(this) a from java.lang.String where toString(this) like 'java.util.Hash%'"
+            + " order by this",
+        "a",
+        "0x7bfe83a00", "0x7bfe92df0", "0x7bfeaaf10");
+    returnsInOrder("select getHexAddress(this) a from java.lang.String where toString(this) like 'java.util.Hash%'"
+            + " order by this desc",
+        "a",
+        "0x7bfeaaf10", "0x7bfe92df0", "0x7bfe83a00");
+  }
+
+  @Test
   public void groupByClassLoader() throws SQLException {
     returnsInOrder("select \"@classLoader\", count(*) classes" +
             " from java.lang.Class group by \"@classLoader\" order by 2 desc",
@@ -186,13 +203,46 @@ public class BasicQueriesTests extends SampleHeapDumpTests {
   }
 
   @Test
+  public void mergeJoinOnHeapObjectsKeepsEveryMatch() throws SQLException {
+    // Calcite sorts both inputs of a merge join through HeapReference.entrySet() and merges them with
+    // HeapReference.compareTo: when the two orders differed, matches were skipped. The right side must be a strict
+    // subset of the left for that to show (identical sides merge in lockstep): every third string by address,
+    // 1064 of the 3256 strings, each of which must find itself
+    returnsInOrder("select count(*) n, count(b.this) matched from java.lang.String a"
+            + " left join (select this from java.lang.String where mod(getAddress(this) / 8, 3) = 0) b"
+            + " on (a.this = b.this)",
+        "n|matched",
+        "3256|1064");
+  }
+
+  @Test
   public void joinClassClassLoader() throws SQLException {
+    // Every class has its loader among the ClassLoader rows: the bootstrap loader is MAT's pseudo-object
+    // java.lang.ClassLoader @ 0x0, which instanceof.java.lang.ClassLoader includes. So all 985 rows match.
+    // This read 469 while every two heap objects compared equal (HeapReference.entrySet() was empty), which
+    // made a sort-based join drop matches.
     returnsInOrder("select count(c.name) c, count(cl.this) cl\n" +
             "  from java.lang.Class c\n" +
             "  left join instanceof.java.lang.ClassLoader cl\n" +
             "  on (c.\"@classLoader\" = cl.this)",
         "c|cl",
         "985|985");
+    // The same join phrased differently must agree
+    returnsInOrder("select count(*) n\n" +
+            "  from java.lang.Class c\n" +
+            "  left join instanceof.java.lang.ClassLoader cl\n" +
+            "  on (c.\"@classLoader\" = cl.this)\n" +
+            " where cl.this is not null",
+        "n",
+        "985");
+    // Classes per loader, as counted one loader at a time by address: 748 + 217 + 16 + 4 = 985
+    returnsInOrder("select getHexAddress(cl.this) loader, count(*) classes\n" +
+            "  from java.lang.Class c\n" +
+            "  join instanceof.java.lang.ClassLoader cl\n" +
+            "  on (c.\"@classLoader\" = cl.this)\n" +
+            " group by cl.this order by 2 desc",
+        "loader|classes",
+        "0x0|748", "0x7bfe97510|217", "0x7bfe391f0|16", "0x7bfe394f0|4");
   }
 
   @Test

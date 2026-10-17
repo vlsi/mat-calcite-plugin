@@ -16,7 +16,7 @@ See [Calcite SQL reference](https://calcite.apache.org/docs/reference.html)
 Installation
 ------------
 
-Requirements: Java 17+, Eclipse Memory Analyzer 0.14.0+
+Requirements: Java 21+, Eclipse Memory Analyzer 1.17.0+ (for older MAT versions, use plugin version 1.6.x)
 
 There are two update channels:
  * https://vlsi.github.io/mat-calcite-plugin-update-site/stable (stable releases)
@@ -231,9 +231,9 @@ from
 
 Requirements
 ------------
-Java 17 as a build JDK.
-The code can use all Java 17 features.
-Eclipse Memory Analyzer 0.14.0 or higher
+Java 21 as a build JDK.
+The code can use all Java 21 features.
+Eclipse Memory Analyzer 1.17.0 or higher
 
 Building
 --------
