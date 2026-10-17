@@ -7,7 +7,7 @@ runs:
       shell: bash
       run: |
         ./mvnw --color=always -B verify
-    - uses: actions/upload-artifact@v6
+    - uses: actions/upload-artifact@v7
       name: Attach generated update site as zip
       if: runner.os == 'Linux'
       with:
