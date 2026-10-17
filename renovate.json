@@ -3,7 +3,9 @@
   "extends": [
     "config:base"
   ],
-  "schedule": ["every 3 weeks on Monday"],
+  "schedule": ["at any time"],
+  "prConcurrentLimit": 10,
+  "prHourlyLimit": 5,
   "platformAutomerge": true,
   "packageRules": [
     {
