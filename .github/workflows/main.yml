@@ -40,3 +40,13 @@ jobs:
         with:
           update_site_token:
             ${{ secrets.UPDATE_SITE_TOKEN }}
+
+  ci-gate:
+    name: CI Gate
+    needs: [build-test]
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - name: Fail if any dependency failed
+        if: contains(needs.*.result, 'failure') || contains(needs.*.result, 'cancelled')
+        run: exit 1

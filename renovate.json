@@ -4,10 +4,15 @@
     "config:base"
   ],
   "schedule": ["every 3 weeks on Monday"],
+  "platformAutomerge": true,
   "packageRules": [
     {
       "matchPackagePrefixes": ["org.codehaus.janino"],
       "groupName": "org.codehaus.janino"
+    },
+    {
+      "matchUpdateTypes": ["minor", "patch", "pin", "digest"],
+      "automerge": true
     }
   ]
 }
