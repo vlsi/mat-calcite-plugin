@@ -2,17 +2,18 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: MatCalcitePlugin
 Bundle-SymbolicName: MatCalcitePlugin;singleton:=true
-Bundle-Version: 1.6.4.qualifier
+Bundle-Version: 2.0.0.qualifier
 Bundle-Vendor: Vladimir Sitnikov
-Bundle-RequiredExecutionEnvironment: JavaSE-17
-Require-Bundle: org.eclipse.mat.api;bundle-version="1.13.0",
- org.eclipse.mat.ui;bundle-version="1.13.0",
+Bundle-RequiredExecutionEnvironment: JavaSE-21
+Require-Bundle: org.eclipse.mat.api;bundle-version="1.17.0",
+ org.eclipse.mat.ui;bundle-version="1.17.0",
  org.eclipse.ui;bundle-version="3.6.0",
  org.eclipse.core.runtime;bundle-version="3.7.0",
  org.eclipse.jface.text;bundle-version="3.7.2",
  org.eclipse.core.resources;bundle-version="3.7.101"
 Export-Package: com.github.vlsi.mat.calcite,
-  com.github.vlsi.mat.calcite.functions
+  com.github.vlsi.mat.calcite.functions,
+  com.github.vlsi.mat.calcite.mcp;x-friends:="MatCalciteTest"
 Import-Package: com.fasterxml.jackson.core.util,
  com.google.common.base,
  com.google.common.cache,
@@ -49,4 +50,13 @@ Import-Package: com.fasterxml.jackson.core.util,
  org.apache.commons.text.similarity,
  org.codehaus.commons.compiler,
  org.codehaus.janino,
- org.locationtech.jts.geom
+ org.locationtech.jts.geom,
+ org.apache.hc.core5.util,
+ org.apache.hc.core5.http,
+ org.apache.hc.core5.http.io,
+ org.apache.hc.core5.net,
+ org.apache.hc.client5.http,
+ org.apache.hc.client5.http.classic,
+ org.joou,
+ net.minidev.json,
+ net.minidev.json.parser

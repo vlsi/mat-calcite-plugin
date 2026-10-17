@@ -3,16 +3,20 @@ package com.github.vlsi.mat.calcite;
 import org.eclipse.mat.query.Column;
 import org.eclipse.mat.query.ContextProvider;
 import org.eclipse.mat.query.IContextObject;
+import org.eclipse.mat.query.IIconProvider;
 import org.eclipse.mat.query.IResultTable;
 import org.eclipse.mat.query.ResultMetaData;
+import org.eclipse.mat.snapshot.model.IObject;
+import org.eclipse.mat.snapshot.query.Icons;
 
+import java.net.URL;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Types;
 
 import javax.sql.rowset.CachedRowSet;
 
-public class RowSetTable implements IResultTable {
+public class RowSetTable implements IResultTable, IIconProvider {
 
   private final ResultMetaData metaData;
   private final CachedRowSet rowSet;
@@ -91,6 +95,23 @@ public class RowSetTable implements IResultTable {
     return getContext(row, idColumnPosition);
   }
 
+  /**
+   * Icon of the object in the context column (instance, class, array, class loader, with a GC root overlay),
+   * the same icons MAT shows in its own object lists.
+   */
+  @Override
+  public URL getIcon(Object row) {
+    if (idColumnPosition == -1 || !(row instanceof Object[])) {
+      return null;
+    }
+    Object[] data = (Object[]) row;
+    if (idColumnPosition >= data.length || !(data[idColumnPosition] instanceof HeapReference)) {
+      return null;
+    }
+    IObject o = ((HeapReference) data[idColumnPosition]).getIObject();
+    return Icons.forObject(o.getSnapshot(), o.getObjectId());
+  }
+
   private static IContextObject getContext(final Object row, final int columnPosition) {
     if (!(row instanceof Object[])) {
       return null;
@@ -127,7 +148,6 @@ public class RowSetTable implements IResultTable {
 
   @Override
   public int getRowCount() {
-    System.out.println("size: " + rowSet.size());
     return rowSet.size();
   }
 }
