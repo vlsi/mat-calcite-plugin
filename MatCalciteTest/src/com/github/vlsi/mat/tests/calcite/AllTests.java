@@ -8,7 +8,11 @@ import org.junit.runners.Suite;
     BasicQueriesTests.class,
     GetByKeyTests.class,
     TableFunctionsTests.class,
-    CollectionsFunctionsTests.class
+    CollectionsFunctionsTests.class,
+    RowSetTableTests.class,
+    SqlForObjectsTests.class,
+    DateFunctionsTests.class,
+    QueryCancellationTests.class
 })
 public class AllTests {
 }

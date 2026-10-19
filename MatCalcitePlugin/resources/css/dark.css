@@ -1,0 +1,8 @@
+/* SQL (Calcite) editor syntax colors for the dark theme. Ids are defined in plugin.xml (org.eclipse.ui.themes). */
+IEclipsePreferences#org-eclipse-ui-workbench:MatCalcitePlugin {
+  preferences:
+    'com.github.vlsi.mat.calcite.sql_keyword=204,120,50'
+    'com.github.vlsi.mat.calcite.sql_function=104,151,187'
+    'com.github.vlsi.mat.calcite.sql_comment=128,128,128'
+    'com.github.vlsi.mat.calcite.sql_string=106,135,89'
+}
