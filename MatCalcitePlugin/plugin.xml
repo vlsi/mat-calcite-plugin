@@ -6,6 +6,9 @@
       <query
             impl="com.github.vlsi.mat.calcite.Query">
       </query>
+      <query
+            impl="com.github.vlsi.mat.calcite.editor.OpenInSqlEditorQuery">
+      </query>
    </extension>
    <extension
          point="org.eclipse.mat.ui.editorContributions">
@@ -21,6 +24,146 @@
             class="com.github.vlsi.mat.calcite.editor.CalcitePane"
             id="CALCITE">
       </pane>
+      <pane
+            class="com.github.vlsi.mat.calcite.editor.SqlReferencePane"
+            id="CALCITE_REFERENCE">
+      </pane>
+   </extension>
+   <extension
+         point="org.eclipse.ui.themes">
+      <themeElementCategory
+            id="com.github.vlsi.mat.calcite.themeElementCategory"
+            label="SQL (Calcite) editor">
+         <description>
+            Syntax colors of the SQL (Calcite) query editor
+         </description>
+      </themeElementCategory>
+      <colorDefinition
+            categoryId="com.github.vlsi.mat.calcite.themeElementCategory"
+            id="com.github.vlsi.mat.calcite.sql_keyword"
+            isEditable="true"
+            label="SQL keyword"
+            value="127,0,85">
+      </colorDefinition>
+      <colorDefinition
+            categoryId="com.github.vlsi.mat.calcite.themeElementCategory"
+            id="com.github.vlsi.mat.calcite.sql_function"
+            isEditable="true"
+            label="SQL function"
+            value="26,0,192">
+      </colorDefinition>
+      <colorDefinition
+            categoryId="com.github.vlsi.mat.calcite.themeElementCategory"
+            id="com.github.vlsi.mat.calcite.sql_comment"
+            isEditable="true"
+            label="SQL comment"
+            value="63,127,95">
+      </colorDefinition>
+      <colorDefinition
+            categoryId="com.github.vlsi.mat.calcite.themeElementCategory"
+            id="com.github.vlsi.mat.calcite.sql_string"
+            isEditable="true"
+            label="SQL string and quoted identifier"
+            value="42,0,255">
+      </colorDefinition>
+   </extension>
+   <extension
+         point="org.eclipse.e4.ui.css.swt.theme">
+      <stylesheet
+            uri="resources/css/dark.css">
+         <themeid
+               refid="org.eclipse.e4.ui.css.theme.e4_dark">
+         </themeid>
+      </stylesheet>
+   </extension>
+   <!-- SQL editor keys. The bindings use a child of MAT's editor context, so they take precedence over MAT's OQL
+        bindings for the same keys (F5, Ctrl+Enter, Ctrl+Space) while the SQL editor has focus. -->
+   <extension
+         point="org.eclipse.ui.contexts">
+      <context
+            id="com.github.vlsi.mat.calcite.sqlEditor"
+            name="Editing SQL (Calcite) queries"
+            parentId="org.eclipse.mat.ui.editor">
+      </context>
+   </extension>
+   <extension
+         point="org.eclipse.ui.commands">
+      <command
+            categoryId="org.eclipse.ui.category.edit"
+            description="Runs the selected SQL, or the whole SQL editor"
+            id="com.github.vlsi.mat.calcite.execute"
+            name="Run SQL query">
+      </command>
+      <command
+            categoryId="org.eclipse.ui.category.edit"
+            description="Shows the execution plan of the selected SQL, or of the whole SQL editor"
+            id="com.github.vlsi.mat.calcite.explain"
+            name="Explain SQL query">
+      </command>
+      <command
+            categoryId="org.eclipse.ui.category.edit"
+            description="Completes table, column and function names in the SQL editor"
+            id="com.github.vlsi.mat.calcite.contentAssist"
+            name="SQL content assist">
+      </command>
+      <command
+            categoryId="org.eclipse.ui.category.edit"
+            description="Comments or uncomments the current line of the SQL editor"
+            id="com.github.vlsi.mat.calcite.toggleComment"
+            name="Toggle SQL comment">
+      </command>
+   </extension>
+   <extension
+         point="org.eclipse.ui.handlers">
+      <handler
+            class="com.github.vlsi.mat.calcite.editor.SqlEditorCommandHandler"
+            commandId="com.github.vlsi.mat.calcite.execute">
+      </handler>
+      <handler
+            class="com.github.vlsi.mat.calcite.editor.SqlEditorCommandHandler"
+            commandId="com.github.vlsi.mat.calcite.explain">
+      </handler>
+      <handler
+            class="com.github.vlsi.mat.calcite.editor.SqlEditorCommandHandler"
+            commandId="com.github.vlsi.mat.calcite.contentAssist">
+      </handler>
+      <handler
+            class="com.github.vlsi.mat.calcite.editor.SqlEditorCommandHandler"
+            commandId="com.github.vlsi.mat.calcite.toggleComment">
+      </handler>
+   </extension>
+   <extension
+         point="org.eclipse.ui.bindings">
+      <key
+            commandId="com.github.vlsi.mat.calcite.execute"
+            contextId="com.github.vlsi.mat.calcite.sqlEditor"
+            schemeId="org.eclipse.mat.scheme"
+            sequence="M1+ENTER">
+      </key>
+      <key
+            commandId="com.github.vlsi.mat.calcite.execute"
+            contextId="com.github.vlsi.mat.calcite.sqlEditor"
+            schemeId="org.eclipse.mat.scheme"
+            sequence="F5">
+      </key>
+      <key
+            commandId="com.github.vlsi.mat.calcite.explain"
+            contextId="com.github.vlsi.mat.calcite.sqlEditor"
+            schemeId="org.eclipse.mat.scheme"
+            sequence="F10">
+      </key>
+      <key
+            commandId="com.github.vlsi.mat.calcite.contentAssist"
+            contextId="com.github.vlsi.mat.calcite.sqlEditor"
+            schemeId="org.eclipse.mat.scheme"
+            sequence="CTRL+SPACE">
+      </key>
+      <key
+            commandId="com.github.vlsi.mat.calcite.toggleComment"
+            contextId="com.github.vlsi.mat.calcite.sqlEditor"
+            schemeId="org.eclipse.mat.scheme"
+            sequence="M1+/">
+      </key>
    </extension>
    <extension id="execute" point="org.eclipse.core.runtime.applications">
       <application

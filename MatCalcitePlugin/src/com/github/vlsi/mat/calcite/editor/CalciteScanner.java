@@ -5,16 +5,12 @@ import com.github.vlsi.mat.calcite.CalciteDataSource;
 import com.google.common.base.Splitter;
 import org.apache.calcite.jdbc.CalciteConnection;
 import org.apache.calcite.sql.parser.SqlAbstractParserImpl;
-import org.eclipse.jface.text.TextAttribute;
 import org.eclipse.jface.text.rules.IRule;
 import org.eclipse.jface.text.rules.IWhitespaceDetector;
 import org.eclipse.jface.text.rules.IWordDetector;
 import org.eclipse.jface.text.rules.RuleBasedScanner;
 import org.eclipse.jface.text.rules.Token;
 import org.eclipse.jface.text.rules.WordRule;
-import org.eclipse.swt.graphics.Color;
-import org.eclipse.swt.graphics.RGB;
-import org.eclipse.swt.widgets.Display;
 
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -45,10 +41,8 @@ public class CalciteScanner extends RuleBasedScanner {
     List<IRule> rules = new ArrayList<>();
 
     Token other = new Token(CalcitePartitionScanner.OTHER);
-    Token keywordToken = new Token(new TextAttribute(new Color(
-        Display.getCurrent(), new RGB(127, 0, 85))));
-    Token functionToken = new Token(new TextAttribute(new Color(
-        Display.getCurrent(), new RGB(26, 0, 192))));
+    Token keywordToken = SqlColors.token(SqlColors.KEYWORD);
+    Token functionToken = SqlColors.token(SqlColors.FUNCTION);
 
     // "other" class is importantThis is required so Eclipse does not try to highlight in the middle of the words
     WordRule keywordRule = new WordRule(new CalciteWordDetector(),

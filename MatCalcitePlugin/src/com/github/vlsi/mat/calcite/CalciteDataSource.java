@@ -34,6 +34,23 @@ public class CalciteDataSource {
 
   private static boolean initCompilerDone;
 
+  /**
+   * Returns the schema that {@link #getConnection(ISnapshot)} exposes as {@code HEAP}, building it on first use.
+   */
+  public static Schema getHeapSchema(ISnapshot snapshot) throws ExecutionException {
+    return SCHEMA_CACHE.get(snapshot);
+  }
+
+  /**
+   * Drops the schema of a snapshot that is being closed. The cache's keys are weak, but each schema refers to its
+   * snapshot, so an entry would otherwise never be dropped and would keep the closed snapshot in memory.
+   */
+  public static void dispose(ISnapshot snapshot) {
+    if (snapshot != null) {
+      SCHEMA_CACHE.invalidate(snapshot);
+    }
+  }
+
   public static Connection getConnection(ISnapshot snapshot)
       throws SQLException {
     initJanino();
