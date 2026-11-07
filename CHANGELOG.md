@@ -164,6 +164,13 @@
 - MCP `immediate_dominators` reports the true immediate dominators. MAT's query skips `java.*` dominators by
   default, which made JDK-held objects all show `<ROOT>`; the new `skip` argument restores that view on request.
 
+### Security
+- Updated bundled libraries with known vulnerabilities, over the versions Calcite 1.42.0 and Avatica 1.29.0
+  ask for: httpclient5 5.6.5 (CVE-2026-71290, CVE-2026-64607),
+  jackson-core 2.22.4 (CVE-2026-89407, CVE-2026-89425), commons-lang3 3.21.0 instead of 3.1
+  (CVE-2025-48924) and json-smart 2.6.1 (CVE-2026-113602). None of them is reachable from the plugin's own
+  code paths except jackson-core, through Calcite's JSON functions; scanners flag them by version.
+
 ### Notes
 - Only the MAT units this plugin needs are listed in the target (api, report, ui, parser, hprof).
   Pulling the full `org.eclipse.mat.feature.feature.group` would drag in `mat.chart`/`mat.chart.ui`
