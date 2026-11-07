@@ -1,5 +1,7 @@
 package com.github.vlsi.mat.calcite.schema.objects;
 
+import com.github.vlsi.mat.calcite.QueryCancellation;
+
 import com.google.common.collect.FluentIterable;
 import com.google.common.collect.ImmutableList;
 import com.google.common.primitives.Ints;
@@ -54,7 +56,7 @@ public class InstanceIdsByClassTable extends AbstractQueryableTable {
                   }
                 });
 
-        return Linq4j.iterableEnumerator(it);
+        return new CancellableEnumerator<>(Linq4j.iterableEnumerator(it));
       }
     };
   }
@@ -71,5 +73,39 @@ public class InstanceIdsByClassTable extends AbstractQueryableTable {
         Collections.singletonList(typeFactory.createJavaType(int.class)),
         Collections.singletonList("@ID")
     );
+  }
+
+  /**
+   * Stops the scan when its query is cancelled ({@link QueryCancellation}), e.g. by the MCP server. Calcite checks
+   * its own cancel flag only between result rows, so without this an aggregation over a large class could not be
+   * stopped until it had read every object.
+   */
+  static final class CancellableEnumerator<T> implements Enumerator<T> {
+    private final Enumerator<T> delegate;
+
+    CancellableEnumerator(Enumerator<T> delegate) {
+      this.delegate = delegate;
+    }
+
+    @Override
+    public T current() {
+      return delegate.current();
+    }
+
+    @Override
+    public boolean moveNext() {
+      QueryCancellation.check();
+      return delegate.moveNext();
+    }
+
+    @Override
+    public void reset() {
+      delegate.reset();
+    }
+
+    @Override
+    public void close() {
+      delegate.close();
+    }
   }
 }

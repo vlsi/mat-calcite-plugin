@@ -43,6 +43,48 @@ public abstract class AbstractQueriesTests {
     Assert.assertArrayEquals(sql, nnl(expected), nnl(actuals));
   }
 
+  /**
+   * Same as {@link #returnsInOrder(String, String...)}, but tolerant of MAT's own stack frame formatting.
+   *
+   * MAT renders the source location of a native method differently depending on its version. Before commit
+   * 0c72944e ("Bug 581644 - Allow stack frames as pseudo-objects for HPROF snapshots") it produced
+   * "(Native Method)"; from that commit on it also includes the source file, e.g.
+   * "(Object.java(Native Method))".
+   *
+   * That string never passes through plugin logic - SnapshotThreadStacksTable returns
+   * IStackFrame.getText() verbatim - so pinning the exact rendering only makes the test fail whenever MAT
+   * changes its own formatting, for reasons unrelated to what is actually being tested. This helper strips
+   * the optional source file prefix so the assertion still covers the stable, meaningful part: that
+   * native.ThreadStackFrames is queryable, sorts correctly, and reports the right thread, depth and method.
+   */
+  protected void returnsInOrderIgnoringStackFrameSourceFile(String sql, String... expected)
+      throws SQLException {
+    String[] actuals;
+    try {
+      actuals = executeToCSV(sql).toArray(new String[0]);
+    } catch (SQLException e) {
+      e.printStackTrace(); // tycho-surefire-plugin forces trimStackTrace=true
+      throw e;
+    }
+    Assert.assertArrayEquals(sql, stripStackFrameSourceFile(nnl(expected)),
+        stripStackFrameSourceFile(nnl(actuals)));
+  }
+
+  private static Object[] stripStackFrameSourceFile(Object[] lines) {
+    for (int i = 0; i < lines.length; i++) {
+      if (lines[i] instanceof String) {
+        // "(Object.java(Native Method))" -> "(Native Method)".
+        // The [^()] guard keeps ordinary "(ReferenceQueue.java:142)" line references untouched, because
+        // they are followed by ':' rather than by '('. Note the two trailing \\): one closes the inner
+        // "(Native Method)", the other closes the outer "(...java(Native Method))". Omitting the second
+        // leaves a dangling ")" in the result.
+        lines[i] = ((String) lines[i]).replaceAll(
+            "\\((?:[^()]+\\.(?:java|class))\\((Native Method|Compiled Code)\\)\\)", "($1)");
+      }
+    }
+    return lines;
+  }
+
   protected List<String> executeToCSV(String sql) throws SQLException {
     List<String> res = new ArrayList<>();
     System.out.println("sql = " + sql);

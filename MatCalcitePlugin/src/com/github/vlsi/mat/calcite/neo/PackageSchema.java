@@ -1,6 +1,7 @@
 package com.github.vlsi.mat.calcite.neo;
 
 import com.github.vlsi.mat.calcite.functions.CollectionsFunctions;
+import com.github.vlsi.mat.calcite.functions.DateFunctions;
 import com.github.vlsi.mat.calcite.functions.HeapFunctions;
 import com.github.vlsi.mat.calcite.functions.SnapshotFunctions;
 import com.github.vlsi.mat.calcite.functions.TableFunctions;
@@ -101,6 +102,7 @@ public class PackageSchema extends AbstractSchema {
       // Create functions for schema
       ImmutableMultimap.Builder<String, Function> builder = ImmutableMultimap.builder();
       builder.putAll(ScalarFunctionImpl.functions(HeapFunctions.class));
+      builder.putAll(ScalarFunctionImpl.functions(DateFunctions.class));
       builder.putAll(CollectionsFunctions.createAll());
       builder.putAll(TableFunctions.createAll());
       builder.putAll(SnapshotFunctions.createAll(snapshot));
@@ -137,6 +139,9 @@ public class PackageSchema extends AbstractSchema {
 
         // Make class available via "instanceof.package.name.ClassName"
         defaultSchema.addClass("instanceof." + fullClassName, withSubClasses);
+
+        // Make class available via instanceof."package.name.ClassName", like "package.name.ClassName" in the root
+        instanceOfPackage.addClass(fullClassName, withSubClasses);
 
         // Make class available via instanceof.package.name.ClassName
         PackageSchema instanceOfSchema = getPackage(instanceOfPackage, fullClassName);

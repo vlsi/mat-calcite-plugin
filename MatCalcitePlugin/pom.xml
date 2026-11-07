@@ -4,36 +4,86 @@
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>MatCalcitePlugin</artifactId>
-    <version>1.6.4-SNAPSHOT</version>
+    <version>2.0.0-SNAPSHOT</version>
     <packaging>eclipse-plugin</packaging>
     <name>Calcite SQL plugin</name>
 
     <parent>
         <groupId>com.github.vlsi.mat.calcite</groupId>
         <artifactId>parent</artifactId>
-        <version>1.6.4-SNAPSHOT</version>
+        <version>2.0.0-SNAPSHOT</version>
     </parent>
 
     <dependencies>
         <dependency>
             <groupId>net.minidev</groupId>
             <artifactId>accessors-smart</artifactId>
-            <version>2.6.0</version>
+            <version>2.6.1</version>
         </dependency>
         <dependency>
             <groupId>net.minidev</groupId>
             <artifactId>json-smart</artifactId>
-            <version>2.6.0</version>
+            <version>2.6.1</version>
+        </dependency>
+        <!--
+            Calcite 1.42.0 depends on Avatica 1.28.0, which has CVE-2026-70410 (unsafe reflection, CVSS 8.8),
+            fixed in 1.29.0. Keep this version in sync with MatCalciteTargetPlatform.target.
+            Declared before calcite-core on purpose: Avatica 1.29.0 brings Jackson 2.22, which the target
+            platform ships (Tycho takes the highest version), and Maven takes the first declaration, so the
+            plugin compiles against the same Jackson it runs with.
+        -->
+        <dependency>
+            <groupId>org.apache.calcite.avatica</groupId>
+            <artifactId>avatica-core</artifactId>
+            <version>1.29.0</version>
         </dependency>
         <dependency>
             <groupId>org.apache.calcite</groupId>
             <artifactId>calcite-core</artifactId>
-            <version>1.41.0</version>
+            <version>1.42.0</version>
         </dependency>
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-dbcp2</artifactId>
             <version>2.14.0</version>
+            <exclusions>
+                <!--
+                    commons-dbcp2 pulls in jakarta.transaction-api transitively. That artifact declares an
+                    unsatisfiable Import-Package (javax.enterprise.context) and, although it no longer
+                    provides them, still competes for the javax.transaction packages that Calcite and dbcp2
+                    actually need. Excluding it leaves org.apache.geronimo.specs:geronimo-jta_1.1_spec as the
+                    single provider of javax.transaction / javax.transaction.xa.
+                -->
+                <exclusion>
+                    <groupId>jakarta.transaction</groupId>
+                    <artifactId>jakarta.transaction-api</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <!--
+            Security updates of libraries the update site ships, over the versions Calcite 1.42.0 and
+            Avatica 1.29.0 ask for. Keep in sync with MatCalciteTargetPlatform.target.
+            - jackson-core 2.22.4 (Avatica asks for 2.22.2): CVE-2026-89407, CVE-2026-89425
+            - httpclient5 5.6.5 (Avatica asks for 5.5): CVE-2026-71290, CVE-2026-64607
+            - commons-lang3 3.21.0 (Calcite -> uzaygezen-core 0.2 asks for 3.1): CVE-2025-48924
+            json-smart 2.6.1 (CVE-2026-113602) is updated where it is declared.
+        -->
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-core</artifactId>
+            <version>2.22.4</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.httpcomponents.client5</groupId>
+            <artifactId>httpclient5</artifactId>
+            <version>5.6.5</version>
+            <scope>runtime</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
+            <version>3.21.0</version>
+            <scope>runtime</scope>
         </dependency>
         <dependency>
             <groupId>com.google.guava</groupId>

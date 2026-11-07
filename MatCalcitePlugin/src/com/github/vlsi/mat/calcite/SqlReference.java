@@ -1,0 +1,61 @@
+package com.github.vlsi.mat.calcite;
+
+/**
+ * Quick reference of the SQL dialect: shown by the SQL editor's "SQL Reference" tab and returned by the MCP server.
+ */
+public final class SqlReference {
+  public static final String TEXT = "SQL (Calcite) quick reference\n"
+      + "\n"
+      + "Keys:\n"
+      + "  F5, Ctrl+Enter   run the selected text, or the whole editor if nothing is selected\n"
+      + "  F10              explain plan (same as prefixing the query with: explain plan for)\n"
+      + "  Ctrl+Space       complete table, column and function names\n"
+      + "  Ctrl+/           comment or uncomment the current line\n"
+      + "\n"
+      + "Tables:\n"
+      + "  \"java.math.BigInteger\"               all BigIntegers\n"
+      + "  instanceof.\"java.util.AbstractMap\"   AbstractMap and every class that extends it\n"
+      + "                                       (superclasses only: heap dumps do not record interfaces,\n"
+      + "                                       so instanceof.\"java.util.Map\" is empty)\n"
+      + "  java.util.\"HashMap$Node\"             the same as \"java.util.HashMap$Node\", one schema per package\n"
+      + "  instanceof.java.lang.\"ref\".Reference package form: quote parts that are SQL words (ref, user...)\n"
+      + "  \"java.util.Date\"                     quote the whole name when a part is an SQL word: Date\n"
+      + "\n"
+      + "Virtual columns:\n"
+      + "  this['@shallow']       shallow heap size\n"
+      + "  this['@retained']      retained heap size\n"
+      + "  this['@class']         class\n"
+      + "  this['@className']     class name\n"
+      + "  this['@super']         superclass\n"
+      + "  this['@classLoader']   class loader\n"
+      + "  this['fieldName']      the same as getField(this, 'fieldName')\n"
+      + "  this['a.b.c']          the same as this['a']['b']['c']\n"
+      + "\n"
+      + "Functions:\n"
+      + "  toString(any)               string representation\n"
+      + "  getAddress(any)             address of the referenced object\n"
+      + "  getHexAddress(any)          the same as hex text, e.g. 0x7bfeb5848\n"
+      + "  getDominator(any)           immediate dominator, or null when dominated by the root\n"
+      + "  getType(any)                class name of the referenced object\n"
+      + "  shallowSize(any)            shallow heap size\n"
+      + "  retainedSize(any)           retained heap size\n"
+      + "  length(array)               length of an array reference\n"
+      + "  getSize(collection|map|array)\n"
+      + "                              size of a collection or map, or number of non-null array elements\n"
+      + "  getByKey(map, key)          map element for the key with the given string representation\n"
+      + "  getField(any, field name)   value of the field for the given object\n"
+      + "\n"
+      + "Dates and times (java.util.Date, java.sql.Date/Time/Timestamp, Calendar, java.time.Instant, LocalDate,\n"
+      + "LocalTime, LocalDateTime, ZonedDateTime, OffsetDateTime, Duration, and numbers as epoch milliseconds):\n"
+      + "  toDateTime(any)             readable text, e.g. 2026-10-01 11:11:11.224; points in time in UTC,\n"
+      + "                              Calendar/Zoned/OffsetDateTime in their own zone (named after the time)\n"
+      + "  toDateTime(any, zone)       points in time in a zone, e.g. toDateTime(this, 'Europe/Madrid');\n"
+      + "                              'jvm' is the dumped JVM's default zone (java.sql.Date/Time use it)\n"
+      + "  toEpochMillis(any[, zone])  epoch milliseconds; local date-times taken in the zone (default UTC)\n"
+      + "  millisToDateTime(long[, zone]), secondsToDateTime(long[, zone])   epoch number to readable text\n"
+      + "  toDuration(any)             java.time.Duration or milliseconds as e.g. 1d 2h 3m 4.567s\n"
+      + "  Note: Date is an SQL keyword, so quote the table: select toDateTime(this) from \"java.util.Date\"\n";
+
+  private SqlReference() {
+  }
+}
