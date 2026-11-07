@@ -5,16 +5,20 @@
 
     <groupId>com.github.vlsi.mat.calcite</groupId>
     <artifactId>parent</artifactId>
-    <version>1.6.4-SNAPSHOT</version>
+    <version>2.0.0-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>MAT Calcite plugin parent</name>
 
     <properties>
         <tycho-version>4.0.13</tycho-version>
-        <eclipse-repository>https://download.eclipse.org/releases/2022-12</eclipse-repository>
+        <!-- Must match the Eclipse platform targeted by MatCalciteTargetPlatform.target (MAT 1.17.0 builds against 4.40) -->
+        <eclipse-repository>https://download.eclipse.org/eclipse/updates/4.40</eclipse-repository>
+        <!-- Must match the MAT update site location in MatCalciteTargetPlatform.target -->
+        <mat-repository>https://download.eclipse.org/mat/1.17.0/update-site/</mat-repository>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <maven.compiler.source>17</maven.compiler.source>
-        <maven.compiler.target>17</maven.compiler.target>
+        <!-- Java 21 is mandatory: org.eclipse.mat.api declares Bundle-RequiredExecutionEnvironment: JavaSE-21 -->
+        <maven.compiler.source>21</maven.compiler.source>
+        <maven.compiler.target>21</maven.compiler.target>
     </properties>
 
     <modules>
@@ -30,6 +34,11 @@
             <id>Eclipse</id>
             <layout>p2</layout>
             <url>${eclipse-repository}</url>
+        </repository>
+        <repository>
+            <id>MAT</id>
+            <layout>p2</layout>
+            <url>${mat-repository}</url>
         </repository>
     </repositories>
 
@@ -118,7 +127,7 @@
                 <version>${tycho-version}</version>
                 <configuration>
                     <pomDependencies>wrapAsBundle</pomDependencies>
-                    <executionEnvironment>JavaSE-17</executionEnvironment>
+                    <executionEnvironment>JavaSE-21</executionEnvironment>
                     <target>
                         <artifact>
                             <groupId>com.github.vlsi.mat.calcite</groupId>

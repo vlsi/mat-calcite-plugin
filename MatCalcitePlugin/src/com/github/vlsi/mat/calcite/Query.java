@@ -45,7 +45,9 @@ public class Query implements IQuery {
     Statement st = null;
     ResultSet rs = null;
 
-    try {
+    // Cancel in MAT's progress view sets the listener's flag; the heap object scan checks it through QueryCancellation
+    try (QueryCancellation.Scope cancellation = QueryCancellation.enter(
+        listener == null ? () -> false : listener::isCanceled)) {
       con = CalciteDataSource.getConnection(snapshot);
 
       st = con.createStatement();
@@ -61,7 +63,6 @@ public class Query implements IQuery {
           && EXPLAIN_PLAN.matcher(sql).find()) {
         rowSet.absolute(1);
         String plan = rowSet.getString(1);
-        System.out.println("plan = " + plan);
         {
           Matcher ind = RENAME_INDEX.matcher(plan);
           StringBuffer sb = new StringBuffer();
