@@ -16,3 +16,4 @@ dependency-reduced-pom.xml
 
 # Windows image cache files
 Thumbs.db
+.github/workflows/node_modules/

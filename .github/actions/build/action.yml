@@ -1,15 +1,31 @@
 name: Build plugin
 description: Builds the plugin
+inputs:
+  maven_args:
+    required: false
+    description: Extra Maven arguments, such as -Pmat-latest to build against the newest MAT
+    default: ''
+  test_jvm_args:
+    required: false
+    description: Extra JVM options for the tests, such as a locale or a time zone
+    default: ''
+  upload_update_site:
+    required: false
+    description: Whether to attach the update site to the workflow run
+    default: 'true'
 runs:
   using: "composite"
   steps:
     - name: Test
       shell: bash
+      env:
+        BUILD_MAVEN_ARGS: ${{ inputs.maven_args }}
+        TEST_JVM_ARGS: ${{ inputs.test_jvm_args }}
       run: |
-        ./mvnw --color=always -B verify
+        ./mvnw --color=always -B $BUILD_MAVEN_ARGS "-Dtest.jvm.args=$TEST_JVM_ARGS" verify
     - uses: actions/upload-artifact@v7
       name: Attach generated update site as zip
-      if: runner.os == 'Linux'
+      if: inputs.upload_update_site == 'true'
       with:
         name: mat-calcite-plugin-update-site
         # actions/upload-artifact always creates .zip, so we specify directory here to prevent double zip archiving

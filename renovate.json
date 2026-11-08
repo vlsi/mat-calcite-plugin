@@ -3,37 +3,133 @@
   "extends": [
     "config:recommended"
   ],
-  "schedule": ["at any time"],
+  "schedule": [
+    "at any time"
+  ],
   "prConcurrentLimit": 10,
   "prHourlyLimit": 5,
   "platformAutomerge": true,
+  "customDatasources": {
+    "eclipse-mat-releases": {
+      "description": "Release directories of https://download.eclipse.org/mat/. It lists a release as soon as it ships, while the eclipse-mat/mat tags on GitHub can lag behind by months.",
+      "defaultRegistryUrlTemplate": "https://download.eclipse.org/mat/",
+      "format": "html"
+    },
+    "eclipse-updates": {
+      "description": "The release repository at https://download.eclipse.org/eclipse/updates/ links only the newest Eclipse release.",
+      "defaultRegistryUrlTemplate": "https://download.eclipse.org/eclipse/updates/",
+      "format": "html"
+    }
+  },
   "customManagers": [
     {
       "description": "Maven dependencies in Tycho target definitions. The branch name comes from depName, so an update lands in the same PR as the one for the pom.",
       "customType": "regex",
-      "managerFilePatterns": ["/\\.target$/"],
+      "managerFilePatterns": [
+        "/\\.target$/"
+      ],
       "matchStrings": [
         "<groupId>(?<groupId>[^<]+)</groupId>\\s*<artifactId>(?<artifactId>[^<]+)</artifactId>\\s*<version>(?<currentValue>[^<]+)</version>"
       ],
       "depNameTemplate": "{{{groupId}}}:{{{artifactId}}}",
       "datasourceTemplate": "maven",
       "versioningTemplate": "maven"
+    },
+    {
+      "description": "The oldest supported MAT: its update site in the main target definition, the lowest bundle-version of the MAT bundles in the manifests, and the version README.md names.",
+      "customType": "regex",
+      "managerFilePatterns": [
+        "/^MatCalciteTargetPlatform/MatCalciteTargetPlatform\\.target$/",
+        "/(^|/)META-INF/MANIFEST\\.MF$/",
+        "/^README\\.md$/"
+      ],
+      "matchStrings": [
+        "download\\.eclipse\\.org/mat/(?<currentValue>\\d+\\.\\d+\\.\\d+)/update-site/",
+        "org\\.eclipse\\.mat\\.[a-z]+;bundle-version=\"(?<currentValue>\\d+\\.\\d+\\.\\d+)\"",
+        "Eclipse Memory Analyzer (?<currentValue>\\d+\\.\\d+\\.\\d+)"
+      ],
+      "depNameTemplate": "eclipse-mat",
+      "packageNameTemplate": "eclipse-mat/mat",
+      "datasourceTemplate": "github-tags",
+      "extractVersionTemplate": "^R_(?<version>\\d+\\.\\d+\\.\\d+)$",
+      "versioningTemplate": "semver"
+    },
+    {
+      "description": "The newest MAT, in the target definition the tests also run against.",
+      "customType": "regex",
+      "managerFilePatterns": [
+        "/^MatCalciteTargetPlatform/mat-latest\\.target$/"
+      ],
+      "matchStrings": [
+        "download\\.eclipse\\.org/mat/(?<currentValue>\\d+\\.\\d+\\.\\d+)/update-site/"
+      ],
+      "depNameTemplate": "eclipse-mat-latest",
+      "datasourceTemplate": "custom.eclipse-mat-releases",
+      "extractVersionTemplate": "^/mat/(?<version>\\d+\\.\\d+\\.\\d+)$",
+      "versioningTemplate": "semver"
+    },
+    {
+      "description": "The newest Eclipse release, in the target definition the tests also run against.",
+      "customType": "regex",
+      "managerFilePatterns": [
+        "/^MatCalciteTargetPlatform/mat-latest\\.target$/"
+      ],
+      "matchStrings": [
+        "download\\.eclipse\\.org/eclipse/updates/(?<currentValue>4\\.\\d+)/"
+      ],
+      "depNameTemplate": "eclipse-platform-latest",
+      "datasourceTemplate": "custom.eclipse-updates",
+      "extractVersionTemplate": "^(?<version>4\\.\\d+)$",
+      "versioningTemplate": "loose"
     }
   ],
   "packageRules": [
     {
-      "matchPackageNames": ["org.codehaus.janino:**"],
+      "matchPackageNames": [
+        "org.codehaus.janino:**"
+      ],
       "groupName": "org.codehaus.janino"
     },
     {
-      "matchUpdateTypes": ["minor", "patch", "pin", "digest"],
+      "matchUpdateTypes": [
+        "minor",
+        "patch",
+        "pin",
+        "digest"
+      ],
       "automerge": true
     },
     {
-      "matchManagers": ["github-actions"],
-      "matchPackageNames": ["actions/*"],
-      "matchUpdateTypes": ["major"],
+      "matchManagers": [
+        "github-actions"
+      ],
+      "matchPackageNames": [
+        "actions/*"
+      ],
+      "matchUpdateTypes": [
+        "major"
+      ],
       "automerge": true
+    },
+    {
+      "description": "The plugin supports the newest MAT release that is at least two years old, see \"Supported versions\" in README.md. Raising it drops users of older MAT, so a maintainer merges it.",
+      "matchDepNames": [
+        "eclipse-mat"
+      ],
+      "minimumReleaseAge": "730 days",
+      "internalChecksFilter": "strict",
+      "groupName": "oldest supported MAT",
+      "automerge": false,
+      "prBodyNotes": [
+        "Raising the oldest supported MAT drops users of older MAT releases. Before merging, update by hand:\n\n- the Eclipse release in `MatCalciteTargetPlatform/MatCalciteTargetPlatform.target`: the one this MAT builds against;\n- if this MAT needs a newer Java: `mat.executionEnvironment` in `pom.xml`, `Bundle-RequiredExecutionEnvironment` in `MatCalcitePlugin/META-INF/MANIFEST.MF`, and the Java versions in `README.md`;\n- the entry under `[Unreleased]` in `CHANGELOG.md`."
+      ]
+    },
+    {
+      "matchDepNames": [
+        "eclipse-mat-latest",
+        "eclipse-platform-latest"
+      ],
+      "groupName": "newest MAT"
     }
   ]
 }

@@ -16,7 +16,7 @@ See [Calcite SQL reference](https://calcite.apache.org/docs/reference.html)
 Installation
 ------------
 
-Requirements: Java 17+, Eclipse Memory Analyzer 0.14.0+
+Requirements: Java 17+, Eclipse Memory Analyzer 1.15.0+, see [Supported versions](#supported-versions)
 
 There are two update channels:
  * https://vlsi.github.io/mat-calcite-plugin-update-site/stable (stable releases)
@@ -34,6 +34,16 @@ To install Calcite SQL plugin, perform the following:
 1. Click `Next` (Installation Details)
 1. Accept License
 1. Click `Finish` and restart MAT
+
+Supported versions
+------------------
+
+The plugin supports the newest Eclipse Memory Analyzer release that is at least two years old, and every release after
+it. The oldest supported release is Eclipse Memory Analyzer 1.15.0, which runs on Java 17.
+CI tests the plugin against both the oldest supported and the newest MAT release.
+
+When a MAT release turns two years old, Renovate opens a pull request that raises the minimum, and the plugin release
+that follows requires that MAT.
 
 Early access versions
 ---------------------
@@ -233,7 +243,9 @@ Requirements
 ------------
 Java 17 as a build JDK.
 The code can use all Java 17 features.
-Eclipse Memory Analyzer 0.14.0 or higher
+
+The build compiles and tests against the oldest supported MAT, see [Supported versions](#supported-versions).
+To test against the newest MAT, which requires Java 21, run `./mvnw -Pmat-latest verify`.
 
 Building
 --------
