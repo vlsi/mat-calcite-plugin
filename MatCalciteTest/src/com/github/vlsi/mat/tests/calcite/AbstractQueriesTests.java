@@ -8,8 +8,14 @@ import org.eclipse.mat.snapshot.ISnapshot;
 import org.eclipse.mat.snapshot.SnapshotFactory;
 import org.eclipse.mat.util.VoidProgressListener;
 import org.junit.Assert;
+import org.osgi.framework.FrameworkUtil;
 
 import java.io.File;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.DirectoryStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -22,9 +28,38 @@ public abstract class AbstractQueriesTests {
 
   protected abstract ISnapshot getSnapshot();
 
-  protected static ISnapshot openSnapshot(File heapDump) throws SnapshotException {
+  protected static ISnapshot openSnapshot(File heapDump) throws SnapshotException, IOException {
     System.out.println("exists = " + heapDump.exists() + ", file = " + heapDump.getAbsolutePath());
+    deleteIndexesOfOtherMatVersion(heapDump.toPath());
     return SnapshotFactory.openSnapshot(heapDump, new VoidProgressListener());
+  }
+
+  /**
+   * Deletes the index files of the heap dump unless the running MAT version wrote them.
+   *
+   * <p>MAT opens the {@code *.index} and {@code *.threads} files next to the dump instead of
+   * parsing the dump again, so indexes left by an older MAT would make the tests check that
+   * version's output. The MAT version that wrote the indexes is kept next to them, in a file named
+   * after the dump with the {@code mat-version} extension, such as {@code mvn1m_jdk18.mat-version}.
+   */
+  private static void deleteIndexesOfOtherMatVersion(Path heapDump) throws IOException {
+    String matVersion = FrameworkUtil.getBundle(SnapshotFactory.class).getVersion().toString();
+    String fileName = heapDump.getFileName().toString();
+    // For mvn1m_jdk18.hprof, MAT writes mvn1m_jdk18.index, mvn1m_jdk18.idx.index, mvn1m_jdk18.threads, and so on
+    String prefix = fileName.substring(0, fileName.lastIndexOf('.') + 1);
+    Path dir = heapDump.toAbsolutePath().getParent();
+    Path versionFile = dir.resolve(prefix + "mat-version");
+    if (Files.exists(versionFile)
+        && new String(Files.readAllBytes(versionFile), StandardCharsets.UTF_8).equals(matVersion)) {
+      return;
+    }
+    try (DirectoryStream<Path> files = Files.newDirectoryStream(dir, prefix + "{index,*.index,threads}")) {
+      for (Path file : files) {
+        System.out.println("Deleting " + file + ": no record that MAT " + matVersion + " wrote it");
+        Files.delete(file);
+      }
+    }
+    Files.write(versionFile, matVersion.getBytes(StandardCharsets.UTF_8));
   }
 
   public static void closeSnapshot(ISnapshot snapshot) {

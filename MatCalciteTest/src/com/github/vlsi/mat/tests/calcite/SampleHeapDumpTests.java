@@ -6,12 +6,13 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 
 import java.io.File;
+import java.io.IOException;
 
 public abstract class SampleHeapDumpTests extends AbstractQueriesTests {
   protected static ISnapshot snapshot;
 
   @BeforeClass
-  public static void openSnapshot() throws SnapshotException {
+  public static void openSnapshot() throws SnapshotException, IOException {
     snapshot = openSnapshot(new File("dumps", "mvn1m_jdk18.hprof"));
   }
 
