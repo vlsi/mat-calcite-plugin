@@ -12,6 +12,12 @@
     <properties>
         <tycho-version>4.0.13</tycho-version>
         <eclipse-repository>https://download.eclipse.org/releases/2022-12</eclipse-repository>
+        <!-- The target definition in MatCalciteTargetPlatform: empty for the main one, with the oldest supported MAT -->
+        <mat.target/>
+        <!-- The Java version the oldest supported MAT requires -->
+        <mat.executionEnvironment>JavaSE-17</mat.executionEnvironment>
+        <!-- Extra JVM options for the tests, such as a locale or a time zone -->
+        <test.jvm.args/>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.source>17</maven.compiler.source>
         <maven.compiler.target>17</maven.compiler.target>
@@ -85,14 +91,6 @@
         </dependencies>
     </dependencyManagement>
 
-    <repositories>
-        <repository>
-            <id>Eclipse</id>
-            <layout>p2</layout>
-            <url>${eclipse-repository}</url>
-        </repository>
-    </repositories>
-
     <build>
         <plugins>
             <plugin>
@@ -159,7 +157,7 @@
                 <artifactId>tycho-surefire-plugin</artifactId>
                 <version>${tycho-version}</version>
                 <configuration>
-                    <argLine>-ea -Xmx768m -Dcalcite.debug=${calcite.debug}</argLine>
+                    <argLine>-ea -Xmx768m -Dcalcite.debug=${calcite.debug} ${test.jvm.args}</argLine>
                     <!--<debugPort>5005</debugPort>-->
                     <!--<testFailureIgnore>true</testFailureIgnore>-->
                     <includes>
@@ -178,12 +176,13 @@
                 <version>${tycho-version}</version>
                 <configuration>
                     <pomDependencies>wrapAsBundle</pomDependencies>
-                    <executionEnvironment>JavaSE-17</executionEnvironment>
+                    <executionEnvironment>${mat.executionEnvironment}</executionEnvironment>
                     <target>
                         <artifact>
                             <groupId>com.github.vlsi.mat.calcite</groupId>
                             <artifactId>MatCalciteTargetPlatform</artifactId>
                             <version>${project.version}</version>
+                            <classifier>${mat.target}</classifier>
                         </artifact>
                     </target>
                     <environments>
@@ -212,4 +211,16 @@
             </plugin>
         </plugins>
     </build>
+
+    <profiles>
+        <profile>
+            <!-- Builds and tests against the newest MAT, see MatCalciteTargetPlatform/mat-latest.target -->
+            <id>mat-latest</id>
+            <properties>
+                <mat.target>mat-latest</mat.target>
+                <!-- The Java version the newest MAT requires -->
+                <mat.executionEnvironment>JavaSE-21</mat.executionEnvironment>
+            </properties>
+        </profile>
+    </profiles>
 </project>

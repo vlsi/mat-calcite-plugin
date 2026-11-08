@@ -1,4 +1,6 @@
 ## [Unreleased]
+### Changed
+- Eclipse Memory Analyzer 1.15.0 or higher is required. The plugin supports the newest MAT release that is at least two years old, see "Supported versions" in README.md
 
 ## [1.6.2] - 2023-11-17
 ### Fixed

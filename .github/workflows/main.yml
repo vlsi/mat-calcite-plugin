@@ -7,6 +7,12 @@ on:
   pull_request:
     branches:
       - '**'
+  # Replays the matrix of an earlier run: its seed is in the step summary of "Matrix Preparation"
+  workflow_dispatch:
+    inputs:
+      matrix_rng_seed:
+        description: RNG seed
+        required: false
 
 concurrency:
   # On main/release, we don't want any jobs cancelled so the sha is used to name the group
@@ -16,26 +22,49 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  matrix_prep:
+    name: Matrix Preparation
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.set-matrix.outputs.matrix }}
+    env:
+      MATRIX_JOBS: 4
+      # Every push to a pull request draws the same jobs
+      GITHUB_PR_NUMBER: ${{ github.event.number }}
+      RNG_SEED: ${{ github.event.inputs.matrix_rng_seed }}
+    steps:
+      - name: Checkout sources
+        uses: actions/checkout@v7
+      - id: set-matrix
+        name: Generate the matrix
+        shell: bash
+        run: |
+          npm ci --prefix .github/workflows
+          node .github/workflows/matrix.mjs
+
   build-test:
+    needs: matrix_prep
     strategy:
-      matrix:
-        java: [ 17 ]
-        os: [ ubuntu-latest, windows-latest ]
-    name: 'Test, ${{ matrix.os }}, java ${{ matrix.java }}'
-    runs-on: ${{ matrix.os }}
+      fail-fast: false
+      matrix: ${{ fromJson(needs.matrix_prep.outputs.matrix) }}
+    name: ${{ matrix.name }}
+    runs-on: ${{ matrix.runs_on }}
     steps:
       - name: Checkout sources
         uses: actions/checkout@v7
       - name: Setup Java
         uses: ./.github/actions/setup_java
         with:
-          java_version: ${{ matrix.java }}
+          java_version: ${{ matrix.java_version }}
+          java_distribution: ${{ matrix.java_distribution }}
       - name: Build
         uses: ./.github/actions/build
         with:
-          java_version: ${{ matrix.java }}
+          maven_args: ${{ matrix.maven_args }}
+          test_jvm_args: ${{ matrix.test_jvm_args }}
+          upload_update_site: ${{ matrix.publish }}
       - name: Publish Eclipse update site
-        if: runner.os == 'Linux' && github.repository == 'vlsi/mat-calcite-plugin' && github.ref == 'refs/heads/main'
+        if: matrix.publish && github.repository == 'vlsi/mat-calcite-plugin' && github.ref == 'refs/heads/main'
         uses: ./.github/actions/publish-update-site
         with:
           update_site_token:
@@ -43,7 +72,7 @@ jobs:
 
   ci-gate:
     name: CI Gate
-    needs: [build-test]
+    needs: [matrix_prep, build-test]
     if: always()
     runs-on: ubuntu-latest
     steps:

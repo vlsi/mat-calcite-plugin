@@ -5,13 +5,17 @@ inputs:
     required: true
     description: Java version for building the plugin
     default: '17'
+  java_distribution:
+    required: false
+    description: Java distribution, as actions/setup-java names it
+    default: zulu
 runs:
   using: "composite"
   steps:
     - name: 'Set up JDK ${{ inputs.java_version }}'
       uses: actions/setup-java@v6
       with:
-        distribution: zulu
+        distribution: ${{ inputs.java_distribution }}
         java-version: ${{ inputs.java_version }}
     - name: Cache local Maven repository
       uses: actions/cache@v6
