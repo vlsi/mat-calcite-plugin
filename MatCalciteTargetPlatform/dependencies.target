@@ -18,7 +18,7 @@
                 <dependency>
                     <groupId>org.apache.calcite</groupId>
                     <artifactId>calcite-core</artifactId>
-                    <version>1.36.0</version>
+                    <version>1.42.0</version>
                 </dependency>
                 <!-- Calcite asks for an older Avatica; Avatica before 1.29.0 has CVE-2026-70410 -->
                 <dependency>
