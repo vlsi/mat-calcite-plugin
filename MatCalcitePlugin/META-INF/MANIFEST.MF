@@ -49,4 +49,5 @@ Import-Package: com.fasterxml.jackson.core.util,
  org.apache.commons.text.similarity,
  org.codehaus.commons.compiler,
  org.codehaus.janino,
+ org.joou,
  org.locationtech.jts.geom

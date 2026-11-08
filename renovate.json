@@ -7,9 +7,22 @@
   "prConcurrentLimit": 10,
   "prHourlyLimit": 5,
   "platformAutomerge": true,
+  "customManagers": [
+    {
+      "description": "Maven dependencies in Tycho target definitions. The branch name comes from depName, so an update lands in the same PR as the one for the pom.",
+      "customType": "regex",
+      "managerFilePatterns": ["/\\.target$/"],
+      "matchStrings": [
+        "<groupId>(?<groupId>[^<]+)</groupId>\\s*<artifactId>(?<artifactId>[^<]+)</artifactId>\\s*<version>(?<currentValue>[^<]+)</version>"
+      ],
+      "depNameTemplate": "{{{groupId}}}:{{{artifactId}}}",
+      "datasourceTemplate": "maven",
+      "versioningTemplate": "maven"
+    }
+  ],
   "packageRules": [
     {
-      "matchPackagePrefixes": ["org.codehaus.janino"],
+      "matchPackageNames": ["org.codehaus.janino:**"],
       "groupName": "org.codehaus.janino"
     },
     {
