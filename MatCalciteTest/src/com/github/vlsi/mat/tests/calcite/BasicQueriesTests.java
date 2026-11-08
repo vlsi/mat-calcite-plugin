@@ -62,7 +62,7 @@ public class BasicQueriesTests extends SampleHeapDumpTests {
   public void testStackTraces() throws SQLException {
     returnsInOrder("select thread, depth, text from native.ThreadStackFrames order by 1, 2, 3 limit 2",
         "thread|depth|text",
-        "Finalizer|0|at java.lang.Object.wait(J)V (Native Method)",
+        "Finalizer|0|at java.lang.Object.wait(J)V (Object.java(Native Method))",
         "Finalizer|1|at java.lang.ref.ReferenceQueue.remove(J)Ljava/lang/ref/Reference; (ReferenceQueue.java:142)");
   }
 
